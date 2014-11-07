@@ -2,8 +2,9 @@
 
 namespace app\models;
 
-use Yii;
 
+use Yii;
+use \NumberFormatter;
 /**
  * This is the model class for table "account_invoice_line".
  *
@@ -106,6 +107,14 @@ class AccountInvoiceLine extends \yii\db\ActiveRecord
 
     public static function defaultOrder($query){
         return $query->orderBy('no desc');
+    }
+
+
+    public function afterFind(){
+        $this->price_subtotal = number_format($this->price_subtotal,2,',','.');
+        // $this->price_subtotal = Yii::$app->formatter->asCurrency($this->price_subtotal,'',[],[NumberFormatter::DECIMAL_SEPARATOR_SYMBOL=>',']);
+
+        return true;
     }
 
     /**

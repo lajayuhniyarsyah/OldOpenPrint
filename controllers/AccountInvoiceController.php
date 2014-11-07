@@ -48,7 +48,7 @@ class AccountInvoiceController extends Controller
         
         $model = $this->findModel($id);
 
-        return $this->render('print',['model'=>$model]);
+        return $this->render('print/fp_rp',['model'=>$model]);
     }
 
     /**

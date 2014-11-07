@@ -184,7 +184,7 @@ use yii\helpers\Url;
 										
 									</td>
 									<td class="border-left"><?=$move->product_qty.' '.$move->productUom->name?></td>
-									<td class="border-left"><?=$move->name?></td>
+									<td class="border-left"><?=($move->name ? $move->name:$move->desc)?></td>
 									<td class="border-left border-right"><?=$move->product->default_code?></td>
 								</tr>
 							<?php

@@ -86,9 +86,9 @@
 </style>
 
 <?php
-
+$pages=1;
 ?>
-<div class="main">
+<div class="main<?=$pages?>">
 	<div class="header">
 		<div class="kwitansiNo">Inv. <?= $model->kwitansi ?></div>
 		<div class="noPajak"><?= $model->faktur_pajak_no; ?></div>
@@ -104,7 +104,7 @@
 		</div>
 	</div>
 	<div class="content">
-		<table width="100%">
+		<table id="contentTable" width="100%">
 			<tbody>
 			<?php foreach($model->accountInvoiceLines as $invoiceLine): ?>
 				<tr>
@@ -142,3 +142,8 @@
 </div>
 
 
+<?php
+$this->registerJs('
+	console.log(jQuery(\'.main1\').height());
+');
+?>

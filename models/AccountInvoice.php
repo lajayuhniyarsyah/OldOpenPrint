@@ -152,6 +152,20 @@ class AccountInvoice extends \yii\db\ActiveRecord
         ];
     }
 
+    public function afterFind(){
+        /*$this->amount_untaxed = number_format($this->amount_untaxed,2,',','.');
+        $this->amount_tax = number_format($this->amount_tax,2,',','.');*/
+        $this->amount_tax = $this->numberFormat($this->amount_tax);
+        $this->amount_untaxed = $this->numberFormat($this->amount_untaxed);
+        $this->amount_total = $this->numberFormat($this->amount_total);
+        return true;
+    }
+
+    private function numberFormat($val){
+        return number_format($val,2,',','.');
+    }
+
+    
     /**
      * @return \yii\db\ActiveQuery
      */
