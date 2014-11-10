@@ -48,7 +48,14 @@ class AccountInvoiceController extends Controller
         
         $model = $this->findModel($id);
 
-        return $this->render('print/fp_rp',['model'=>$model]);
+        if($model->currency->name=='IDR' and $model->currency->id==13)
+        {
+            // if Rupiah
+            return $this->render('print/fp_rp',['model'=>$model]);
+        }else{
+            return $this->render('print/fp_valas',['model'=>$model]);
+        }
+        
     }
 
     /**

@@ -86,7 +86,7 @@ use yii\helpers\Url;
 						</td>
 						<td>
 							<div id="heading">
-								<span class="boldBig">PT.SUPRABAKTI MANDIRI</span>
+								<span class="boldBig">PT. SUPRABAKTI MANDIRI</span>
 								<span class="fontLitle">Jl.Danau Sunter UtaraBlok A No.9 Sunter Jakarta Utara 14350-INDONESIA</span>
 								<span class="fontLitle">Telephone : +62 21 658 33666, Fax : +62 21 658 31666</span>
 								<div style="height:20px;">&nbsp;</div>
@@ -109,14 +109,16 @@ use yii\helpers\Url;
 								<tr>
 									<td width="10%">To</td>
 									<td>:</td>
-									<td><?=$partner->comment?></td>
+									<td>
+									<?=$partner->name?><br/>
+									<?=$partner->comment?></td>
 								</tr>
 							</table>
 						</td>
 						<td>
 							<table>
 								<tr>
-									<td width="42%">IM NO</td>
+									<td style="width:61%;">IM NO</td>
 									<td>:</td>
 									<td><?=$model->name?></td>
 								</tr>
