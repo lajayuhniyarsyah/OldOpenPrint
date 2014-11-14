@@ -6,5 +6,4 @@ protected/data/*.db
 themes/classic/views/
 runtime/*
 vendor/*
-config/*
 config/db.php
