@@ -52,12 +52,12 @@ use app\assets\AppAsset;
         }
     </style>
     <?php
-        $this->registerJs('
+        /*$this->registerJs('
             jQuery(\'#btnSetting\').click(function(){
                 jQuery(\'#absoluteWrapper\').show();
                 return false;
             });
-        ');
+        ',\yii\web\View::POS_HEAD);*/
     ?>
 </head>
 <body>

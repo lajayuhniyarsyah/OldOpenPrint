@@ -130,7 +130,7 @@ use yii\helpers\Url;
 								<tr>
 									<td>Delivery Date</td>
 									<td>:</td>
-									<td contenteditable="true">
+									<td>
 										<?=Yii::$app->formatter->asDatetime($model->min_date, "php:d-m-Y");?>
 									</td>
 								</tr>
@@ -155,23 +155,22 @@ use yii\helpers\Url;
 					</thead>
 					<tbody>
 					<?php $move_set_printed = [];$countLines = count($model->stockMoves); ?>
-					<?php $renderedRow = 0; ?>
 					<?php foreach($model->stockMoves as $k=>$move): ?>
-							
+						
 							<?php
 							// JIKA MOVE SET DATA TIDAK ADA DAN BELUM ADA YG DI PRINTED STOCK MOVE REF DARI MOVE SET DATA
 							if(isset($move->set) && !isset($move_set_printed[$move->set_id])):
 							?>
-								<tr id="trLine<?=$k?>">
+								<tr>
 									<td class="border-left"><?= $move->set->no ?></td>
 									<td class="border-left">
-										<?=$move->set->product_qty.' '.$move->set->productUom->name?>
+										<?=$move->set->product_qty.' '.$move->set->productUom->name?>O
 									</td>
 									<td class="border-left">
 										<?=$move->set->product->name_template?>
 										<div>
 											Consist Of :
-											<ul id="listConsistOf<?=$move->set_id?>" style="margin-top:1mm;"></ul>
+											<ul id="listConsistOf<?=$move->set_id?>"></ul>
 										</div>
 
 									</td>
@@ -179,19 +178,18 @@ use yii\helpers\Url;
 									<?php $move_set_printed[$move->set_id][] = $move->id; ?>
 								</tr>
 							<?php
-								$renderedRow=$renderedRow+1;
 							elseif(!isset($move_set_printed[$move->set_id])):
 							?>
-								<tr id="trLine<?=$k?>">
-									<td contenteditable="true" style="<?php if($countLines==1 || ($countLines>1 and $countLines<4 and ($k+1)==$countLines)): echo 'height:'.(200-($countLines*30)).'px;'; endif; ?>" class="border-left">
+								<tr>
+									<td style="<?php if($countLines==1 || ($countLines>1 and $countLines<4 and ($k+1)==$countLines)): echo 'height:'.(200-($countLines*30)).'px;'; endif; ?>" class="border-left">
 										<?= $move->no ?>
+										
 									</td>
-									<td class="border-left canEdit" contenteditable="true"><?=$move->product_qty.' '.$move->productUom->name?></td>
-									<td class="border-left canEdit" contenteditable="true"><?=($move->name ? nl2br($move->name):nl2br($move->desc))?></td>
-									<td class="border-left border-right canEdit" contenteditable="true"><?=$move->product->default_code?> <a class="deleteRow hideOnPrint" style="position:absolute;right:0;cursor:pointer;" ref="<?=$k?>">X</a></td>
+									<td class="border-left"><?=$move->product_qty.' '.$move->productUom->name?></td>
+									<td class="border-left"><?=($move->name ? nl2br($move->name):nl2br($move->desc))?></td>
+									<td class="border-left border-right"><?=$move->product->default_code?></td>
 								</tr>
 							<?php
-								$renderedRow=$renderedRow+1;
 							elseif(isset($move_set_printed[$move->set_id])):
 								$move_set_printed[$move->set_id][] = $move->id;
 							endif;
@@ -281,7 +279,7 @@ foreach($move_set_printed as $set=>$childs):
 	foreach($childs as $child):
 		$moveChild = app\models\StockMove::findOne($child);
 		// echo $moveChild->product->name_template;
-		$setTo .='<li>['.$moveChild->product->default_code.'] '.$moveChild->product->name_template.'</li>';
+		$setTo .='<li>['.$moveChild->product->default_code.'] '.$moveChild->product->name_template.' ('.$moveChild->product_qty.' '.$moveChild->productUom->name.')</li>';
 	endforeach;
 	$scr = '
 		jQuery(\'#listConsistOf'.$set.'\').html(\''.$setTo.'\')
@@ -289,25 +287,4 @@ foreach($move_set_printed as $set=>$childs):
 	$this->registerJs($scr,yii\web\View::POS_END);
 endforeach;
 
-?>
-
-<?php
-$this->registerJsFile(Url::base().'/js/ckeditor/ckeditor.js',['position'=>\yii\web\View::POS_HEAD]);
-
-// $this->registerJsFile(Url::base().'/js/ckeditor/adapters/jquery.js',['position'=>\yii\web\View::POS_END]);
-$scr = "";
-for($l=1;$l<=$renderedRow;$l++){
-	$scr .= "CKEDITOR.inline('isiLine".($l-1)."');";
-}
-
-$scr2 ='
-	jQuery(\'.deleteRow\').click(function(){
-		console.log(jQuery(this).attr(\'ref\'));
-		jQuery(\'#trLine\'+jQuery(this).attr(\'ref\')).remove();
-	});
-';
-
-
-
-$this->registerJs($scr2);
 ?>

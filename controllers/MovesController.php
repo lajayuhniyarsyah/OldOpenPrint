@@ -81,6 +81,41 @@ class MovesController extends Controller
         return $this->render($renderTo,['model'=>$model,'partner'=>$partner,'page'=>$page,'maxItemPerPage'=>$maxItemPerPage,'user'=>$user]);
     }
 
+    public function actionPrintTest($id,$uid,$page=1,$maxItemPerPage=17){
+        $this->layout = 'printout';
+        $model = $this->findModel($id);
+        $dest = [];
+        $locDest = null;
+
+        $user = \app\models\ResUsers::findOne($uid);
+        // var_dump(count($model->stockMoves));
+        $renderTo = 'print';
+        if($model->type == 'in'){
+
+        }elseif($model->type=='out'){
+
+        }elseif($model->type=='internal'){
+            $renderTo='printDummy';
+        }else{
+
+        }
+        foreach($model->stockMoves as $move):
+            if(!isset($dest[$move->location_dest_id])){
+                $dest[$move->location_dest_id] = $move->locationDest->id;
+                $locDest = $move->location_dest_id;
+            }
+        endforeach;
+        $partner = false;
+        if(count($dest)!=1){
+            throw new \yii\web\NotAcceptableHttpException("Something Wrong With data that Your Trying to Access");
+        }else{
+
+            $partner = StockLocation::findOne($locDest);
+        }
+
+        return $this->render($renderTo,['model'=>$model,'partner'=>$partner,'page'=>$page,'maxItemPerPage'=>$maxItemPerPage,'user'=>$user]);
+    }
+
     /**
      * Displays a single StockPicking model.
      * @param integer $id

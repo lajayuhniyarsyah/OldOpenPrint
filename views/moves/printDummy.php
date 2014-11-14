@@ -130,7 +130,7 @@ use yii\helpers\Url;
 								<tr>
 									<td>Delivery Date</td>
 									<td>:</td>
-									<td contenteditable="true">
+									<td>
 										<?=Yii::$app->formatter->asDatetime($model->min_date, "php:d-m-Y");?>
 									</td>
 								</tr>
@@ -165,13 +165,13 @@ use yii\helpers\Url;
 								<tr id="trLine<?=$k?>">
 									<td class="border-left"><?= $move->set->no ?></td>
 									<td class="border-left">
-										<?=$move->set->product_qty.' '.$move->set->productUom->name?>
+										<?=$move->set->product_qty.' '.$move->set->productUom->name?>O
 									</td>
 									<td class="border-left">
 										<?=$move->set->product->name_template?>
 										<div>
 											Consist Of :
-											<ul id="listConsistOf<?=$move->set_id?>" style="margin-top:1mm;"></ul>
+											<ul id="listConsistOf<?=$move->set_id?>"></ul>
 										</div>
 
 									</td>
@@ -281,7 +281,7 @@ foreach($move_set_printed as $set=>$childs):
 	foreach($childs as $child):
 		$moveChild = app\models\StockMove::findOne($child);
 		// echo $moveChild->product->name_template;
-		$setTo .='<li>['.$moveChild->product->default_code.'] '.$moveChild->product->name_template.'</li>';
+		$setTo .='<li>['.$moveChild->product->default_code.'] '.$moveChild->product->name_template.' ('.$moveChild->product_qty.' '.$moveChild->productUom->name.')</li>';
 	endforeach;
 	$scr = '
 		jQuery(\'#listConsistOf'.$set.'\').html(\''.$setTo.'\')
@@ -292,6 +292,7 @@ endforeach;
 ?>
 
 <?php
+echo $renderedRow;
 $this->registerJsFile(Url::base().'/js/ckeditor/ckeditor.js',['position'=>\yii\web\View::POS_HEAD]);
 
 // $this->registerJsFile(Url::base().'/js/ckeditor/adapters/jquery.js',['position'=>\yii\web\View::POS_END]);
