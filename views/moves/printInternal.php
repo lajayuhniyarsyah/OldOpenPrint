@@ -163,11 +163,11 @@ use yii\helpers\Url;
 							if(isset($move->set) && !isset($move_set_printed[$move->set_id])):
 							?>
 								<tr id="trLine<?=$k?>">
-									<td class="border-left"><?= $move->set->no ?></td>
-									<td class="border-left">
+									<td contenteditable="true" class="border-left"><?= $move->set->no ?></td>
+									<td contenteditable="true" class="border-left">
 										<?=$move->set->product_qty.' '.$move->set->productUom->name?>
 									</td>
-									<td class="border-left">
+									<td contenteditable="true" class="border-left">
 										<?=$move->set->product->name_template?>
 										<div>
 											Consist Of :
@@ -175,7 +175,7 @@ use yii\helpers\Url;
 										</div>
 
 									</td>
-									<td class="border-left border-right"><?=$move->set->product->default_code?></td>
+									<td contenteditable="true" class="border-left border-right"><?=$move->set->product->default_code?></td>
 									<?php $move_set_printed[$move->set_id][] = $move->id; ?>
 								</tr>
 							<?php
