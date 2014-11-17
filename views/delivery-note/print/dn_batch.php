@@ -147,9 +147,9 @@ $this->registerJs('
 		return "<tr class=\'cRows rows"+rowNo+"\'><td style=\"width:23%;\">"+data.qty+"</td><td style=\"width:58%\">"+data.name+"</td><td style=\"text-align:center;\">"+data.part_no+"</td></tr>";
 	}
 
-	function printNotes(rowNo,data)
+	function getNotes(notes)
 	{
-
+		return "<tr><td></td><td>"+notes+"</td><td></td></tr>";
 	}
 	var rowPage = 0;
 	jQuery.each(lines,function(key,line){
@@ -180,14 +180,15 @@ $this->registerJs('
 
 			jQuery(\'#lines\'+currPage).html(getRow);
 			currLineHeight = jQuery(\'#tdLine\'+currPage).height();
-			jQuery(\'.pager:last\').html(currPage);
+			// jQuery(\'.pager:last\').html(currPage);
 			// console.log(tmpl);
 			
 		}
-
+		
 		console.log(\'Rendering Page \'+currPage+\' Row \'+currRow+\' Height => \'+currLineHeight);
 		currRow=currRow+1;
 	});
 	// end loop
+	jQuery(\'.contentLines tr:last\').after(getNotes('..'));
 ');
 ?>
