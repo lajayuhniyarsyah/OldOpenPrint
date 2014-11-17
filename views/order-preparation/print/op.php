@@ -1,5 +1,7 @@
 <?php
 use yii\helpers\Url;
+
+
 ?>
 <style type="text/css">
 	#pageContainer{
@@ -11,7 +13,7 @@ use yii\helpers\Url;
 		/* border-top: 1px solid black;
 		border-bottom: 1px solid black; */
 	}
-		.contener{
+	.contener{
 		border: 1px solid black;
 		width: 200mm; height: 297mm;
 		margin-left: auto; margin-right: auto;
@@ -43,7 +45,7 @@ use yii\helpers\Url;
 	}
 	.logo .judul{
 		font-size: 24px;
-		margin-top: 12px;
+		margin-top: -60px;
 		margin-left: 15px;
 		font-family: Geneva, Arial, Helvetica, sans-serif;
 		font-weight: bold;
@@ -59,16 +61,18 @@ use yii\helpers\Url;
 		font-size: 24px;
 		font-weight: bold;
 		margin-left: 16px;
-		margin-top: -25px;
+		margin-top: -5px;
 		/*position: absolute;*/
 		float: left;
 		text-decoration: underline;
 	}
 	.yth{
-		float: left;
-		width: 50%; margin-top: 23px;
-		margin-left: 16px;
-		display: block;
+	 	display: block;
+	    float: left;
+	    font-size: 17px;
+	    margin-left: 16px;
+	    margin-top: 12px;
+	    width: 50%;
 	}
 	.customer{
 		float: right;
@@ -95,6 +99,7 @@ use yii\helpers\Url;
 	.isicus{
 		display: block;
 		margin-top: 15px; margin-left: 10px;
+		font-size: 16px;
 	}
 	.content{
 		margin-left: 15px;
@@ -114,16 +119,16 @@ use yii\helpers\Url;
 		border: 1px solid black;
 	}
 	.tablefooter{
-		float:left; width:430px; border-left:1px solid black; border-right:1px solid black; height:200px;
+		float:left; width:430px; border-left:1px solid black; border-right:1px solid black; height:185px;
 		border-bottom:1px solid black;
 	}
 	.tablefooter td{
 		text-align: center;
 		border: none !important;
-		font-size: 18px;
+		font-size: 13px;
 	}
 	.isigudang{
-		margin-top:20px;
+		margin-top:10px;
 		margin-left: 40px;
 		text-align: left;
 		font-weight: bold;
@@ -150,7 +155,7 @@ use yii\helpers\Url;
 	}
 	.tablecontent{
 		line-height: 30px;
-		font-size: 17px;
+		font-size: 13px;
 	}
 	@media all {
 		.page-break	{ display: none; }
@@ -161,14 +166,17 @@ use yii\helpers\Url;
 			height:1mm !important;
 		}
 		.tglkirim{
-			width: 191px !important;
+			width: 203px !important;
 		}
-		.tablettd{
+/*		.tablettd{
 			margin-top: -48px !important;
-		}	
-		.tblkirim{
-		margin-top: -7px !important;
-		}
+		}	*/
+		/*.tblkirim{
+		margin-top: -13px !important;
+		}*/
+	/*	.isigudang{
+			margin-top: -10px;
+		}*/
 
 	}
 	.pages{
@@ -188,14 +196,16 @@ use yii\helpers\Url;
 		border-right:  1px solid black;
 		border-collapse: collapse;
 		line-height: 25px;
+		font-size: 15px;
+		vertical-align: top;
 	}
 	.leftdata{
 		float: left;
-		width: 70%;
+		width: 75%;
 		margin-left: 10px;
 	}
 	.rightdata{
-		width: 25%;
+		width: 18%;
 		float: right;
 		margin-right: 10px;
 		text-align: right;
@@ -204,63 +214,45 @@ use yii\helpers\Url;
 		width: 203px;
 	}
 	.break{
-		height:50mm;
+		height:100mm;
 	}
 	.tablettd{
-		width:400px; float:left;  margin-left: 15px;margin-top: -33px;
+		width:400px; float:left;  margin-left: 15px;margin-top: -32px;
 	}
 	.tblkirim{
 		float: left;margin-left: 0px;margin-top: -1px; margin-left:15px; border-collapse: collapse;  line-height: 30px;
 	}
+	.dataiso{
+		text-align: center;
+		width: 100px;
+		float: left;
+		font-size: 9px;
+		margin-left: 2px;
+	}
 </style>
+	<?php 
 
-	<?php
-		 	$data1 = array( 
-		 				array('1', '2 Roll', 'Conveyor ROller','121212'), 
-		 				array('2', '4 Roll', 'Conveyor ROller','121212'), 
-		 				array('3', '3 Roll', 'Conveyor ROller','121212'), 
-		 				array('3', '3 Roll', 'Conveyor ROller','121212'), 
-		 				array('3', '3 Roll', 'Conveyor ROller','121212'), 
-		 				array('3', '3 Roll', 'Conveyor ROller','121212'), 
-		 				array('3', '3 Roll', 'Conveyor ROller','121212'), 
-		 				array('3', '3 Roll', 'Conveyor ROller','121sss212'), 
-		 				array('3', '3 Roll', 'Conveyor ROller','121212'), 
-		 				array('3', '3 Roll', 'Conveyor ROller','121212'), 
-		 				array('3', '3 Roll', 'Conveyor ROller','121212'), 
-		 				array('3', '3 Roll', 'Conveyor ROller','121212'), 
-		 				array('3', '3 Roll', 'Conveyor ROller','121212'), 
-		 				array('1', '2 Roll', 'Conveyor ROller','121212'), 
-		 				array('2', '4 Roll', 'Conveyor ROller','121212'), 
-		 				array('3', '3 Roll', 'Conveyor ROller','121212'), 
-		 				array('3', '3 Roll', 'Conveyor ROller','121212'), 
-		 				array('3', '3 Roll', 'Conveyor ROller','121212'), 
-		 				array('3', '3 Roll', 'Conveyor ROller','121212'), 
-		 				array('3', '3 Roll', 'Conveyor ROller','121212'), 
-		 				array('3', '3 Roll', 'Conveyor ROller','121sss212'), 
-		 				array('3', '3 Roll', 'Conveyor ROller','121212'), 
-		 				array('3', '3 Roll', 'Conveyor ROller','121212'), 
-		 				array('3', '3 Roll', 'Conveyor ROller','121212'), 
-		 				array('3', '3 Roll', 'Conveyor ROller','121212'), 
-		 				array('3', '3 Roll', 'Conveyor ROller','121212'), 
-		 					 				array('3', '3 Roll', 'Conveyor ROller','121sss212'), 
-		 				array('3', '3 Roll', 'Conveyor ROller','121212'), 
-		 				array('3', '3 Roll', 'Conveyor ROller','121212'), 
-		 				array('3', '3 Roll', 'Conveyor ROller','121212'), 
-		 				array('3', '3 Roll', 'Conveyor ROller','121212'), 
-		 				array('3', '3 Roll', 'Conveyor ROller','121212'), 
-		 				array('1', '2 Roll', 'Conveyor ROller','121212'), 
-		 				array('2', '4 Roll', 'Conveyor ROller','121212'), 
-		 				array('3', '3 Roll', 'Conveyor ROller','121212'), 
-		 				array('3', '3 Roll', 'Conveyor ROller','121212'), 
-		 				array('3', '3 Roll', 'Conveyor ROller','121212'), 
-		 				array('3', '3 Roll', 'Conveyor ROller','121212'), 
-		 				array('3', '3 Roll', 'Conveyor ROller','121212'), 
-		 				array('3', '3 Roll', 'Conveyor ROller','121sss212'), 
-		 				array('3', '3 Roll', 'Conveyor ROller','121212'), 
-		 				array('3', '3 Roll', 'Conveyor ROller','121212'), 
-		 				array('3', '3 Roll', 'Conveyor ROller','121212'), 
-		 				array('3', '3 Roll', 'Conveyor ROller','121212'), 
-		 				);
+		foreach ($model->orderPreparationLines as $value) {
+				$databatch=[];
+				foreach ($value->orderPreparationBatches as $batch) {
+					if ($batch->exp_date==""){
+						$databatch[]='Batch No : '.$batch->name0->name.' '.$batch->name0->desc.' Qty :'.$batch->qty.' '.$no=$value->productUom->name.'<br/>';
+					}else{
+						$databatch[]='Batch No : '.$batch->name0->name.' '.$batch->name0->desc.' Exp Date : '.$batch->name0->exp_date.' Qty :'.$batch->qty.' '.$no=$value->productUom->name.'<br/>';	
+					}
+					
+				}
+				$desc=$value->name.'<br/>'.implode($databatch);
+				if ($value->no==""){
+					$no='';
+				}else{
+					$no=$value->no;					
+				}
+
+				$data2[]=array($no,$value->product_qty.' '.$no=$value->productUom->name,$desc,$value->product->default_code);
+
+		}
+		$data2[]=array('','','<br/><br/>'.$model->terms,'');
 	?>
 <div id="pageContainer">
 <div class="pages">
@@ -272,6 +264,9 @@ use yii\helpers\Url;
 						<td>
 							<div class="logo">
 								<img style="width:85px; float:left" src="<?= Url::base() ?>/img/logo.png">
+								<div style="clear:both;"></div>
+								<div class="dataiso">SMB-F-SA-04b/01<br/>
+									12/09/10</div>
 								<div class="judul"><strong><h3>PT.SUPRABAKTI MANDIRI</h3></strong></div>
 							</div>
 							<div class="iso">
@@ -289,9 +284,8 @@ use yii\helpers\Url;
 								<div class="customer">
 									<fieldset>
 										<div class="isicus">
-										FREEPORT INDONESIA, PT<br/>
-											Plaza 89 5th Floor<br/>
-											Jl. H.R. Rasuna Said Kav. X-7 No.6<br/>
+										<?php echo $model->partner->name; ?><br/>
+										<?php echo $model->partner->street; ?><br/>
 											021-2591818<br/>
 										</div>
 									</fieldset>
@@ -301,9 +295,9 @@ use yii\helpers\Url;
 								<div class="headtable">
 									<table class="tablecontent">
 										<tr>
-											<td width="80px">No.DO</td>
+											<td width="70px">No.DO</td>
 											<td>:</td>
-											<td width="170px"></td>
+											<td width="220px"><?php echo $model->name; ?></td>
 
 											<td width="50px">No.SC</td>
 											<td>:</td>
@@ -318,13 +312,13 @@ use yii\helpers\Url;
 								<div class="headtable" style="margin-top:-1px;">
 									<table class="tablecontent">
 										<tr>
-											<td width="80px">Tanggal.DO</td>
+											<td width="70px">Tanggal.DO</td>
 											<td>:</td>
-											<td width="170px"></td>
+											<td width="220px"><?php echo $model->duedate; ?></td>
 
 											<td width="50px">No.PO</td>
 											<td>:</td>
-											<td width="150px"></td>
+											<td width="150px"><?php echo $model->poc; ?></td>
 
 											<td width="50px">No.SPK</td>
 											<td>:</td>
@@ -346,7 +340,7 @@ use yii\helpers\Url;
 										</td>
 									</tr>
 									<tr>
-										<?php $maxHeight = '130mm'; ?>
+										<?php $maxHeight = '180mm'; ?>
 										<td class="tdLines" style="height:<?=$maxHeight?>;vertical-align:top;">
 											<div class="contentArea">
 												<table class="contentLines">
@@ -362,20 +356,20 @@ use yii\helpers\Url;
 										<tr>
 											<td>
 												Dibuat Oleh :<br/><br/><br/><br/><br/><br/><br/>
-												(..........................)
+												(.................................)
 											</td>
 											<td>
 												Dicek Oleh ,<br/><br/><br/><br/><br/><br/><br/>
-												(..........................)
+												(.................................)
 											</td>
 											<td>
 												Disetujui Oleh,<br/> General Manager,<br/><br/><br/><br/><br/><br/>
-												(..........................)
+												(.................................)
 											</td>
 										</tr>
 									</table>
 									</div>
-									<div style="float:right; width:285px; margin-left:15px;">
+									<div style="float:right; width:285px; margin-left:15px; margin-top:-15px;">
 										<div class="isigudang">DIISI OLEH GUDANG </div>
 										<br/>
 										<table class="gudang">
@@ -395,13 +389,11 @@ use yii\helpers\Url;
 												<td>...............................</td>
 											</tr>
 										</table>
-
 									</div>
-
 								<div style="clear:both;"></div>
 								<table class="tblkirim">
 									<tr>
-										<td width="232px" style="border:1px solid black; ">
+										<td width="220px" style="border:1px solid black; ">
 											No SJ :
 										</td>
 										<td class="tglkirim" style="border:1px solid black; ">
@@ -438,7 +430,7 @@ $this->registerJs('
 	
 
 	// data to render
-	var lines = '.\yii\helpers\Json::encode($data1).';
+	var lines = '.\yii\helpers\Json::encode($data2).';
 	var maxLinesHeight = jQuery(\'.tdLines:last\').height();
 	
 
@@ -451,6 +443,7 @@ $this->registerJs('
 		console.log(data[0]);
 		return "<tr class=\'cRows rows"+rowNo+"\'><td style=\"width:50px; text-align:center;\">"+data[0]+"</td><td style=\"width:180px; text-align:center;\">"+data[1]+"</td><td><div class=\"leftdata\">"+data[2]+"</div><div class=\"rightdata\">"+data[3]+"</div></td></tr>";
 	}
+
 	var rowPage = 0;
 	jQuery.each(lines,function(key,line){
 		var getRow = prepareRow(currRow,line);
@@ -489,7 +482,7 @@ $this->registerJs('
 	});
 		var HeightTable=jQuery(\'#tdLine\'+currPage).height();
 		var cektable=jQuery(\'#lines\'+currPage).height();
-		var SetHeight=HeightTable-cektable-18;
+		var SetHeight=HeightTable-cektable-17;
 
 		if (cektable < HeightTable){
 			var res = "<tr><td style=\"width:50px; height:"+SetHeight+"px;  text-align:center;\"></td><td style=\"width:180px; text-align:center;\"></td><td><div class=\"leftdata\"></div><div class=\"rightdata\"></div></td></tr>";
