@@ -196,7 +196,7 @@ use yii\helpers\Url;
 		border-right:  1px solid black;
 		border-collapse: collapse;
 		line-height: 25px;
-		font-size: 15px;
+		font-size: 13px;
 		vertical-align: top;
 	}
 	.leftdata{
@@ -217,7 +217,7 @@ use yii\helpers\Url;
 		height:100mm;
 	}
 	.tablettd{
-		width:400px; float:left;  margin-left: 15px;margin-top: -32px;
+		width:400px; float:left;  margin-left: 15px;margin-top: -9px;
 	}
 	.tblkirim{
 		float: left;margin-left: 0px;margin-top: -1px; margin-left:15px; border-collapse: collapse;  line-height: 30px;
@@ -333,14 +333,14 @@ use yii\helpers\Url;
 							<table class="headtablepages" style="width:186mm; border:1px solid black; border-collapse: collapse; margin-left:15px;">
 									<tr>
 										<th width="50px">No.</th>
-										<th width="180px">Jumlah</th>
+										<th width="130px">Jumlah</th>
 										<th>Nama Barang</th>
 									</tr>
 							</table>
 										</td>
 									</tr>
 									<tr>
-										<?php $maxHeight = '180mm'; ?>
+										<?php $maxHeight = '100mm'; ?>
 										<td class="tdLines" style="height:<?=$maxHeight?>;vertical-align:top;">
 											<div class="contentArea">
 												<table class="contentLines">
@@ -441,7 +441,7 @@ $this->registerJs('
 	function prepareRow(rowNo,data)
 	{
 		console.log(data[0]);
-		return "<tr class=\'cRows rows"+rowNo+"\'><td style=\"width:50px; text-align:center;\">"+data[0]+"</td><td style=\"width:180px; text-align:center;\">"+data[1]+"</td><td><div class=\"leftdata\">"+data[2]+"</div><div class=\"rightdata\">"+data[3]+"</div></td></tr>";
+		return "<tr class=\'cRows rows"+rowNo+"\'><td style=\"width:50px; text-align:center;\">"+data[0]+"</td><td style=\"width:130px; text-align:center;\">"+data[1]+"</td><td><div class=\"leftdata\">"+data[2]+"</div><div class=\"rightdata\">"+data[3]+"</div></td></tr>";
 	}
 
 	var rowPage = 0;
@@ -462,6 +462,14 @@ $this->registerJs('
 		if(currLineHeight>maxLinesHeight){
 			// remove last row
 			jQuery(\'table#lines\'+currPage+\' tr:last\').remove();
+			
+			var pageHeight=jQuery(\'#lines\'+currPage).height();
+			// alert(pageHeight);
+			var setLineHeight=403-pageHeight;
+			
+			var resLine = "<tr><td style=\"width:50px; height:"+setLineHeight+"px;  text-align:center;\"></td><td style=\"width:130px; text-align:center;\"></td><td><div class=\"leftdata\"></div><div class=\"rightdata\"></div></td></tr>";
+			jQuery(\'#lines\'+currPage+\' tr:last\').after(resLine);
+
 			// add new page container
 			jQuery(\'div#page\'+currPage).after(tmpl);
 			currPage = currPage+1;
@@ -482,10 +490,10 @@ $this->registerJs('
 	});
 		var HeightTable=jQuery(\'#tdLine\'+currPage).height();
 		var cektable=jQuery(\'#lines\'+currPage).height();
-		var SetHeight=HeightTable-cektable-17;
+		var SetHeight=HeightTable-cektable+25;
 
 		if (cektable < HeightTable){
-			var res = "<tr><td style=\"width:50px; height:"+SetHeight+"px;  text-align:center;\"></td><td style=\"width:180px; text-align:center;\"></td><td><div class=\"leftdata\"></div><div class=\"rightdata\"></div></td></tr>";
+			var res = "<tr><td style=\"width:50px; height:"+SetHeight+"px;  text-align:center;\"></td><td style=\"width:130px; text-align:center;\"></td><td><div class=\"leftdata\"></div><div class=\"rightdata\"></div></td></tr>";
 			jQuery(\'#lines\'+currPage+\' tr:last\').after(res);
 		}
 	// end loop
