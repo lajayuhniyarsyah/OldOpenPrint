@@ -3,8 +3,9 @@
 	{
 		width: 190mm;
 		/*border: 1px solid black;*/
-		padding-left: 8mm;
+		padding-left: 10mm;
 		vertical-align: top;
+		font-family: Arial, Helvetica, sans-serif;
 
 	}
 	.pages
@@ -151,12 +152,12 @@ $scr = '
 
 	function prepareRow(rowNo,data)
 	{
-		return "<tr class=\'cRows rows"+rowNo+"\'><td style=\"width:23%;\">"+data.qty+"</td><td contenteditable=\"true\" style=\"width:58%\">"+data.name+"</td><td style=\"text-align:center;\">"+data.part_no+"</td></tr>";
+		return "<tr class=\'cRows rows"+rowNo+"\'><td style=\"width:23%;\">"+data.qty+"</td><td contenteditable=\"true\" style=\"width:57%\">"+data.name+"</td><td style=\"text-align:center;\">"+data.part_no+"</td></tr>";
 	}
 
 	function getNotes(notes,rowNo=999999)
 	{
-		return "<tr class=\'cRows rows"+rowNo+"\'><td style=\"width:23%;\"></td><td style=\"width:58%;padding-top:10mm;\">Notes : <br/>"+notes+"</td><td></td></tr>";
+		return "<tr class=\'cRows rows"+rowNo+"\'><td style=\"width:23%;\"></td><td style=\"width:57%;padding-top:10mm;\">Notes : <br/>"+notes+"</td><td></td></tr>";
 	}
 	var rowPage = 0;
 
