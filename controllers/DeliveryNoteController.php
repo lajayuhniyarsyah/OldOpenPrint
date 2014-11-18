@@ -127,17 +127,11 @@ class DeliveryNoteController extends Controller
         $model = $this->findModel($id);
 
         // PREPARE LINE DATA FOR PRINT
-        // $linesData = [];
+        
         $sets = [];
-        /*array_push($linesData,[
-            'qty'=>'<div style="width:100%;"><div style="width:40%;float:left;">'.$line->no.'</div><div style="width:40%;float:left;">'.$lineQty.'</div><div style="clear:both;"></div></div>',
-            'name'=>$lineName,
-            'part_no'=>$line->product->default_code,
-        ]);*/
+        
         $prepLines = $this->prepareLineData($model->deliveryNoteLines);
-        /*echo '<pre>';
-        var_dump($prepLines);
-        echo '</pre>';*/
+        
         $linesData = $this->renderLinesPrint($prepLines);
 
         // if Rupiah
@@ -151,7 +145,7 @@ class DeliveryNoteController extends Controller
         $res = [];
         foreach($preparedLines as $k=>$l):
             $res[$k]=[
-                'qty'=>'<div style="float:left;width:10mm;">'.$l['no'].'</div><div>'.floatval($l['qty']).' '.$l['uom'].'</div><div style="clear:both;"></div>',
+                'qty'=>'<div style="float:left;width:10mm;">'.($l['no'] ? $l['no']:'&nbsp;').'</div><div>'.floatval($l['qty']).' '.$l['uom'].'</div><div style="clear:both;"></div>',
                 'name'=>$l['name'],
                 'part_no'=>$l['part_no']
             ];
@@ -160,14 +154,7 @@ class DeliveryNoteController extends Controller
                 foreach($l['set'] as $set){
                     $res[$k]['name'] .= '<li>'.$set['name'].'</li>';
                     if(array_key_exists('batches', $set) && count($set['batches'])>=1):
-                        /*$res[$k]['name'].='Taken From :<ul style="margin:0;">';
-
-                        foreach($set['batches'] as $batch):
-                            $res[$k]['name'].='<li>Batch No : '.$batch['name'].' - '.$batch['qty'].' '.$set['uom'].' (Exp Date '.Yii::$app->formatter->asDatetime($batch['exp_date'], "php:d/m/Y").')</li>';
-                        endforeach;
-
-                        $res[$k]['name'].='</ul>';*/
-
+                        
 
                         $res[$k]['name'].=$this->prepareBathesRender($set);
 

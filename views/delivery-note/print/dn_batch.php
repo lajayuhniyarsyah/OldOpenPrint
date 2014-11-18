@@ -5,13 +5,14 @@
 		border: 1px solid black;
 		padding-left: 8mm;
 		vertical-align: top;
+
 	}
 	.pages
 	{
 		padding-top: 37mm;
 		page-break-after: always;
 		height: 284mm;
-		border-bottom: 1px solid red;
+		/*border-bottom: 1px solid red;*/
 	}
 	.pager
 	{
@@ -30,6 +31,7 @@
 		float: left;
 		width: 43%;
 		padding-top: 11mm;
+		font-size: larger;
 	}
 
 	.partnerName
@@ -39,7 +41,8 @@
 	.tdLines
 	{
 		min-height: 134mm;
-		border-bottom: 1px solid blue;
+		/*border-bottom: 1px solid blue;*/
+		font-size: larger;
 	}
 	.contentLines tr td{
 		vertical-align: top;
@@ -59,11 +62,14 @@
 	{
 		margin-top: 9%;
 		padding-left: 61%;
+		font-size: larger;
+
 	}
 	.poc
 	{
 		margin-top: 8%;
 		padding-left: 49%;
+		font-size: larger;
 	}
 	@media print
 	{
@@ -149,7 +155,7 @@ $this->registerJs('
 
 	function getNotes(notes,rowNo=99)
 	{
-		return "<tr class=\'cRows rows"+rowNo+"\'><td style=\"width:23%;\"></td><td style=\"width:58%\">"+notes+"</td><td></td></tr>";
+		return "<tr class=\'cRows rows"+rowNo+"\'><td style=\"width:23%;\"></td><td style=\"width:58%\">Notes : <br/>"+notes+"</td><td></td></tr>";
 	}
 	var rowPage = 0;
 
