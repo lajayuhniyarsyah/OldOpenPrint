@@ -93,12 +93,7 @@
 						</td>
 					</tr>
 					<tr>
-						<td>
-							<div class="amount">&nbsp;</div>
-						</td>
-					</tr>
-					<tr>
-						<td>
+						<td style="height:10mm;">
 							<div class="amount">&nbsp;</div>
 						</td>
 					</tr>

@@ -10,7 +10,7 @@
 	{
 		padding-top: 37mm;
 		page-break-after: always;
-		height: 295mm;
+		height: 284mm;
 		border-bottom: 1px solid red;
 	}
 	.pager
@@ -81,7 +81,7 @@
 					<?=$model->partnerShipping->street?>
 					<?=($model->partnerShipping->street2 ? '<br/>'.$model->partnerShipping->street2:null)?>
 					<br/><?=$model->partnerShipping->city?>
-					 - <?=$model->partnerShipping->country->name?>
+					 <?=(isset($model->partnerShipping->country->name) ? ' - '.$model->partnerShipping->country->name:false)?>
 					 <br/><?=$model->partnerShipping->zip?>
 					 <br/>Phone : <?=$model->partnerShipping->phone?>
 					 <?php
@@ -108,11 +108,11 @@
 		</div>
 		
 		<div class="tdLines">
-			<table class="contentLines">
+			<table class="contentLines" style="width:100%;">
 				<tr>
-					<td>Jumlah</td>
-					<td>Jenis Barang</td>
-					<td>Part No</td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
+					<td>&nbsp;</td>
 				</tr>
 			</table>
 		</div>
@@ -144,14 +144,17 @@ $this->registerJs('
 
 	function prepareRow(rowNo,data)
 	{
-		return "<tr class=\'cRows rows"+rowNo+"\'><td style=\"width:23%;\">"+data.qty+"</td><td style=\"width:58%\">"+data.name+"</td><td style=\"text-align:center;\">"+data.part_no+"</td></tr>";
+		return "<tr class=\'cRows rows"+rowNo+"\'><td style=\"width:23%;\">"+data.qty+"</td><td contenteditable=\"true\" style=\"width:58%\">"+data.name+"</td><td style=\"text-align:center;\">"+data.part_no+"</td></tr>";
 	}
 
-	function getNotes(notes)
+	function getNotes(notes,rowNo=99)
 	{
-		return "<tr><td></td><td>"+notes+"</td><td></td></tr>";
+		return "<tr class=\'cRows rows"+rowNo+"\'><td style=\"width:23%;\"></td><td style=\"width:58%\">"+notes+"</td><td></td></tr>";
 	}
 	var rowPage = 0;
+
+
+
 	jQuery.each(lines,function(key,line){
 		var getRow = prepareRow(currRow,line);
 		if(key==0)
@@ -189,6 +192,31 @@ $this->registerJs('
 		currRow=currRow+1;
 	});
 	// end loop
-	jQuery(\'.contentLines tr:last\').after(getNotes('..'));
+	
+	jQuery(\'.contentLines tr:last\').after(getNotes(\''.preg_replace('/\n/', '', nl2br($model->terms)).'\'));
+	currLineHeight = jQuery(\'#tdLine\'+currPage).height();
+	console.log(currLineHeight);
+	if(currLineHeight>maxLinesHeight){
+			// remove last row
+			var notes = jQuery(\'#lines\'+currPage+\' tr:last\')
+			var notesHtml = notes.html();
+			notes.remove();
+			// add new page container
+			jQuery(\'div#page\'+currPage).after(tmpl);
+			console.log(\'div#page\'+currPage);
+			currPage = currPage+1;
+			console.log(currPage);
+			// add id to new div
+			jQuery(\'div.pages:last\').attr(\'id\',\'page\'+currPage);
+			jQuery(\'.contentLines:last\').attr(\'id\',\'lines\'+currPage);
+			jQuery(\'.tdLines:last\').attr(\'id\',\'tdLine\'+currPage);
+
+			jQuery(\'#lines\'+currPage).html(notes);
+			currLineHeight = jQuery(\'#tdLine\'+currPage).height();
+			// jQuery(\'.pager:last\').html(currPage);
+			// console.log(tmpl);
+			
+		}
+
 ');
 ?>
