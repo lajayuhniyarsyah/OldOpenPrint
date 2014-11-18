@@ -11,7 +11,7 @@
 	{
 		padding-top: 37mm;
 		page-break-after: always;
-		height: 284mm;
+		height: 275mm;
 		/*border-bottom: 1px solid red;*/
 	}
 	.pager
