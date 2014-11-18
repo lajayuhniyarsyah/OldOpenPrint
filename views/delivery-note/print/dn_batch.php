@@ -9,7 +9,7 @@
 	}
 	.pages
 	{
-		padding-top: 37mm;
+		padding-top: 35mm;
 		page-break-after: always;
 		height: 284mm;
 		/*border-bottom: 1px solid red;*/
@@ -24,25 +24,25 @@
 	{
 		
 		/*border-bottom: 1px solid black;*/
-		height: 65mm;
+		height: 67mm;
 	}
 	.attnTo
 	{
 		float: left;
 		width: 43%;
 		padding-top: 11mm;
-		font-size: 12pt;
+		font-size: larger;
 	}
 
 	.partnerName
 	{
-		font-size: 12pt;
+		font-size: larger;
 	}
 	.tdLines
 	{
 		min-height: 134mm;
 		/*border-bottom: 1px solid blue;*/
-		font-size: 12pt;
+		font-size: larger;
 	}
 	.contentLines tr td{
 		vertical-align: top;
@@ -54,7 +54,7 @@
 	}
 	.dnNo
 	{
-		font-size: 12pt;
+		font-size: larger;
 		padding-top: 5%;
 		padding-left: 51%;
 	}
@@ -62,14 +62,14 @@
 	{
 		margin-top: 9%;
 		padding-left: 61%;
-		font-size: 12pt;
+		font-size: larger;
 
 	}
 	.poc
 	{
 		margin-top: 8%;
 		padding-left: 49%;
-		font-size: 12pt;
+		font-size: larger;
 	}
 	@media print
 	{
