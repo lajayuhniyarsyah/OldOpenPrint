@@ -93,7 +93,7 @@
                     <tr>
                         <td>
                             <div class="amount">
-                                <span><?= $model->amount_untaxed; ?></span>
+                                <span><?= '<div style="float:left;width:17mm;">'.$model->currency->name.'</div><div>'.$model->amount_untaxed.'</div><div style="clear:both;"></div>'; ?></span>
                             </div>
 
                         </td>
@@ -111,8 +111,8 @@
                     <tr>
                         <td>
                             <div class="amount">
-                                <div style="width:43mm;float:left;"><?= (isset($model->amount_untaxed) ? $model->currency->name.' '.$model->amount_untaxed:''); ?></div>
-                                <div style=""><?=$model->amount_untaxed*$model->pajak?></div>
+                                <div style="width:43mm;float:left;"><?= (isset($model->amount_untaxed) ? '<div style="float:left;width:17mm;">'.$model->currency->name.'</div><div>'.$model->amount_untaxed.'</div><div style="clear:both;"></div>':''); ?></div>
+                                <div style=""><?=number_format(($model->amount_untaxed*$model->pajak),2,',','.')?></div>
                                 <div class="clear:both;"></div>
                             </div>
 
@@ -121,7 +121,7 @@
                     <tr>
                         <td>
                             <div class="amount" style="margin-top:-3px;">
-                                <div style="width:43mm;float:left;"><?= (isset($model->amount_tax) ? $model->currency->name.' '.$model->amount_tax:''); ?></div>
+                                <div style="width:43mm;float:left;"><?= (isset($model->amount_tax) ? '<div style="float:left;width:17mm;">'.$model->currency->name.'</div><div>'.$model->amount_tax.'</div><div style="clear:both;"></div>':''); ?></div>
                                 <div><?=number_format(($model->amount_tax*$model->pajak),2,',','.')?></div>
                                 <div class="clear:both;"></div>
                             </div>
@@ -179,7 +179,7 @@ $this->registerJs('
 
     function prepareRow(rowNo,data)
     {
-        return "<tr class=\'cRows rows"+rowNo+"\'><td style=\"width:6%;\">"+eval(rowNo+1)+"</td><td style=\"width:56%\">"+data.name+"</td><td>"+rateSymbol+data.price_subtotal+"</td><td>&nbsp;</td></tr>";
+        return "<tr class=\'cRows rows"+rowNo+"\'><td style=\"width:6%;\">"+eval(rowNo+1)+"</td><td style=\"width:56%\">"+data.name+"</td><td><div style=\"float:left;width:17mm;\">"+rateSymbol+"</div><div>"+data.price_subtotal+"</div><div style=\"clear:both;\"></div></td><td>&nbsp;</td></tr>";
     }
     var rowPage = 0;
     jQuery.each(lines,function(key,line){

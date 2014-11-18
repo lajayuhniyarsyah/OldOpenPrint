@@ -24,7 +24,9 @@ use Yii;
  * @property string $no_moved0
  * @property integer $no_moved1
  * @property string $no
+ * @property integer $op_line_id
  *
+ * @property OrderPreparationLine $opLine
  * @property ProductProduct $product
  * @property ProductUom $productUom
  * @property DeliveryNote $note
@@ -48,7 +50,7 @@ class DeliveryNoteLine extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['create_uid', 'write_uid', 'note_id', 'product_uom', 'product_packaging', 'product_id', 'no_moved1'], 'integer'],
+            [['create_uid', 'write_uid', 'note_id', 'product_uom', 'product_packaging', 'product_id', 'no_moved1', 'op_line_id'], 'integer'],
             [['create_date', 'write_date'], 'safe'],
             [['note_id'], 'required'],
             [['product_qty'], 'number'],
@@ -81,7 +83,16 @@ class DeliveryNoteLine extends \yii\db\ActiveRecord
             'no_moved0' => 'No',
             'no_moved1' => 'No',
             'no' => 'No',
+            'op_line_id' => 'OP Line',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getOpLine()
+    {
+        return $this->hasOne(OrderPreparationLine::className(), ['id' => 'op_line_id']);
     }
 
     /**

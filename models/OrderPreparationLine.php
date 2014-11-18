@@ -22,7 +22,9 @@ use Yii;
  * @property integer $no
  * @property string $detail
  * @property integer $prodlot_id
+ * @property integer $move_id
  *
+ * @property StockMove $move
  * @property StockProductionLot $prodlot
  * @property ProductPackaging $productPackaging
  * @property ProductUom $productUom
@@ -30,6 +32,7 @@ use Yii;
  * @property ProductProduct $product
  * @property ResUsers $writeU
  * @property ResUsers $createU
+ * @property DeliveryNoteLine[] $deliveryNoteLines
  * @property OrderPreparationBatch[] $orderPreparationBatches
  */
 class OrderPreparationLine extends \yii\db\ActiveRecord
@@ -48,7 +51,7 @@ class OrderPreparationLine extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['create_uid', 'write_uid', 'preparation_id', 'product_uom', 'product_packaging', 'product_id', 'no', 'prodlot_id'], 'integer'],
+            [['create_uid', 'write_uid', 'preparation_id', 'product_uom', 'product_packaging', 'product_id', 'no', 'prodlot_id', 'move_id'], 'integer'],
             [['create_date', 'write_date'], 'safe'],
             [['preparation_id'], 'required'],
             [['product_qty'], 'number'],
@@ -78,7 +81,16 @@ class OrderPreparationLine extends \yii\db\ActiveRecord
             'no' => 'No',
             'detail' => 'Detail Product',
             'prodlot_id' => 'Serial Number',
+            'move_id' => 'Move',
         ];
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getMove()
+    {
+        return $this->hasOne(StockMove::className(), ['id' => 'move_id']);
     }
 
     /**
@@ -135,6 +147,14 @@ class OrderPreparationLine extends \yii\db\ActiveRecord
     public function getCreateU()
     {
         return $this->hasOne(ResUsers::className(), ['id' => 'create_uid']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDeliveryNoteLines()
+    {
+        return $this->hasMany(DeliveryNoteLine::className(), ['op_line_id' => 'id']);
     }
 
     /**

@@ -118,7 +118,7 @@ use yii\helpers\Url;
 						<td>
 							<table>
 								<tr>
-									<td style="width:61%;">IM NO</td>
+									<td style="width:41%;">IM NO</td>
 									<td>:</td>
 									<td><?=$model->name?></td>
 								</tr>
@@ -163,11 +163,11 @@ use yii\helpers\Url;
 							if(isset($move->set) && !isset($move_set_printed[$move->set_id])):
 							?>
 								<tr id="trLine<?=$k?>">
-									<td class="border-left"><?= $move->set->no ?></td>
-									<td class="border-left">
+									<td contenteditable="true" class="border-left"><?= $move->set->no ?></td>
+									<td contenteditable="true" class="border-left">
 										<?=$move->set->product_qty.' '.$move->set->productUom->name?>
 									</td>
-									<td class="border-left">
+									<td contenteditable="true" class="border-left">
 										<?=$move->set->product->name_template?>
 										<div>
 											Consist Of :
@@ -175,7 +175,7 @@ use yii\helpers\Url;
 										</div>
 
 									</td>
-									<td class="border-left border-right"><?=$move->set->product->default_code?></td>
+									<td contenteditable="true" class="border-left border-right"><?=$move->set->product->default_code?></td>
 									<?php $move_set_printed[$move->set_id][] = $move->id; ?>
 								</tr>
 							<?php
@@ -187,7 +187,7 @@ use yii\helpers\Url;
 										<?= $move->no ?>
 									</td>
 									<td class="border-left canEdit" contenteditable="true"><?=$move->product_qty.' '.$move->productUom->name?></td>
-									<td class="border-left canEdit" contenteditable="true"><?=($move->name ? nl2br($move->name):nl2br($move->desc))?></td>
+									<td class="border-left canEdit" contenteditable="true"><?=($move->desc ? nl2br($move->desc):nl2br($move->name))?></td>
 									<td class="border-left border-right canEdit" contenteditable="true"><?=$move->product->default_code?> <a class="deleteRow hideOnPrint" style="position:absolute;right:0;cursor:pointer;" ref="<?=$k?>">X</a></td>
 								</tr>
 							<?php
@@ -292,7 +292,7 @@ endforeach;
 ?>
 
 <?php
-$this->registerJsFile(Url::base().'/js/ckeditor/ckeditor.js',['position'=>\yii\web\View::POS_HEAD]);
+
 
 // $this->registerJsFile(Url::base().'/js/ckeditor/adapters/jquery.js',['position'=>\yii\web\View::POS_END]);
 $scr = "";
