@@ -69,7 +69,7 @@ use yii\helpers\Url;
 	.yth{
 	 	display: block;
 	    float: left;
-	    font-size: 17px;
+	    font-size: 13px;
 	    margin-left: 16px;
 	    margin-top: 12px;
 	    width: 50%;
@@ -79,6 +79,7 @@ use yii\helpers\Url;
 		width: 40%;
 		display: block;
 		margin-right: 10px;
+		margin-top: -23px;
 	}
 	fieldset{
 		width: 271px;
@@ -99,7 +100,7 @@ use yii\helpers\Url;
 	.isicus{
 		display: block;
 		margin-top: 15px; margin-left: 10px;
-		font-size: 16px;
+		font-size: 13px;
 	}
 	.content{
 		margin-left: 15px;
@@ -270,7 +271,7 @@ use yii\helpers\Url;
 								<div class="judul"><strong><h3>PT.SUPRABAKTI MANDIRI</h3></strong></div>
 							</div>
 							<div class="iso">
-								<img style="width:100%; float: right;" src="<?= Url::base() ?>/img/iso.jpg">
+								<img style="width:85%; float: right;" src="<?= Url::base() ?>/img/iso.jpg">
 							</div>
 							<div style="clear:both;"></div>
 							<div class="do">DELIVERY ORDER</div>
@@ -340,7 +341,7 @@ use yii\helpers\Url;
 										</td>
 									</tr>
 									<tr>
-										<?php $maxHeight = '100mm'; ?>
+										<?php $maxHeight = '115mm'; ?>
 										<td class="tdLines" style="height:<?=$maxHeight?>;vertical-align:top;">
 											<div class="contentArea">
 												<table class="contentLines">
@@ -465,7 +466,7 @@ $this->registerJs('
 			
 			var pageHeight=jQuery(\'#lines\'+currPage).height();
 			// alert(pageHeight);
-			var setLineHeight=403-pageHeight;
+			var setLineHeight=439-pageHeight;
 			
 			var resLine = "<tr><td style=\"width:50px; height:"+setLineHeight+"px;  text-align:center;\"></td><td style=\"width:130px; text-align:center;\"></td><td><div class=\"leftdata\"></div><div class=\"rightdata\"></div></td></tr>";
 			jQuery(\'#lines\'+currPage+\' tr:last\').after(resLine);
@@ -490,7 +491,7 @@ $this->registerJs('
 	});
 		var HeightTable=jQuery(\'#tdLine\'+currPage).height();
 		var cektable=jQuery(\'#lines\'+currPage).height();
-		var SetHeight=HeightTable-cektable+25;
+		var SetHeight=HeightTable-cektable+35;
 
 		if (cektable < HeightTable){
 			var res = "<tr><td style=\"width:50px; height:"+SetHeight+"px;  text-align:center;\"></td><td style=\"width:130px; text-align:center;\"></td><td><div class=\"leftdata\"></div><div class=\"rightdata\"></div></td></tr>";
