@@ -160,25 +160,7 @@ use yii\helpers\Url;
 	@media all {
 		.page-break	{ display: none; }
 	}
-	@media print {
-		.page-break	{ display: block; page-break-before: always; }
-		.break{
-			height:1mm !important;
-		}
-		.tglkirim{
-			width: 203px !important;
-		}
-/*		.tablettd{
-			margin-top: -48px !important;
-		}	*/
-		/*.tblkirim{
-		margin-top: -13px !important;
-		}*/
-	/*	.isigudang{
-			margin-top: -10px;
-		}*/
-
-	}
+	
 	.pages{
 		height: 245mm;
 		padding-left:4mm;
@@ -217,7 +199,7 @@ use yii\helpers\Url;
 		height:100mm;
 	}
 	.tablettd{
-		width:400px; float:left;  margin-left: 15px;margin-top: -32px;
+		width:400px; float:left;  margin-left: 15px;  margin-top:-9px; 
 	}
 	.tblkirim{
 		float: left;margin-left: 0px;margin-top: -1px; margin-left:15px; border-collapse: collapse;  line-height: 30px;
@@ -231,7 +213,6 @@ use yii\helpers\Url;
 	}
 </style>
 	<?php 
-
 		foreach ($model->orderPreparationLines as $value) {
 				$databatch=[];
 				foreach ($value->orderPreparationBatches as $batch) {
@@ -340,7 +321,7 @@ use yii\helpers\Url;
 										</td>
 									</tr>
 									<tr>
-										<?php $maxHeight = '180mm'; ?>
+										<?php $maxHeight = '110mm'; ?>
 										<td class="tdLines" style="height:<?=$maxHeight?>;vertical-align:top;">
 											<div class="contentArea">
 												<table class="contentLines">
@@ -351,6 +332,7 @@ use yii\helpers\Url;
 									</tr>
 									<tr>
 										<td>
+									
 									<div class="tablettd">
 										<table class="tablefooter">
 										<tr>
@@ -369,7 +351,7 @@ use yii\helpers\Url;
 										</tr>
 									</table>
 									</div>
-									<div style="float:right; width:285px; margin-left:15px; margin-top:-15px;">
+									<div style="float:right; width:285px; margin-left:15px;">
 										<div class="isigudang">DIISI OLEH GUDANG </div>
 										<br/>
 										<table class="gudang">
@@ -458,12 +440,22 @@ $this->registerJs('
 		rowPage = rowPage+1;
 
 		var currLineHeight = jQuery(\'#tdLine\'+currPage).height();
+		var linesHeight = jQuery(\'#lines\'+currPage).height();
+		console.log(\'Tinggi Tabel \'+linesHeight);
 		console.log(\'Key \'+key+\' \'+currLineHeight);
 		if(currLineHeight>maxLinesHeight){
 			// remove last row
 			jQuery(\'table#lines\'+currPage+\' tr:last\').remove();
+			var pageHeight=jQuery(\'#lines\'+currPage).height();
+			
+			var setLineHeight=533-pageHeight;
+			
+			var resLine = "<tr><td style=\"width:50px; height:"+setLineHeight+"px;  text-align:center;\"></td><td style=\"width:180px; text-align:center;\"></td><td><div class=\"leftdata\"></div><div class=\"rightdata\"></div></td></tr>";
+			jQuery(\'#lines\'+currPage+\' tr:last\').after(resLine);
+
 			// add new page container
 			jQuery(\'div#page\'+currPage).after(tmpl);
+
 			currPage = currPage+1;
 			console.log(currPage);
 			// add id to new div
@@ -479,15 +471,36 @@ $this->registerJs('
 		
 		console.log(\'Rendering Page \'+currPage+\' Row \'+currRow+\' Height => \'+currLineHeight);
 		currRow=currRow+1;
+		// var cektable=jQuery(\'#lines\'+currPage).height();
+		// alert(cektable);
 	});
 		var HeightTable=jQuery(\'#tdLine\'+currPage).height();
 		var cektable=jQuery(\'#lines\'+currPage).height();
-		var SetHeight=HeightTable-cektable-17;
-
+		// var SetHeight=HeightTable-cektable;
+		var SetHeight=HeightTable-cektable+4;
 		if (cektable < HeightTable){
 			var res = "<tr><td style=\"width:50px; height:"+SetHeight+"px;  text-align:center;\"></td><td style=\"width:180px; text-align:center;\"></td><td><div class=\"leftdata\"></div><div class=\"rightdata\"></div></td></tr>";
 			jQuery(\'#lines\'+currPage+\' tr:last\').after(res);
 		}
 	// end loop
+
+	// if(currPage==1){
+	// 	jQuery(\'#printStyle\').append(\'.tablettd{margin-top: -38px !important;}\');
+	// }else{
+	// 	jQuery(\'#printStyle\').append(\'.tablettd{margin-top: -30px !important;}\');
+	// }
+	
 ');
+
 ?>
+
+<style id="printStyle" type="text/css" media="print">
+	.page-break	{ display: block; page-break-before: always; }
+	.break{
+		height:0mm !important;
+	}
+	.tglkirim{
+		width: 203px !important;
+	}
+	/*.tablettd{margin-top: -30px !important;}*/
+</style>
