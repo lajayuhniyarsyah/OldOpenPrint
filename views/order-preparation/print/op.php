@@ -5,7 +5,7 @@ use yii\helpers\Url;
 ?>
 <style type="text/css">
 	#pageContainer{
-		width: 200mm; height: 297mm;
+		width: 200mm;
 		margin-left: auto; margin-right: auto;
 		page-break-after: always;
 	}
@@ -15,7 +15,6 @@ use yii\helpers\Url;
 	}
 	.contener{
 		border: 1px solid black;
-		width: 200mm; height: 297mm;
 		margin-left: auto; margin-right: auto;
 		page-break-after: always;
 	}
@@ -27,7 +26,6 @@ use yii\helpers\Url;
 	}
 
 	.pages{
-		height: 245mm;
 		padding-top:5mm;
 		padding-left:4mm;
 		page-break-after: always;
