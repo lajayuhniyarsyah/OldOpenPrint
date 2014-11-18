@@ -112,6 +112,7 @@
 			</div>
 			<div style="clear:both;"></div>
 		</div>
+		<div style="clear:both;">&nbsp;</div>
 		
 		<div class="tdLines">
 			<table class="contentLines" style="width:100%;">
