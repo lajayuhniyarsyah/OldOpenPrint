@@ -9,7 +9,7 @@
 	}
 	.pages
 	{
-		padding-top: 37mm;
+		padding-top: 35mm;
 		page-break-after: always;
 		height: 284mm;
 		/*border-bottom: 1px solid red;*/
