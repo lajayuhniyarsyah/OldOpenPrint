@@ -2,7 +2,7 @@
 	#container
 	{
 		width: 190mm;
-		border: 1px solid black;
+		/*border: 1px solid black;*/
 		padding-left: 8mm;
 		vertical-align: top;
 
@@ -11,7 +11,7 @@
 	{
 		padding-top: 37mm;
 		page-break-after: always;
-		height: 284mm;
+		height: 240mm;
 		/*border-bottom: 1px solid red;*/
 	}
 	.pager
