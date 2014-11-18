@@ -128,7 +128,7 @@
 
 
 <?php
-$this->registerJs('
+$scr = '
 	var currPage = 1;
 
 	// save page template to var
@@ -154,9 +154,9 @@ $this->registerJs('
 		return "<tr class=\'cRows rows"+rowNo+"\'><td style=\"width:23%;\">"+data.qty+"</td><td contenteditable=\"true\" style=\"width:58%\">"+data.name+"</td><td style=\"text-align:center;\">"+data.part_no+"</td></tr>";
 	}
 
-	function getNotes(notes,rowNo=99)
+	function getNotes(notes,rowNo=999999)
 	{
-		return "<tr class=\'cRows rows"+rowNo+"\'><td style=\"width:23%;\"></td><td style=\"width:58%\">Notes : <br/>"+notes+"</td><td></td></tr>";
+		return "<tr class=\'cRows rows"+rowNo+"\'><td style=\"width:23%;\"></td><td style=\"width:58%;padding-top:10mm;\">Notes : <br/>"+notes+"</td><td></td></tr>";
 	}
 	var rowPage = 0;
 
@@ -200,30 +200,38 @@ $this->registerJs('
 	});
 	// end loop
 	
-	jQuery(\'.contentLines tr:last\').after(getNotes(\''.preg_replace('/\n/', '', nl2br($model->terms)).'\'));
+	
+
+';
+
+$this->registerJs($scr);
+
+if($model->terms){
+	$scr2='jQuery(\'.contentLines tr:last\').after(getNotes(\''.preg_replace('/\n/', '', nl2br($model->terms)).'\'));
 	currLineHeight = jQuery(\'#tdLine\'+currPage).height();
 	console.log(currLineHeight);
 	if(currLineHeight>maxLinesHeight){
-			// remove last row
-			var notes = jQuery(\'#lines\'+currPage+\' tr:last\')
-			var notesHtml = notes.html();
-			notes.remove();
-			// add new page container
-			jQuery(\'div#page\'+currPage).after(tmpl);
-			console.log(\'div#page\'+currPage);
-			currPage = currPage+1;
-			console.log(currPage);
-			// add id to new div
-			jQuery(\'div.pages:last\').attr(\'id\',\'page\'+currPage);
-			jQuery(\'.contentLines:last\').attr(\'id\',\'lines\'+currPage);
-			jQuery(\'.tdLines:last\').attr(\'id\',\'tdLine\'+currPage);
+		// remove last row
+		var notes = jQuery(\'#lines\'+currPage+\' tr:last\')
+		var notesHtml = notes.html();
+		notes.remove();
+		// add new page container
+		jQuery(\'div#page\'+currPage).after(tmpl);
+		console.log(\'div#page\'+currPage);
+		currPage = currPage+1;
+		console.log(currPage);
+		// add id to new div
+		jQuery(\'div.pages:last\').attr(\'id\',\'page\'+currPage);
+		jQuery(\'.contentLines:last\').attr(\'id\',\'lines\'+currPage);
+		jQuery(\'.tdLines:last\').attr(\'id\',\'tdLine\'+currPage);
 
-			jQuery(\'#lines\'+currPage).html(notes);
-			currLineHeight = jQuery(\'#tdLine\'+currPage).height();
-			// jQuery(\'.pager:last\').html(currPage);
-			// console.log(tmpl);
-			
-		}
+		jQuery(\'#lines\'+currPage).html(notes);
+		currLineHeight = jQuery(\'#tdLine\'+currPage).height();
+		// jQuery(\'.pager:last\').html(currPage);
+		// console.log(tmpl);
+		
+	}';
+	$this->registerJs($scr2);
+}
 
-');
 ?>
