@@ -104,7 +104,7 @@ class OrderPreparation extends \yii\db\ActiveRecord
      */
     public function getPartnerShipping()
     {
-        return $this->hasOne(ResPartner::className(), ['id' => 'partner_shipping_id'])->order('no ASC');
+        return $this->hasOne(ResPartner::className(), ['id' => 'partner_shipping_id']);
     }
 
     /**
