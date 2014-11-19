@@ -330,7 +330,7 @@ use yii\helpers\Url;
 										<tr>
 											<td width="70px">Tanggal.DO</td>
 											<td>:</td>
-											<td width="220px"><?php echo $model->duedate; ?></td>
+											<td width="220px"><?=date('d-M-Y')?></td>
 
 											<td width="50px">No.PO</td>
 											<td>:</td>
