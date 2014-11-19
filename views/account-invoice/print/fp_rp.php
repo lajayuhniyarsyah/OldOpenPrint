@@ -32,6 +32,9 @@
 		margin-top: 29%;
 		margin-left: 9%;
 	}
+	.contentLines{
+		font-size: 11pt;
+	}
 </style>
 <div id="pageContainer">
 <div class="pages">
