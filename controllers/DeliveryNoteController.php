@@ -249,7 +249,11 @@ class DeliveryNoteController extends Controller
             if($printHead==true)
                 $res=[
                     'no'=>$line->no,
-                    'qty'=>$line->product_qty,'uom'=>$line->productUom->name,'name'=>nl2br($line->name),'part_no'=>$line->product->default_code];
+                    'qty'=>$line->product_qty,
+                    'uom'=>(isset($line->productUom->name) ? $line->productUom->name:'-'),
+                    'name'=>nl2br($line->name),
+                    'part_no'=>(isset($line->product->default_code) ? $line->product->default_code:'-')
+                ];
         }
         return $res;
     }
