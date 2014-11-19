@@ -38,6 +38,9 @@ $config = [
             ],
         ],
         'db' => require(__DIR__ . '/db.php'),
+        'numericLib'=>[
+            'class'=>'app\components\NumericLib',
+        ]
     ],
     'params' => $params,
 ];

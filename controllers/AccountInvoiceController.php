@@ -58,6 +58,21 @@ class AccountInvoiceController extends Controller
         
     }
 
+    public function actionPrintInvoice($id,$uid=null){
+        $this->layout = 'printout';
+        $model=$this->findModel($id);
+        $lines = [];
+        foreach($model->accountInvoiceLines as $k=>$line):
+            $lines[$k]['no'] = $line->sequence;
+            $lines[$k]['qty'] = $line->quantity.' '.$line->uos->name;
+            $lines[$k]['desc'] = nl2br($line->name);
+            $lines[$k]['unit_price'] = $line->price_unit;
+            $lines[$k]['ext_price'] = $line->price_subtotal;
+        endforeach;
+
+        return $this->render('print/inv',['model'=>$model,'lines'=>$lines]);
+    }
+
     /**
      * Displays a single AccountInvoice model.
      * @param integer $id
