@@ -43,7 +43,7 @@
 	{
 		min-height: 134mm;
 		/*border-bottom: 1px solid blue;*/
-		font-size: 12pt;
+		font-size: 11pt;
 	}
 	.contentLines tr td{
 		vertical-align: top;

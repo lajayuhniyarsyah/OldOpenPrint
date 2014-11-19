@@ -22,7 +22,7 @@ use app\assets\AppAsset;
     <?php $this->head() ?>
     <style type="text/css">
         body{
-            font: 11pt arial solid black;
+            font-family: Arial, Helvetica, sans-serif;
         }
         @page {
             margin: 1%;
