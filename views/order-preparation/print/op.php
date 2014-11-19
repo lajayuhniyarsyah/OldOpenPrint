@@ -8,6 +8,7 @@ use yii\helpers\Url;
 		width: 200mm;
 		margin-left: auto; margin-right: auto;
 		page-break-after: always;
+		font-family: Arial, Helvetica, sans-serif;
 	}
 	table{
 		/* border-top: 1px solid black;
@@ -17,6 +18,7 @@ use yii\helpers\Url;
 		border: 1px solid black;
 		margin-left: auto; margin-right: auto;
 		page-break-after: always;
+		font-family: Arial, Helvetica, sans-serif;
 	}
 	.header{
 		height: 10%;
@@ -59,18 +61,20 @@ use yii\helpers\Url;
 		font-size: 24px;
 		font-weight: bold;
 		margin-left: 16px;
-		margin-top: -5px;
+		margin-top: 0px;
 		/*position: absolute;*/
+		font-family: Times New Roman;
 		float: left;
 		text-decoration: underline;
 	}
 	.yth{
-	 	display: block;
-	    float: left;
-	    font-size: 13px;
-	    margin-left: 16px;
-	    margin-top: 12px;
-	    width: 50%;
+		display: block;
+		float: left;
+		font-family: Times New Roman;
+		font-size: 14px;
+		margin-left: 16px;
+		margin-top: 12px;
+		width: 50%;
 	}
 	.customer{
 		float: right;
@@ -97,8 +101,9 @@ use yii\helpers\Url;
 	}
 	.isicus{
 		display: block;
-		margin-top: 15px; margin-left: 10px;
-		font-size: 13px;
+		font-size: 12px;
+		margin-left: 10px;
+		margin-top: 22px;
 	}
 	.content{
 		margin-left: 15px;
@@ -109,10 +114,11 @@ use yii\helpers\Url;
 		border-collapse: collapse
 	}
 	.headtablepages tr th{
-		text-align: center;
 		border: 1px solid black;
+		font-family: Times New Roman;
+		font-size: 13px;
 		line-height: 30px;
-		font-size: 18px;
+		text-align: center;
 	}
 	.content tr td{
 		border: 1px solid black;
@@ -122,23 +128,27 @@ use yii\helpers\Url;
 		border-bottom:1px solid black;
 	}
 	.tablefooter td{
+		border: medium none !important;
+		font-family: Times New Roman;
+		font-size: 11px;
 		text-align: center;
-		border: none !important;
-		font-size: 13px;
 	}
 	.isigudang{
-		margin-top:10px;
+		margin-top:35px;
 		margin-left: 40px;
 		text-align: left;
 		font-weight: bold;
+		font-family: Times New Roman;
 	}
 	.gudang{
 		margin-left: 40px;
 		border: none;
+		font-family: Times New Roman;
 	}
 	.gudang td{
 		line-height: 30px;
 		border: none !important;
+		font-size: 12px;
 
 	}
 	.data{
@@ -154,7 +164,8 @@ use yii\helpers\Url;
 	}
 	.tablecontent{
 		line-height: 30px;
-		font-size: 13px;
+		font-size: 11px;
+		font-family: Times New Roman;
 	}
 	@media all {
 		.page-break	{ display: none; }
@@ -195,7 +206,7 @@ use yii\helpers\Url;
 		border-right:  1px solid black;
 		border-collapse: collapse;
 		line-height: 25px;
-		font-size: 13px;
+		font-size: 12px;
 		vertical-align: top;
 	}
 	.leftdata{
@@ -219,7 +230,13 @@ use yii\helpers\Url;
 		width:400px; float:left;  margin-left: 15px;margin-top: -9px;
 	}
 	.tblkirim{
-		float: left;margin-left: 0px;margin-top: -1px; margin-left:15px; border-collapse: collapse;  line-height: 30px;
+		border-collapse: collapse;
+		float: left;
+		font-family: Times New Roman;
+		font-size: 12px;
+		line-height: 30px;
+		margin-left: 15px;
+		margin-top: -1px;
 	}
 	.dataiso{
 		text-align: center;
@@ -283,7 +300,7 @@ use yii\helpers\Url;
 								<div class="customer">
 									<fieldset>
 										<div class="isicus">
-										<?php echo $model->partner->name; ?><br/>
+										<b><?php echo $model->partner->name; ?></b><br/>
 										<?php echo $model->partner->street; ?><br/>
 											021-2591818<br/>
 										</div>
@@ -393,10 +410,11 @@ use yii\helpers\Url;
 								<table class="tblkirim">
 									<tr>
 										<td width="220px" style="border:1px solid black; ">
-											No SJ :
+											<div style="margin-left:10px;">No SJ :</div>
 										</td>
 										<td class="tglkirim" style="border:1px solid black; ">
-										Tgl Kirim :
+
+											<div style="margin-left:10px;">Tgl Kirim :</div>
 										</td>
 										<td>
 
