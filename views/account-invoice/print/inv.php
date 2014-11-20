@@ -135,7 +135,7 @@
 			<div class="notes">
 				<div class="terb">
 					<!-- DUA RATUS DELAPAN PULUH JUTA LIMA RATUS RIBU ENAM RATUS RUPIAH -->
-					<?=ucwords(Yii::$app->numericLib->convertToWords($model->amount_total))?> Rupiah
+					<?=ucwords(Yii::$app->numericLib->convertToWords($model->amount_total,$model->currency->name))?>
 
 				</div>
 				<div class="dueDate"><?=Yii::$app->formatter->asDatetime($model->date_invoice, "php:d-m-Y")?></div>
