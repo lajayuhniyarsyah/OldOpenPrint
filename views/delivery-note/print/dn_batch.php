@@ -32,7 +32,7 @@
 		float: left;
 		width: 43%;
 		padding-top: 11mm;
-		font-size: 12pt;
+		font-size: 11pt;
 	}
 
 	.partnerName
@@ -43,7 +43,7 @@
 	{
 		min-height: 134mm;
 		/*border-bottom: 1px solid blue;*/
-		font-size: 11pt;
+		font-size: 10pt;
 	}
 	.contentLines tr td{
 		vertical-align: top;
