@@ -21,7 +21,8 @@ use yii\helpers\Url;
 	}
 
 	table thead tr th{
-		text-align: center
+		text-align: center;
+		font-size: 10pt;
 	}
 	/* table#contentVal thead tr th{
 		border: 1px solid black;
@@ -34,11 +35,13 @@ use yii\helpers\Url;
 	}
 	table#contentVal tr td{
 		padding: 4px;
+		font-size: 9pt;
 	}
 
 
 	#heading{
 		/*letter-spacing: 1pt;*/
+		font-size: 11pt;
 	}
 	#heading span{
 		display: block;
