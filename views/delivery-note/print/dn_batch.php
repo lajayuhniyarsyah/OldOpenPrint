@@ -84,7 +84,7 @@
 		<div class="headers">
 			<div class="attnTo">
 				<p class="partnerName"><?=$model->partner->name?></p>
-				<p>
+				<p contenteditable="true">
 					<?=$model->partnerShipping->street?>
 					<?=($model->partnerShipping->street2 ? '<br/>'.$model->partnerShipping->street2:null)?>
 					<br/><?=$model->partnerShipping->city?>
