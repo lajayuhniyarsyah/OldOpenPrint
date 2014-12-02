@@ -122,7 +122,7 @@ class DeliveryNoteController extends Controller
 
 
     // action print
-    public function actionPrint($id,$tp=1){
+    public function actionPrint($id,$test=0){
         $this->layout = 'printout';
         
         $model = $this->findModel($id);
@@ -134,9 +134,11 @@ class DeliveryNoteController extends Controller
         $prepLines = $this->prepareLineData($model->deliveryNoteLines);
         
         $linesData = $this->renderLinesPrint($prepLines);
-
-        // if Rupiah
-        return $this->render('print/dn_batch',['model'=>$model,'linesData'=>$linesData]);
+        if(!$test):
+            return $this->render('print/dn_batch',['model'=>$model,'linesData'=>$linesData]);
+        else:
+            return $this->render('print/test/dn_batch_test',['model'=>$model,'linesData'=>$linesData]);
+        endif;
         
     }
 
