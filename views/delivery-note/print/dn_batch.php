@@ -24,7 +24,7 @@
 	.headers
 	{
 		
-		border-bottom: 1px solid black;
+		/*border-bottom: 1px solid black;*/
 		height: 65mm;
 	}
 	.attnTo
@@ -42,9 +42,9 @@
 	.tdLines
 	{
 		min-height: 134mm;
-		border-bottom: 1px solid blue;
+		/*border-bottom: 1px solid blue;*/
 		font-size: 11pt;
-		padding-top: 10mm;
+		padding-top: 9mm;
 	}
 	.contentLines tr td{
 		vertical-align: top;
@@ -95,12 +95,12 @@ if(Yii::$app->request->getQueryParam('uid') == 23):
 	}
 	.dnNo{
 		padding-top: 4%;
-		font-size: 11pt;
+		font-size: 10pt;
 	}
 	.opNo{
 		padding-left: 64% !important;
 		margin-top: 6% !important;
-		font-size: 11pt;
+		font-size: 10pt;
 	}
 	.poc{
 		margin-top: 6% !important;
@@ -112,6 +112,7 @@ if(Yii::$app->request->getQueryParam('uid') == 23):
 	.tdLines{
 		min-height: 110mm;
 		font-size: 10pt !important;
+		padding-top: 5mm;
 	}
 	</style>
 <?php
