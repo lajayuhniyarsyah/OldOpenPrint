@@ -48,11 +48,11 @@ class StockPickingSearch extends StockPicking
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
         ]);
-
+        var_dump(!($this->load($params) && $this->validate()));
         if (!($this->load($params) && $this->validate())) {
             return $dataProvider;
         }
-
+        
         $query->andFilterWhere([
             'id' => $this->id,
             'create_uid' => $this->create_uid,

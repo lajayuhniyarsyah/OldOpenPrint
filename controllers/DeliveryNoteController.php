@@ -8,6 +8,7 @@ use app\models\DeliveryNoteSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+// use app\models\PackingListLine;
 
 /**
  * DeliveryNoteController implements the CRUD actions for DeliveryNote model.
@@ -136,6 +137,48 @@ class DeliveryNoteController extends Controller
 
         // if Rupiah
         return $this->render('print/dn_batch',['model'=>$model,'linesData'=>$linesData]);
+        
+    }
+
+    /**
+     * Print Action For Packing List
+    **/
+    public function actionPrintPack($id,$tp=1){
+        $this->layout = 'printout';
+        
+        $model = $this->findModel($id);
+        // var_dump($model->packingListLines->id);
+        $linesData = [];
+        foreach($model->packingListLines as $k=>$listLine):
+            $linesData[$k]=[
+                'name'=>$listLine->name,
+                'color'=>$listLine->color,
+                'urgent'=>$listLine->urgent,
+                'to'=>$model->partner->name,
+                'attn'=>$model->partnerShipping->name,
+                'date'=>$model->tanggal,
+            ];
+            $totalWeight=0;
+            foreach($listLine->productListLines as $n=>$pLine):
+                    $linesData[$k]['lines'][] = [
+                    'no'=>$pLine->no,
+                    'desc'=>nl2br($pLine->name),
+                    'product'=>'['.$pLine->product->default_code.']'.$pLine->product->name_template,
+                    'qty'=>$pLine->product_qty.' '.$pLine->productUom->name,
+                    'weight'=>$pLine->weight,
+                    'measurement'=>$pLine->measurement,
+                ];
+                $totalWeight+=$pLine->weight;
+            endforeach;
+            $linesData[$k]['totalWeight'] = $totalWeight;
+        endforeach;
+        /*echo '<pre>';
+        var_dump($linesData);
+        echo '</pre>';*/
+        // PREPARE LINE DATA FOR PRINT
+
+        // if Rupiah
+        return $this->render('print/pack',['model'=>$model,'pagesData'=>$linesData]);
         
     }
 
