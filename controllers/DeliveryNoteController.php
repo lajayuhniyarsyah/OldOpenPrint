@@ -166,20 +166,15 @@ class DeliveryNoteController extends Controller
                     'no'=>$pLine->no,
                     'desc'=>nl2br($pLine->name),
                     'product'=>'['.$pLine->product->default_code.']'.$pLine->product->name_template,
-                    'qty'=>$pLine->product_qty.' '.$pLine->productUom->name,
-                    'weight'=>$pLine->weight,
-                    'measurement'=>$pLine->measurement,
+                    'qty'=>floatval($pLine->product_qty).' '.$pLine->productUom->name,
+                    'weight'=>($pLine->weight ? $pLine->weight:'-'),
+                    'measurement'=>($pLine->measurement ? $pLine->measurement:'-'),
                 ];
                 $totalWeight+=$pLine->weight;
             endforeach;
             $linesData[$k]['totalWeight'] = $totalWeight;
         endforeach;
-        /*echo '<pre>';
-        var_dump($linesData);
-        echo '</pre>';*/
-        // PREPARE LINE DATA FOR PRINT
 
-        // if Rupiah
         return $this->render('print/pack',['model'=>$model,'pagesData'=>$linesData]);
         
     }

@@ -1,3 +1,7 @@
+<?php
+use yii\helpers\Html;
+?>
+
 <style type="text/css">
 	#container
 	{
@@ -10,9 +14,9 @@
 	}
 	.pages
 	{
-		padding-top: 60mm;
+		padding-top: 55mm;
 		page-break-after: always;
-		height: 240mm;
+		height: 267mm;
 		/*border-bottom: 1px solid red;*/
 	}
 	.pager
@@ -31,12 +35,22 @@
 	.hLine{
 		height: 7mm;
 	}
+	.datePrint{
+		margin-left: 10mm;
+	}
 	.attnTo
 	{
-		/*float: left;*/
-		width: 43%;
+		float: left;
+		width: 46%;
 		padding-top: 11mm;
 		font-size: 11pt;
+	}
+	.UrgentCode{
+		font-size: 50pt;
+		float: right;
+		margin-right: 10mm;
+		margin-top: 10mm;
+		font-weight: bold;
 	}
 
 	.partnerName
@@ -46,7 +60,7 @@
 	.tdLines
 	{
 		min-height: 122mm;
-		border-bottom: 1px solid blue;
+		/*border-bottom: 1px solid blue;*/
 		font-size: 10pt;
 	}
 	.contentLines tr td{
@@ -77,24 +91,26 @@
 		font-size: 12pt;
 	}
 	.pagesInfo{
-		margin-left: 100mm;
+		margin-left: 134mm;
+		margin-top: 10mm;
 
 	}
 
 	.td1{
-		width: 21mm;
+		width: 22mm;
+		text-align: center;
 	}
 	.td2{
-		width: 17mm;
+		width: 16mm;
 	}
 	.td3{
-		width: 90mm;
+		width: 87mm;
 	}
 	.td4{
-		width: 15mm;
+		width: 19mm;
 	}
 	.td5{
-		width: 15mm;
+		width: 40mm;
 	}
 
 
@@ -103,7 +119,7 @@
 		float: left;
 	}
 	.footers .totalBox{
-		width: 87mm;
+		width: 84mm;
 		height: 14mm;
 		text-align: center;
 		float: left;
@@ -115,7 +131,18 @@
 		clear: both;
 	}
 	.POInfo{
-		padding-left: 50mm;
+		padding-left: 41mm;
+		width: 86mm;
+	}
+	.sign{
+		margin-top: 45mm;
+		text-decoration: underline;
+	}
+	.totalRow{
+		margin-top: 2mm;
+	}
+	.colorCode{
+		margin-top:-3mm;
 	}
 	@media print
 	{
@@ -128,13 +155,18 @@
 	<div class="pages">
 		<div class="headers">
 			<div class="attnTo">
+				<div class="to hLine" contenteditable="true"><?=$model->partner->name?></div>
+				<div class="attn hLine" contenteditable="true"><?=$model->partnerShipping->name?></div>
+				<div class="datePrint hLine">
+					<?=strtoupper(date('F-Y'))?>
+				</div>
+				<div class="ref hLine"><?=$model->name?></div>
+			</div>
+			<div class="UrgentCode">
 				
 			</div>
+			<div class="clear"></div>
 			<div class="pageInfo">
-				<div class="to hLine"><?=$model->partner->name?></div>
-				<div class="attn hLine"><?=$model->partnerShipping->name?></div>
-				<div class="date hLine"><?=$model->tanggal?></div>
-				<div class="ref hLine"><?=$model->name?></div>
 				<div class="pagesInfo">
 					<div class="boxInfo"></div>
 					<div class="pageNo"></div>
@@ -153,11 +185,14 @@
 				<div class="totalWeight"></div>
 				<div class="clear"></div>
 			</div>
-			<div class="POInfo">
-				Purchase Order No. <?=$model->poc?>
-				<?=$model->note?>
+			<div class="POInfo" >
+				<div class="noteline" contenteditable="true">
+					PO No. <?=$model->poc?>
+					<?=Html::encode(nl2br($model->note))?>
+				</div>
+				<div class="colorCode"></div>
 			</div>
-			<div class="sign"></div>
+			<div class="sign">Susanti Pheng</div>
 		</div>
 	</div>
 </div>
@@ -188,7 +223,7 @@ $scr = '
 
 	function prepareRow(rowNo,data)
 	{
-		return "<tr class=\'cRows rows"+rowNo+"\'><td class=\'td1\'>"+data.no+"</td><td class=\'td2\'>"+data.qty+"</td><td class=\'td3\'>"+data.desc+"</td><td class=\'td4\'>"+data.weight+"</td><td style=\"text-align:center;\" class=\'td5\'>"+data.measurement+"</td></tr>";
+		return "<tr class=\'cRows rows"+rowNo+"\'><td class=\'td1\'>"+data.no+"</td><td class=\'td2\'>"+data.qty+"</td><td class=\'td3\'>"+data.desc+"</td><td class=\'td4\'>"+data.weight+"</td><td class=\'td5\'>"+data.measurement+"</td></tr>";
 	}
 	var totalPageBox = [];
 	var packData = [];
@@ -267,12 +302,15 @@ $scr = '
 			totalPageBox[packQue] = pagePerbox;
 			jQuery(\'.footers:last .totalRow .totalItem\').html(\'Total : \'+pageData.lines.length+\' Items\');
 			jQuery(\'.footers:last .totalRow .totalBox\').html(\'TOTAL : 1 BOX\');
-			jQuery(\'.footers:last .totalRow .totalWeight\').html(\'Total : \'+pageData.totalWeight);
+			jQuery(\'.footers:last .totalRow .totalWeight\').html(pageData.totalWeight+\' Kgs\');
 
 
 			jQuery(\'.footers:last .totalRow .totalItem\').attr(\'class\',\'totalItem totalItem\'+packQue);
 			jQuery(\'.footers:last .totalRow .totalBox\').attr(\'class\',\'totalBox totalBox\'+packQue);
 			jQuery(\'.footers:last .totalRow .totalWeight\').attr(\'class\',\'totalweight totalWeight\'+packQue);
+			jQuery(\'.colorCode:last\').html(\'COLOUR CODE : \'+pageData.color);
+			console.log(pageData.color);
+			jQuery(\'.UrgentCode:last\').html(pageData.urgent);
 
 
 

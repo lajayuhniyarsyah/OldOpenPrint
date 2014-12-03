@@ -194,7 +194,7 @@ $scr = '
 
 	function getNotes(notes,rowNo=999999)
 	{
-		return "<tr class=\'cRows rows"+rowNo+"\'><td style=\"width:23%;\"></td><td style=\"width:57%;padding-top:10mm;\">Notes : <br/>"+notes+"</td><td></td></tr>";
+		return "<tr class=\'cRows rows"+rowNo+"\'><td style=\"width:23%;\"></td><td contenteditable=\"true\" style=\"width:57%;padding-top:10mm;\">Notes : <br/>"+notes+"</td><td></td></tr>";
 	}
 	var rowPage = 0;
 
