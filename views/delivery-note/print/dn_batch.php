@@ -77,11 +77,22 @@
 		clear: both;
 		height: 0mm;
 	}
+	.urgentCode{
+		font-size: 46pt;
+		font-weight: bold;
+		float: right;
+		margin-right: 10mm;
+		margin-top: 4mm;
+		text-decoration: underline;
+	}
 	@media print
 	{
 		#container{
 			border: none;
 		}
+	}
+	pre{
+		font-family: Arial, Helvetica, sans-serif;
 	}
 </style>
 
@@ -138,14 +149,30 @@ endif;
 				</p>
 			</div>
 			<div class="dnInfo">
-				<div class="dnNo"><?=$model->name?></div>
+				<div class="dnNo">
+					<div class="urgentCode" contenteditable="true">
+						<?php
+							if(isset($model->packingListLines[0])){
+								echo $model->packingListLines[0]->urgent;
+							}else{
+								echo ' ';
+							}
+						?>
+					</div>
+					<?=$model->name?>
+
+				</div>
 				<div class="opNo">
+
 					<?php
 						$fullOp=$model->prepare->name;
 						$explOp = explode('/', $fullOp);
 						echo $explOp[0];
 					?>
+					
 				</div>
+				
+
 				<div class="poc">
 					<?=$model->poc?>
 				</div>
@@ -194,7 +221,7 @@ $scr = '
 
 	function getNotes(notes,rowNo=999999)
 	{
-		return "<tr class=\'cRows rows"+rowNo+"\'><td style=\"width:23%;\"></td><td contenteditable=\"true\" style=\"width:57%;padding-top:10mm;\">Notes : <br/>"+notes+"</td><td></td></tr>";
+		return "<tr class=\'cRows rows"+rowNo+"\'><td style=\"width:23%;\"></td><td contenteditable=\"true\" style=\"width:57%;padding-top:10mm;\">Notes : <br/><pre>"+notes+"</pre></td><td></td></tr>";
 	}
 	var rowPage = 0;
 

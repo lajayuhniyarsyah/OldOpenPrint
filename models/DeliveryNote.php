@@ -27,10 +27,11 @@ use Yii;
  * @property boolean $special
  * @property integer $work_order_id
  * @property integer $work_order_in
+ * @property integer $attn
  *
  * @property PackingListLine[] $packingListLines
  * @property StockPicking[] $stockPickings
- * @property DeliveryNoteLine[] $deliveryNoteLines
+ * @property ResPartner $attn0
  * @property PerintahKerjaInternal $workOrderIn
  * @property PerintahKerja $workOrder
  * @property OrderPreparation $prepare
@@ -38,6 +39,7 @@ use Yii;
  * @property ResPartner $partner
  * @property ResUsers $writeU
  * @property ResUsers $createU
+ * @property DeliveryNoteLine[] $deliveryNoteLines
  */
 class DeliveryNote extends \yii\db\ActiveRecord
 {
@@ -55,7 +57,7 @@ class DeliveryNote extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['create_uid', 'write_uid', 'partner_id', 'partner_shipping_id', 'prepare_id', 'work_order_id', 'work_order_in'], 'integer'],
+            [['create_uid', 'write_uid', 'partner_id', 'partner_shipping_id', 'prepare_id', 'work_order_id', 'work_order_in', 'attn'], 'integer'],
             [['create_date', 'write_date', 'tanggal'], 'safe'],
             [['name'], 'required'],
             [['note', 'state', 'terms'], 'string'],
@@ -76,21 +78,22 @@ class DeliveryNote extends \yii\db\ActiveRecord
             'create_date' => 'Create Date',
             'write_date' => 'Write Date',
             'write_uid' => 'Write Uid',
-            'colorcode' => 'Color/Stock Code',
-            'partner_id' => 'Customer',
-            'poc' => 'Customer Reference',
-            'name' => 'Delivery Note',
-            'partner_shipping_id' => 'Delivery Address',
-            'note' => 'Notes',
+            'colorcode' => 'Colorcode',
+            'partner_id' => 'Partner ID',
+            'poc' => 'Poc',
+            'name' => 'Name',
+            'partner_shipping_id' => 'Partner Shipping ID',
+            'note' => 'Note',
             'state' => 'State',
-            'tanggal' => 'Date',
-            'prepare_id' => 'Order Packaging',
+            'tanggal' => 'Tanggal',
+            'prepare_id' => 'Prepare ID',
             'ekspedisi' => 'Ekspedisi',
             'jumlah_coli' => 'Jumlah Coli',
-            'terms' => 'Terms & Condition',
-            'special' => 'Special WO',
-            'work_order_id' => 'SPK',
-            'work_order_in' => 'SPK Internal',
+            'terms' => 'Terms',
+            'special' => 'Special',
+            'work_order_id' => 'Work Order ID',
+            'work_order_in' => 'Work Order In',
+            'attn' => 'Attn',
         ];
     }
 
@@ -113,9 +116,9 @@ class DeliveryNote extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getDeliveryNoteLines()
+    public function getAttn0()
     {
-        return $this->hasMany(DeliveryNoteLine::className(), ['note_id' => 'id']);
+        return $this->hasOne(ResPartner::className(), ['id' => 'attn']);
     }
 
     /**
@@ -172,5 +175,13 @@ class DeliveryNote extends \yii\db\ActiveRecord
     public function getCreateU()
     {
         return $this->hasOne(ResUsers::className(), ['id' => 'create_uid']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDeliveryNoteLines()
+    {
+        return $this->hasMany(DeliveryNoteLine::className(), ['note_id' => 'id']);
     }
 }

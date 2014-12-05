@@ -142,10 +142,13 @@ class DeliveryNoteController extends Controller
         
     }
 
+    
+
     /**
      * Print Action For Packing List
     **/
-    public function actionPrintPack($id,$tp=1){
+    public function actionPrintPack($id,$printer='lq300-hadi')
+    {
         $this->layout = 'printout';
         
         $model = $this->findModel($id);
@@ -159,6 +162,7 @@ class DeliveryNoteController extends Controller
                 'to'=>$model->partner->name,
                 'attn'=>$model->partnerShipping->name,
                 'date'=>$model->tanggal,
+                'poc'=>$model->poc,
             ];
             $totalWeight=0;
             foreach($listLine->productListLines as $n=>$pLine):
@@ -175,7 +179,7 @@ class DeliveryNoteController extends Controller
             $linesData[$k]['totalWeight'] = $totalWeight;
         endforeach;
 
-        return $this->render('print/pack',['model'=>$model,'pagesData'=>$linesData]);
+        return $this->render('print/pack',['model'=>$model,'pagesData'=>$linesData,'printer'=>$printer]);
         
     }
 
