@@ -1,5 +1,6 @@
 <?php
 use yii\helpers\Html;
+use yii\helpers\Url;
 ?>
 
 <style type="text/css">
@@ -14,9 +15,11 @@ use yii\helpers\Html;
 	}
 	.pages
 	{
+		
 		padding-top: 55mm;
 		page-break-after: always;
-		height: 267mm;
+		height: 283mm;
+		/*border-top: 1px solid green;*/
 		/*border-bottom: 1px solid red;*/
 	}
 	.pager
@@ -141,22 +144,75 @@ use yii\helpers\Html;
 	.totalRow{
 		margin-top: 2mm;
 	}
-	.colorCode{
-		margin-top:-3mm;
+	.font11{
+		font-size: 11pt;
+	}
+	.choosePrinter{
+		position: absolute;
+		z-index: 9999;
+		right: 0;
 	}
 	@media print
 	{
 		#container{
 			border: none;
 		}
+		.choosePrinter{
+			display: none;
+		}
 	}
+	
 </style>
+
+<?php
+	if($printer=='lq300-hadi'){
+		?>
+		<style type="text/css">
+			.pages{
+				height: 238mm;
+				padding-top: 49mm;
+			}
+			.pages:not(:first-child){
+				padding-top: 51mm;
+			}
+			.headers{
+				height: 66mm;
+			}
+			.hLine{
+				height: 5mm;
+			}
+			.tdLines{
+				min-height: 98mm;
+			}
+			.footers .totalBox{
+				height: 11mm;
+			}
+
+			.td1{
+				width: 21mm;
+			}
+		</style>
+		<?php
+	}
+?>
+<div class="choosePrinter">
+	<form method="get" id="formSelectPrinter">
+			<input type="hidden" value="<?=Url::to('delivery-note/print-pack')?>" name="r" />
+			<input type="hidden" value="<?=$model->id?>" name="id" />
+			<input type="hidden" value="<?=Yii::$app->request->get('uid')?>" name="uid" />
+		Print To : <select name="printer" onchange="jQuery('#formSelectPrinter').submit();">
+			<option <?=($printer=='lQ300-hadi' ? 'selected ':null)?> value="lq300-hadi">Admin Hadi (LQ 300+II)</option>
+			<option <?=($printer=='lx300-novri' ? 'selected ':null)?> value="lx300-novri">Admin Novri (LX 300+II)</option>
+		</select>
+	</form>
+</div>
+
 <div id="container">
 	<div class="pages">
 		<div class="headers">
 			<div class="attnTo">
 				<div class="to hLine" contenteditable="true"><?=$model->partner->name?></div>
-				<div class="attn hLine" contenteditable="true"><?=$model->partnerShipping->name?></div>
+				<div class="attn hLine" contenteditable="true"><?=(isset($model->attn0) ? $model->attn0->name:null)?></div>
 				<div class="datePrint hLine">
 					<?=strtoupper(date('F-Y'))?>
 				</div>
@@ -180,15 +236,13 @@ use yii\helpers\Html;
 		</div>
 		<div class="footers">
 			<div class="totalRow">
-				<div class="totalItem"></div>
-				<div class="totalBox"></div>
-				<div class="totalWeight"></div>
+				<div class="total totalItem"></div>
+				<div class="total totalBox"></div>
+				<div class="total totalWeight"></div>
 				<div class="clear"></div>
 			</div>
 			<div class="POInfo" >
-				<div class="noteline" contenteditable="true">
-					PO No. <?=$model->poc?>
-					<?=Html::encode(nl2br($model->note))?>
+				<div class="noteline">
 				</div>
 				<div class="colorCode"></div>
 			</div>
@@ -295,7 +349,7 @@ $scr = '
 				// jQuery(\'.pager:last\').html(currPage);
 				// console.log(tmpl);
 			}
-			jQuery(\'#page\'+currPage+\' .pagesInfo .boxInfo\').html(\'BOX \'+pad(packQue+1,2)+\' of \'+pad(pagesData.length,2));
+			jQuery(\'#page\'+currPage+\' .pagesInfo .boxInfo\').html(\'Box \'+pad(packQue+1,2)+\' of \'+pad(pagesData.length,2));
 			jQuery(\'#page\'+currPage+\' .pagesInfo .pageNo\').html(\'P. \'+pad(pagePerbox,2)+\' of <span class="pageTotalInfo\'+packQue+\'"></span>\');
 			rowPage = rowPage+1;
 			currRow=currRow+1;
@@ -305,24 +359,35 @@ $scr = '
 			jQuery(\'.footers:last .totalRow .totalWeight\').html(pageData.totalWeight+\' Kgs\');
 
 
-			jQuery(\'.footers:last .totalRow .totalItem\').attr(\'class\',\'totalItem totalItem\'+packQue);
-			jQuery(\'.footers:last .totalRow .totalBox\').attr(\'class\',\'totalBox totalBox\'+packQue);
-			jQuery(\'.footers:last .totalRow .totalWeight\').attr(\'class\',\'totalweight totalWeight\'+packQue);
-			jQuery(\'.colorCode:last\').html(\'COLOUR CODE : \'+pageData.color);
+			jQuery(\'.footers:last .totalRow .totalItem\').attr(\'class\',\'total font11 totalItem totalItem\'+packQue);
+			jQuery(\'.footers:last .totalRow .totalBox\').attr(\'class\',\'total font11 totalBox totalBox\'+packQue);
+			jQuery(\'.footers:last .totalRow .totalWeight\').attr(\'class\',\'total font11 totalweight totalWeight\'+packQue);
+			if(pageData.color){
+				jQuery(\'.colorCode:last\').html(\'COLOUR CODE : \'+pageData.color);
+			}
+			
 			console.log(pageData.color);
 			jQuery(\'.UrgentCode:last\').html(pageData.urgent);
+			jQuery(\'.noteline\').html(\'PO NO. \'+pageData.poc);
 
 
 
 			
 		});
+		
 	});
+	jQuery(\'.noteline\').attr(\'contenteditable\',\'true\');
+	jQuery(\'.td3\').attr(\'contenteditable\',\'true\');
 	// console.log(totalPageBox);
 	jQuery.each(totalPageBox,function(i,v){
 		jQuery(\'.pageTotalInfo\'+i).html(pad(v,2));
 	});
 	console.log(packData);
 	jQuery(\'.pageTotalInfo\').html(pad(currPage,2));
+	jQuery(\'.total\').attr(\'contenteditable\',\'true\');
+	jQuery(\'.boxInfo\').attr(\'contenteditable\',\'true\');
+	jQuery(\'.pageInfo\').attr(\'contenteditable\',\'true\');
+	jQuery(\'.colorCode\').attr(\'contenteditable\',\'true\');
 ';
 
 $this->registerJs($scr);
