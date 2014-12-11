@@ -258,7 +258,7 @@ use yii\helpers\Url;
 					}
 					
 				}
-				$desc=$value->name.'<br/>'.implode($databatch);
+				$desc=$value->name.'<br/>'.$value->detail.'<br/>'.implode($databatch);
 				if ($value->no==""){
 					$no='';
 				}else{

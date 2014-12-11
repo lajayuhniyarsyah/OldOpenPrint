@@ -6,6 +6,10 @@ use Yii;
 use app\models\StockPicking;
 use app\models\StockPickingSearch;
 use app\models\StockLocation;
+use app\models\StockMove;
+use app\models\StockMoveSearch;
+use app\models\MrpBom;
+use app\models\MrpBomSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -35,12 +39,18 @@ class MovesController extends Controller
     public function actionIndex()
     {
         $searchModel = new StockPickingSearch();
+        
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
         ]);
+    }
+
+    public function actionProductSet()
+    {
+        return $this->render('Productset');
     }
 
     /**
@@ -185,12 +195,93 @@ class MovesController extends Controller
      * @return StockPicking the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
-    protected function findModel($id)
+    protected function findModel($id,$model=0)
     {
-        if (($model = StockPicking::findOne($id)) !== null) {
-            return $model;
-        } else {
-            throw new NotFoundHttpException('The requested page does not exist.');
+        switch ($model) {
+            case 1:
+                $modelN = 'StockMove';
+                if (($model = StockMove::findOne($id)) !== null)
+                {
+                    return $model;
+                }
+                else
+                {
+                    throw new NotFoundHttpException('The requested page does not exist.');
+                }
+                break;
+            
+            default:
+                # code...
+                $modelN = 'StockPicking';
+                if (($model = StockPicking::findOne($id)) !== null)
+                {
+                    return $model;
+                }
+                else
+                {
+                    throw new NotFoundHttpException('The requested page does not exist.');
+                }
+                break;
         }
+
+        
+    }
+
+    public function actionViewMoveChilds($id){
+        $searchModel = new StockMoveSearch();
+        $dataProvider = $searchModel->searchChild($id);
+
+
+        $move = $this->findModel($id,1);
+        return $this->render('view_move_childs',['model'=>$move,'dataProvider'=>$dataProvider,'filterModel'=>$searchModel]);
+    }
+
+    public function actionGenerateProductSet($id,$product_id){
+        $dataMove = StockMove::find()->where(['id'=>$id])->one();
+        $bom = MrpBom::find()->where(['product_id'=>$product_id,'type'=>'phantom'])->one();
+        if(!$bom){
+            throw new NotFoundHttpException('This Product Not Setted Into Phantom BOM');
+        }
+
+        $searchModel = new MrpBomSearch();
+        $dataProvider = $searchModel->searchBom($bom->id);
+        foreach($dataProvider->getModels() as $model){
+            $newMove = new StockMove();
+            $newMove->create_uid = $dataMove->create_uid;
+            $newMove->create_date = $dataMove->create_date;
+            $newMove->date = $dataMove->create_date;
+            $newMove->write_date = $dataMove->write_date;
+            $newMove->write_uid = $dataMove->write_uid;
+            $newMove->origin = $dataMove->origin;
+            $newMove->product_uos_qty = $dataMove->product_uos_qty;
+            $newMove->date_expected = $dataMove->date_expected;
+            $newMove->product_uom = $model->product_uom;
+            $newMove->move_dest_id = $dataMove->id;
+            $newMove->product_qty = $dataMove->product_qty * $model->product_qty;
+            $newMove->product_uos = $model->product_uom;
+            $newMove->partner_id = $dataMove->partner_id;
+            $newMove->product_id = $model->product_id;
+            $newMove->location_id = $dataMove->location_id;
+            $newMove->company_id = $dataMove->company_id;
+            $newMove->picking_id = $dataMove->picking_id;
+            $newMove->state = $dataMove->state;
+            $newMove->location_dest_id = $dataMove->location_dest_id;
+            $newMove->tracking_id = $dataMove->tracking_id;
+            $newMove->product_packaging = $dataMove->product_packaging;
+            $newMove->purchase_line_id = $dataMove->purchase_line_id;
+            $newMove->sale_line_id = $dataMove->sale_line_id;
+            $newMove->name = $model->name;
+            $newMove->desc = $model->name;
+            $newMove->no = $dataMove->no;
+            $newMove->weight_uom_id=3;
+            $newMove->save();
+        }
+
+        $stockmove = StockMove::findOne($id);
+        $stockmove->picking_id = '';
+        $stockmove->location_dest_id = 12;
+        $stockmove->update();
+
+        return $this->redirect(['view-move-childs', 'id' => $id]);
     }
 }

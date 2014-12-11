@@ -19,6 +19,10 @@ $this->params['breadcrumbs'][] = $this->title;
         <?= Html::a('Create Stock Picking', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
+    <p>
+        <?= Html::a('Check Stock SET', ['product-set'], ['class' => 'btn btn-success']) ?>
+    </p>
+
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
