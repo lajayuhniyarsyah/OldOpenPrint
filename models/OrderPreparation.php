@@ -88,7 +88,7 @@ class OrderPreparation extends \yii\db\ActiveRecord
      */
     public function getOrderPreparationLines()
     {
-        return $this->hasMany(OrderPreparationLine::className(), ['preparation_id' => 'id']);
+        return $this->hasMany(OrderPreparationLine::className(), ['preparation_id' => 'id'])->orderBy('no ASC');
     }
 
     /**

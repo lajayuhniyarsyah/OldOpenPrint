@@ -112,10 +112,13 @@ class AccountInvoiceLine extends \yii\db\ActiveRecord
 
     public function afterFind(){
         $this->price_subtotal = number_format($this->price_subtotal,2,',','.');
+        $this->price_unit = number_format($this->price_unit,2,',','.');
         // $this->price_subtotal = Yii::$app->formatter->asCurrency($this->price_subtotal,'',[],[NumberFormatter::DECIMAL_SEPARATOR_SYMBOL=>',']);
 
         return true;
     }
+
+    
 
     /**
      * @return \yii\db\ActiveQuery

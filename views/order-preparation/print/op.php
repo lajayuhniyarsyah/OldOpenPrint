@@ -63,14 +63,14 @@ use yii\helpers\Url;
 		margin-left: 16px;
 		margin-top: 0px;
 		/*position: absolute;*/
-		font-family: Times New Roman;
+		/*font-family: Times New Roman;*/
 		float: left;
 		text-decoration: underline;
 	}
 	.yth{
 		display: block;
 		float: left;
-		font-family: Times New Roman;
+		/*font-family: Times New Roman;*/
 		font-size: 14px;
 		margin-left: 16px;
 		margin-top: 12px;
@@ -115,7 +115,7 @@ use yii\helpers\Url;
 	}
 	.headtablepages tr th{
 		border: 1px solid black;
-		font-family: Times New Roman;
+		/*font-family: Times New Roman;*/
 		font-size: 13px;
 		line-height: 30px;
 		text-align: center;
@@ -129,7 +129,7 @@ use yii\helpers\Url;
 	}
 	.tablefooter td{
 		border: medium none !important;
-		font-family: Times New Roman;
+		/*font-family: Times New Roman;*/
 		font-size: 11px;
 		text-align: center;
 	}
@@ -138,12 +138,12 @@ use yii\helpers\Url;
 		margin-left: 40px;
 		text-align: left;
 		font-weight: bold;
-		font-family: Times New Roman;
+		/*font-family: Times New Roman;*/
 	}
 	.gudang{
 		margin-left: 40px;
 		border: none;
-		font-family: Times New Roman;
+		/*font-family: Times New Roman;*/
 	}
 	.gudang td{
 		line-height: 30px;
@@ -165,7 +165,7 @@ use yii\helpers\Url;
 	.tablecontent{
 		line-height: 30px;
 		font-size: 11px;
-		font-family: Times New Roman;
+		/*font-family: Times New Roman;*/
 	}
 	@media all {
 		.page-break	{ display: none; }
@@ -232,7 +232,7 @@ use yii\helpers\Url;
 	.tblkirim{
 		border-collapse: collapse;
 		float: left;
-		font-family: Times New Roman;
+		/*font-family: Times New Roman;*/
 		font-size: 12px;
 		line-height: 30px;
 		margin-left: 15px;
@@ -330,7 +330,7 @@ use yii\helpers\Url;
 										<tr>
 											<td width="70px">Tanggal.DO</td>
 											<td>:</td>
-											<td width="220px"><?php echo $model->duedate; ?></td>
+											<td width="220px"><?=date('d-M-Y')?></td>
 
 											<td width="50px">No.PO</td>
 											<td>:</td>

@@ -8,6 +8,7 @@ use app\models\DeliveryNoteSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+// use app\models\PackingListLine;
 
 /**
  * DeliveryNoteController implements the CRUD actions for DeliveryNote model.
@@ -121,7 +122,7 @@ class DeliveryNoteController extends Controller
 
 
     // action print
-    public function actionPrint($id,$tp=1){
+    public function actionPrint($id,$test=0){
         $this->layout = 'printout';
         
         $model = $this->findModel($id);
@@ -133,9 +134,52 @@ class DeliveryNoteController extends Controller
         $prepLines = $this->prepareLineData($model->deliveryNoteLines);
         
         $linesData = $this->renderLinesPrint($prepLines);
+        if(!$test):
+            return $this->render('print/dn_batch',['model'=>$model,'linesData'=>$linesData]);
+        else:
+            return $this->render('print/test/dn_batch_test',['model'=>$model,'linesData'=>$linesData]);
+        endif;
+        
+    }
 
-        // if Rupiah
-        return $this->render('print/dn_batch',['model'=>$model,'linesData'=>$linesData]);
+    
+
+    /**
+     * Print Action For Packing List
+    **/
+    public function actionPrintPack($id,$printer='lq300-hadi')
+    {
+        $this->layout = 'printout';
+        
+        $model = $this->findModel($id);
+        // var_dump($model->packingListLines->id);
+        $linesData = [];
+        foreach($model->packingListLines as $k=>$listLine):
+            $linesData[$k]=[
+                'name'=>$listLine->name,
+                'color'=>$listLine->color,
+                'urgent'=>$listLine->urgent,
+                'to'=>$model->partner->name,
+                'attn'=>$model->partnerShipping->name,
+                'date'=>$model->tanggal,
+                'poc'=>$model->poc,
+            ];
+            $totalWeight=0;
+            foreach($listLine->productListLines as $n=>$pLine):
+                    $linesData[$k]['lines'][] = [
+                    'no'=>$pLine->no,
+                    'desc'=>nl2br($pLine->name),
+                    'product'=>'['.$pLine->product->default_code.']'.$pLine->product->name_template,
+                    'qty'=>floatval($pLine->product_qty).' '.$pLine->productUom->name,
+                    'weight'=>($pLine->weight ? $pLine->weight:'-'),
+                    'measurement'=>($pLine->measurement ? $pLine->measurement:'-'),
+                ];
+                $totalWeight+=$pLine->weight;
+            endforeach;
+            $linesData[$k]['totalWeight'] = $totalWeight;
+        endforeach;
+
+        return $this->render('print/pack',['model'=>$model,'pagesData'=>$linesData,'printer'=>$printer]);
         
     }
 

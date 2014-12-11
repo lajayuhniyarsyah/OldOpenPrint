@@ -65,7 +65,7 @@ use app\assets\AppAsset;
 
 <?php $this->beginBody() ?>
     <div>
-        <div class="hideOnPrint">
+        <!-- <div class="hideOnPrint">
             <a id="btnSetting">Page Setting</a>
             <div id="absoluteWrapper">
                 <form>
@@ -81,7 +81,7 @@ use app\assets\AppAsset;
                     </div>
                 </form>
             </div>
-        </div>
+        </div> -->
         <div>
             <?= $content ?>
         </div>

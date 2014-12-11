@@ -35,6 +35,9 @@
     .cRows{
         vertical-align: top;
     }
+    .contentLines{
+        font-size: 11pt;
+    }
 </style>
 <div id="pageContainer">
 <div class="pages">

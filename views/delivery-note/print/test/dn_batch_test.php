@@ -82,12 +82,6 @@
 		font-weight: bold;
 		float: right;
 		margin-right: 10mm;
-		margin-top: 4mm;
-		text-decoration: underline;
-	}
-
-	pre{
-		white-space: pre-wrap;
 	}
 	@media print
 	{
@@ -159,7 +153,7 @@ endif;
 							if(isset($model->packingListLines[0])){
 								echo $model->packingListLines[0]->urgent;
 							}else{
-								echo ' ';
+								echo 'L9';
 							}
 						?>
 					</div>
