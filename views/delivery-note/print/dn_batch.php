@@ -85,6 +85,10 @@
 		margin-top: 4mm;
 		text-decoration: underline;
 	}
+
+	pre{
+		white-space: pre-wrap;
+	}
 	@media print
 	{
 		#container{
