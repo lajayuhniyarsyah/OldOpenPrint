@@ -4,77 +4,78 @@
 	
 	if($jenis=="del"){
 		/* ============================= Print out Untuk Surat Jalan  ===========================================  */
-		$judul= "REPORT SURAT JALAN";	
+		$judul= "<div class='judul'>Report Delivery Note</div> <br/> <div class='periode'> ".Yii::$app->formatter->asDatetime($from, "php:d-m-Y")." s/d ".Yii::$app->formatter->asDatetime($to, "php:d-m-Y")."</div>";	
 		$headTable="
 					<tr>
-						<th>Create Date</th>
-						<th>Delivery Date</th>
-						<th>NO Delivery Note</th>
-						<th>No OP</th>
-						<th>Part Number</th>
-						<th>Product Name</th>
-						<th>Product Desc</th>
-						<th>Qty</th>
-						<th>UOM</th>
-						<th>Batch</th>
-						<th>Price</th>
-						<th>Currency</th>
-						<th>SO NO</th>
-						<th>PO NO</th>
-						<th>Customer</th>
-						<th>Status</th>
+						<td>No</td>
+						<td>Date</td>
+						<td>DN</td>
+						<td>OP</td>
+						<td>Part Number</td>
+						<td>Product Name</td>
+						<td>Product Desc</td>
+						<td>Qty</td>
+						<td>UOM</td>
+						<td>Batch</td>
+						<td>Price</td>
+						<td>Currency</td>
+						<td>SO</td>
+						<td>PO</td>
+						<td>Customer</td>
+						<td>Status</td>
 					</tr>
 					";
-
+		$no=1;
 		foreach ($data as $value) {
 			$body[]='<tr>
-					<td>'.$value['cretae_date'].'</td>
-					<td>'.$value['tanggal'].'</td>
-					<td>'.$value['dn_no'].'</td>
-					<td>'.$value['no_op'].'</td>
+					<td>'.$no.'</td>
+					<td>'.Yii::$app->formatter->asDatetime($value['tanggal'], "php:d-m-Y").'</td>
+					<td>'.substr($value['dn_no'], 1,6).'</td>
+					<td>'.substr($value['no_op'], 1,6).'</td>
 					<td>'.$value['part_number'].'</td>
 					<td>'.$value['name_template'].'</td>
 					<td>'.$value['name_input'].'</td>
 					<td>'.$value['qty'].'</td>
 					<td>'.$value['uom'].'</td>
 					<td>'.$value['batch'].'</td>
-					<td>'.$value['price'].'</td>
+					<td>'.app\components\NumericLib::indoStyle($value['price'],2,',','.').'</td>
 					<td>'.$value['pricelist'].'</td>
-					<td>'.$value['so_no'].'</td>
+					<td>'.substr($value['so_no'], 9,5).'</td>
 					<td>'.$value['poc'].'</td>
 					<td>'.$value['partner'].'</td>
 					<td>'.$value['state'].'</td>
 				 </tr>';
+		$no++;
 		}
 	}else{
 		/* ============================= Print out Untuk Incoming Shipment & Internal Move  ===========================================  */
-		$judul= "REPORT INCOMING SHIPMENT DAN INTERNAL MOVE";
+		$judul= "<div class='judul'>Report Incoming Shipment &amp; Internal Move</div> <br/><div class='periode'>  ".Yii::$app->formatter->asDatetime($from, "php:d-m-Y")." s/d ".Yii::$app->formatter->asDatetime($to, "php:d-m-Y")."</div>";
 		$headTable="
 			<tr>
-				<th>Type</th>
-				<th>Date Done</th>
-				<th>LBM No</th>
-				<th>Part Number</th>
-				<th>Product Name</th>
-				<th>Product Desc</th>
-				<th>Qty</th>
-				<th>UOM</th>
-				<th>Batch</th>
-				<th>Price</th>
-				<th>Currency</th>
-				<th>Location</th>
-				<th>Dest Location</th>
-				<th>Partner</th>
-				<th>Type</th>
-				<th>NO PO</th>
-				<th>Origin</th>
-				<th>Status</th>
+				<td>Type</td>
+				<td>Date</td>
+				<td>LBM No</td>
+				<td>Part Number</td>
+				<td>Product Name</td>
+				<td>Product Desc</td>
+				<td>Qty</td>
+				<td>UOM</td>
+				<td>Batch</td>
+				<td>Price</td>
+				<td>Currency</td>
+				<td>Location</td>
+				<td>Dest Location</td>
+				<td>Partner</td>
+				<td>Type</td>
+				<td>NO PO</td>
+				<td>Origin</td>
+				<td>Status</td>
 			</tr>
 			";
 		foreach ($data as $value) {
 			$body[]='<tr>
 					<td>'.$value['jenis'].'</td>
-					<td>'.$value['date_done'].'</td>
+					<td>'.Yii::$app->formatter->asDatetime($value['date_done'], "php:d-m-Y").'</td>
 					<td>'.$value['lbm'].'</td>
 					<td>'.$value['part_number'].'</td>
 					<td>'.$value['name_template'].'</td>
@@ -82,7 +83,7 @@
 					<td>'.$value['qty'].'</td>
 					<td>'.$value['uom'].'</td>
 					<td>'.$value['batch'].'</td>
-					<td>'.$value['price'].'</td>
+					<td>'.app\components\NumericLib::indoStyle($value['price'],2,',','.').'</td>
 					<td>'.$value['pricelist'].'</td>
 					<td>'.$value['location'].'</td>
 					<td>'.$value['desc_location'].'</td>
@@ -96,8 +97,8 @@
 
 	}
 
-	echo "<center>".$judul."</center>";
-	echo "<table class='table table-striped table-hover'>";
+	echo $judul;
+	echo "<table class='ReportTable'>";
 	echo $headTable;
 	foreach ($body as $val) {
 		echo $val;

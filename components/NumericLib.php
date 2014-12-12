@@ -154,8 +154,12 @@ class NumericLib extends Component{
 		return $string;
 	}
 
-	public function indoStyle($numeric){
+	/*public function indoStyle($numeric){
 		return number_format($numeric,2,',','.');
+	}*/
+
+	public function indoStyle($numeric,$decimalDigit=2,$thousandSep='.',$decimalSep=','){
+		return number_format($numeric,$decimalDigit,$decimalSep,$thousandSep);
 	}
 }
 ?>

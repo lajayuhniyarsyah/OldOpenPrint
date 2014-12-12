@@ -25,12 +25,11 @@ class ReportAccountingController extends Controller
             ],
         ];
     }
+
     public function actionStockMove($jenis,$from,$to)
     {
-    	// $this->layout = 'printout';
+    	$this->layout = 'report';
     	$jenisreport=$_GET['jenis'];
-    	/*$from=$_GET['from'];
-    	$to=$_GET['to'];*/
     	$query = new Query;
     	if ($jenisreport=="del"){
 	    		$query
@@ -66,6 +65,7 @@ class ReportAccountingController extends Controller
 			    ->join('JOIN', 'product_pricelist as ppl', 'ppl.id = so.pricelist_id')
 			    ->where(['>=','dn.tanggal',$from])
 			    ->andWhere(['<=','dn.tanggal',$to])
+			    ->andWhere(['not', ['p.default_code' => 'DUMMY01']])
 			    ->orderBy('dn.tanggal ASC');
 			    
 
@@ -111,8 +111,35 @@ class ReportAccountingController extends Controller
 			    ->andWhere(['not', ['p.default_code' => null]])
 			    ->andWhere(['not', ['p.default_code' => 'DUMMY01']]);
     	}
-    	return $this->render('stockmove',['data'=>$query->all(), 'jenis'=>$jenisreport]);
+    	return $this->render('stockmove',['data'=>$query->all(), 'jenis'=>$jenisreport, 'from'=>$from , 'to'=>$to]);
     }
+
+     public function actionTransaksiAccount()
+     {
+     	$from='2014-10-01';
+     	$to='2014-10-30';
+     	$query = new Query;
+     		$query
+     		->select('
+     					aml.id as id,
+     					am.ref as ref,
+     					ac.code as code,
+     					ac.name as account,
+     					aml.name as keterangan,
+     					aml.debit as debit,
+     					aml.credait as credit
+     				 ')
+     		->from('account_move_line as aml')
+     		->join('LEFT JOIN','account_account as ac','ac.id=aml.account_id')
+     		->join('LEFT JOIN','account_move as am','am.id=aml.move_id')
+     		->where(['>=','aml.date',$from])
+     		->andWhere(['<=','aml.date',$to])
+     		->limit(100);
+     	echo '<pre>';
+     	print_r($query->all());
+     	echo '</pre>';
+     	return $this->render('transaksiaccount',['data'=>$query]);
+     }
 }
 
 ?>
