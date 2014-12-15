@@ -3,14 +3,8 @@
         /* border-top: 1px solid black;
         border-bottom: 1px solid black; */
     }
-    .header{
-        height: 10%;
-    }
-    .content{
-        height: 80%;
-    }
     .pages{
-        height: 245mm;
+        height: 282mm;
         padding-top:18mm;
         padding-left:4mm;
         page-break-after: always;
@@ -29,7 +23,7 @@
         padding-left: 58%;
     }
     .sign .signName{
-        margin-top: 29%;
+        margin-top: 86px;
         margin-left: 9%;
     }
     .cRows{
@@ -95,13 +89,13 @@
                                     ?>
                                 </span>
                             </div>
-                            <div style="height:12mm;">&nbsp;</div>
+                            <div style="height:11mm;">&nbsp;</div>
                         </td>
                     </tr>
                     <tr>
                         <td>
                             <div class="amount">
-                                <table cellpadding="0" cellspacing="0">
+                                <table style="width:100%;" cellpadding="0" cellspacing="0">
                                     <tr>
                                         <td style="width:61%;"><?='<div style="width:13mm;float:left;">'.  $model->currency->name.'</div><div>'.Yii::$app->numericLib->indoStyle($model->amount_untaxed).'</div>'?></td>
                                         <td><?=Yii::$app->numericLib->indoStyle((round($model->amount_untaxed*$model->pajak)))?></td>
@@ -134,7 +128,7 @@
             <td>
                 <div class="rateInfo" style="margin-top:3mm;">
                     <div>
-                        <div style="width:37mm;float:left;margin-left:29mm;"><?=$model->pajak?></div><div><?='1 '.$model->currency->name?></div>
+                        <div style="width:37mm;float:left;margin-left:29mm;"><?=Yii::$app->numericLib->indoStyle(floatval($model->pajak))?></div><div><?='1 '.$model->currency->name?></div>
                         <div style="clear:both;"></div>
                     </div>
                     <div>
@@ -171,7 +165,7 @@ $this->registerJs('
 
     function prepareRow(rowNo,data)
     {
-        return "<tr class=\'cRows rows"+rowNo+"\'><td style=\"width:6%;\">"+eval(rowNo+1)+"</td><td contenteditable=\"true\" style=\"width:56%\">"+data.name+"</td><td><div style=\"float:left;width:17mm;\">"+rateSymbol+"</div><div>"+data.price_subtotal+"</div><div style=\"clear:both;\"></div></td><td>&nbsp;</td></tr>";
+        return "<tr class=\'cRows rows"+rowNo+"\'><td style=\"width:6%;\">"+eval(rowNo+1)+"</td><td contenteditable=\"true\" style=\"width:56%\">"+data.name+"</td><td><div style=\"float:left;width:13mm;\">"+rateSymbol+"</div><div>"+data.price_subtotal+"</div><div style=\"clear:both;\"></div></td><td>&nbsp;</td></tr>";
     }
     var rowPage = 0;
     jQuery.each(lines,function(key,line){

@@ -159,7 +159,7 @@ class NumericLib extends Component{
 	}*/
 
 	public function indoStyle($numeric,$decimalDigit=2,$thousandSep='.',$decimalSep=','){
-		return number_format($numeric,$decimalDigit,$decimalSep,$thousandSep);
+		return number_format(floatval($numeric),$decimalDigit,$decimalSep,$thousandSep);
 	}
 }
 ?>
