@@ -91,11 +91,11 @@
                         <td>
                             <div class="amount">
                                 <span>
-                                    <?= '<div style="float:left;width:17mm;">'.$model->currency->name.'</div><div>'.$model->amount_untaxed.'</div><div style="clear:both;"></div>';
+                                    <?= '<div style="float:left;width:13mm;">'.$model->currency->name.'</div><div>'.Yii::$app->numericLib->indoStyle($model->amount_untaxed).'</div><div style="clear:both;"></div>';
                                     ?>
                                 </span>
                             </div>
-                            <div style="height:5mm;">&nbsp;</div>
+                            <div style="height:12mm;">&nbsp;</div>
                         </td>
                     </tr>
                     <tr>
@@ -103,8 +103,8 @@
                             <div class="amount">
                                 <table cellpadding="0" cellspacing="0">
                                     <tr>
-                                        <td style="width:61%;"><?=$model->currency->name.' '.$model->amount_untaxed?></td>
-                                        <td><?=number_format(($model->amount_untaxed*$model->pajak),2,',','.')?></td>
+                                        <td style="width:61%;"><?='<div style="width:13mm;float:left;">'.  $model->currency->name.'</div><div>'.Yii::$app->numericLib->indoStyle($model->amount_untaxed).'</div>'?></td>
+                                        <td><?=Yii::$app->numericLib->indoStyle((round($model->amount_untaxed*$model->pajak)))?></td>
                                     </tr>
                                 </table>
                             </div>
@@ -113,8 +113,8 @@
                     <tr>
                         <td>
                             <div class="amount" style="margin-top:-3px;">
-                                <div style="width:43mm;float:left;"><?= (isset($model->amount_tax) ? '<div style="float:left;width:17mm;">'.$model->currency->name.'</div><div>'.$model->amount_tax.'</div><div style="clear:both;"></div>':''); ?></div>
-                                <div><?=number_format(($model->amount_tax*$model->pajak),2,',','.')?></div>
+                                <div style="width:43mm;float:left;"><?= (isset($model->amount_tax) ? '<div style="float:left;width:13mm;">'.$model->currency->name.'</div><div>'.Yii::$app->numericLib->indoStyle($model->amount_tax).'</div><div style="clear:both;"></div>':''); ?></div>
+                                <div><?=Yii::$app->numericLib->indoStyle((round($model->amount_tax*$model->pajak)))?></div>
                                 <div class="clear:both;"></div>
                             </div>
                         </td>
@@ -171,7 +171,7 @@ $this->registerJs('
 
     function prepareRow(rowNo,data)
     {
-        return "<tr class=\'cRows rows"+rowNo+"\'><td style=\"width:6%;\">"+eval(rowNo+1)+"</td><td style=\"width:56%\">"+data.name+"</td><td><div style=\"float:left;width:17mm;\">"+rateSymbol+"</div><div>"+data.price_subtotal+"</div><div style=\"clear:both;\"></div></td><td>&nbsp;</td></tr>";
+        return "<tr class=\'cRows rows"+rowNo+"\'><td style=\"width:6%;\">"+eval(rowNo+1)+"</td><td contenteditable=\"true\" style=\"width:56%\">"+data.name+"</td><td><div style=\"float:left;width:17mm;\">"+rateSymbol+"</div><div>"+data.price_subtotal+"</div><div style=\"clear:both;\"></div></td><td>&nbsp;</td></tr>";
     }
     var rowPage = 0;
     jQuery.each(lines,function(key,line){

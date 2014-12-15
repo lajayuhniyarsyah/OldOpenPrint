@@ -66,8 +66,8 @@ class AccountInvoiceController extends Controller
             $lines[$k]['no'] = $line->sequence;
             $lines[$k]['qty'] = $line->quantity.' '.$line->uos->name;
             $lines[$k]['desc'] = nl2br($line->name);
-            $lines[$k]['unit_price'] = $line->price_unit;
-            $lines[$k]['ext_price'] = $line->price_subtotal;
+            $lines[$k]['unit_price'] = $model->currency->name.' '.$line->price_unit;
+            $lines[$k]['ext_price'] = $model->currency->name.' '.$line->price_subtotal;
         endforeach;
 
         return $this->render('print/inv',['model'=>$model,'lines'=>$lines]);

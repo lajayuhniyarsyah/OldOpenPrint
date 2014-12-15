@@ -126,15 +126,19 @@
 		</div>
 		<div class="footers">
 			<div class="amounts">
-				<div class="amLine1"><?=Yii::$app->numericLib->indoStyle($model->amount_untaxed)?></div>
+				<div class="amLine1"><?=$model->currency->name.' '.Yii::$app->numericLib->indoStyle($model->amount_untaxed)?></div>
 				<div class="amLine2">&nbsp;</div>
-				<div class="amLine3"><?=Yii::$app->numericLib->indoStyle($model->amount_untaxed)?></div>
-				<div class="amLine4"><?=Yii::$app->numericLib->indoStyle($model->amount_tax)?></div>
-				<div class="amLine5"><?=Yii::$app->numericLib->indoStyle($model->amount_total)?></div>
+				<div class="amLine3"><?=$model->currency->name.' '.Yii::$app->numericLib->indoStyle($model->amount_untaxed)?></div>
+				<div class="amLine4"><?=$model->currency->name.' '.Yii::$app->numericLib->indoStyle($model->amount_tax)?></div>
+				<div class="amLine5"><?=$model->currency->name.' '.Yii::$app->numericLib->indoStyle($model->amount_total)?></div>
 			</div>
 			<div class="notes">
-				<div class="terb">
-					<!-- DUA RATUS DELAPAN PULUH JUTA LIMA RATUS RIBU ENAM RATUS RUPIAH -->
+				<div class="terb" contenteditable="true">
+					<?php
+					if($model->currency->name == 'USD'):
+						echo '# United State Dollar ';
+					endif;
+					?>
 					<?=ucwords(Yii::$app->numericLib->convertToWords($model->amount_total,$model->currency->name))?>
 
 				</div>
