@@ -13,7 +13,7 @@
 	}
 	.headers
 	{
-		padding-top:57mm;
+		padding-top:59mm;
 		height: 30mm;
 	}
 	.leftInfo
@@ -63,7 +63,7 @@
 		clear: both;
 	}
 	.terb{
-		padding-top:13mm;
+		padding-top:15mm;
 		font-size: 10pt;
 		background: yellow;
 		height: 20mm;
@@ -127,7 +127,7 @@
 		<div class="footers">
 			<div class="amounts">
 				<div class="amLine1"><?=Yii::$app->numericLib->indoStyle($model->amount_untaxed)?></div>
-				<div class="amLine2">Discount Line</div>
+				<div class="amLine2">&nbsp;</div>
 				<div class="amLine3"><?=Yii::$app->numericLib->indoStyle($model->amount_untaxed)?></div>
 				<div class="amLine4"><?=Yii::$app->numericLib->indoStyle($model->amount_tax)?></div>
 				<div class="amLine5"><?=Yii::$app->numericLib->indoStyle($model->amount_total)?></div>

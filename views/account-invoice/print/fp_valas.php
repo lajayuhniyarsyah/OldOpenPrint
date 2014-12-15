@@ -11,7 +11,7 @@
     }
     .pages{
         height: 245mm;
-        padding-top:13mm;
+        padding-top:18mm;
         padding-left:4mm;
         page-break-after: always;
     }
@@ -82,13 +82,7 @@
                         <td class="tdLines" style="height:<?=$maxHeight?>;vertical-align:top;">
                             <div class="contentArea">
                                 <table class="contentLines" style="width:100%;margin-top:18mm;">
-                                    <!-- <?php foreach($model->accountInvoiceLines as $cSeq=>$invoiceLine): ?>
-                                    <tr class="cRows rows<?=$cSeq?>" style="vertical-align:top;">
-                                        <td style="width:6%;"><?=$invoiceLine->sequence?></td>
-                                        <td style="width:70%"><?php if(isset($invoiceLine->product)) : ?>[<?= $invoiceLine->product->default_code ?>]<?php endif; ?> <?= $invoiceLine->name ?></td>
-                                        <td><?= $invoiceLine->price_subtotal ?></td>
-                                    </tr>
-                                    <?php endforeach; ?> -->
+                                    
                                 </table>
                             </div>
                         </td>
@@ -96,29 +90,24 @@
                     <tr>
                         <td>
                             <div class="amount">
-                                <span><?= '<div style="float:left;width:17mm;">'.$model->currency->name.'</div><div>'.$model->amount_untaxed.'</div><div style="clear:both;"></div>'; ?></span>
+                                <span>
+                                    <?= '<div style="float:left;width:17mm;">'.$model->currency->name.'</div><div>'.$model->amount_untaxed.'</div><div style="clear:both;"></div>';
+                                    ?>
+                                </span>
                             </div>
-
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div class="amount">&nbsp;</div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div class="amount">&nbsp;</div>
+                            <div style="height:5mm;">&nbsp;</div>
                         </td>
                     </tr>
                     <tr>
                         <td>
                             <div class="amount">
-                                <div style="width:43mm;float:left;"><?= (isset($model->amount_untaxed) ? '<div style="float:left;width:17mm;">'.$model->currency->name.'</div><div>'.$model->amount_untaxed.'</div><div style="clear:both;"></div>':''); ?></div>
-                                <div style=""><?=number_format(($model->amount_untaxed*$model->pajak),2,',','.')?></div>
-                                <div class="clear:both;"></div>
+                                <table cellpadding="0" cellspacing="0">
+                                    <tr>
+                                        <td style="width:61%;"><?=$model->currency->name.' '.$model->amount_untaxed?></td>
+                                        <td><?=number_format(($model->amount_untaxed*$model->pajak),2,',','.')?></td>
+                                    </tr>
+                                </table>
                             </div>
-
                         </td>
                     </tr>
                     <tr>
