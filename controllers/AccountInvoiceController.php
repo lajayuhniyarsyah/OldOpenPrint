@@ -64,7 +64,7 @@ class AccountInvoiceController extends Controller
         $lines = [];
         foreach($model->accountInvoiceLines as $k=>$line):
             $lines[$k]['no'] = $line->sequence;
-            $lines[$k]['qty'] = $line->quantity.' '.$line->uos->name;
+            $lines[$k]['qty'] = $line->quantity.(isset($line->uos->name) ? ' '.$line->uos->name:null);
             $lines[$k]['desc'] = nl2br($line->name);
             $lines[$k]['unit_price'] = $model->currency->name.' '.$line->price_unit;
             $lines[$k]['ext_price'] = $model->currency->name.' '.$line->price_subtotal;

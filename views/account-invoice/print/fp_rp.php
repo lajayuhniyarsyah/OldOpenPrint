@@ -144,7 +144,7 @@ $this->registerJs('
 
 	function prepareRow(rowNo,data)
 	{
-		return "<tr class=\'cRows rows"+rowNo+"\'><td style=\"width:6%;\">"+eval(rowNo+1)+"</td><td style=\"width:70%\">"+data.name+"</td><td>"+data.price_subtotal+"</td></tr>";
+		return "<tr class=\'cRows rows"+rowNo+"\'><td style=\"width:38px;\">"+eval(rowNo+1)+"</td><td style=\"width:440px;\">"+data.name+"</td><td>"+data.price_subtotal+"</td></tr>";
 	}
 	var rowPage = 0;
 	jQuery.each(lines,function(key,line){

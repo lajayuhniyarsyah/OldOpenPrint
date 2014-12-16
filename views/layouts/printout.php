@@ -65,23 +65,7 @@ use app\assets\AppAsset;
 
 <?php $this->beginBody() ?>
     <div>
-        <!-- <div class="hideOnPrint">
-            <a id="btnSetting">Page Setting</a>
-            <div id="absoluteWrapper">
-                <form>
-                    <div>
-                        <select name="split">
-                            <option value="1">1</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5</option>
-                            <option value="6">6</option>
-                        </select>
-                    </div>
-                </form>
-            </div>
-        </div> -->
+        
         <div>
             <?= $content ?>
         </div>

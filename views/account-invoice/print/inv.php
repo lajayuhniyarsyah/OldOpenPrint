@@ -1,10 +1,12 @@
 <style type="text/css">
-	
+	body{
+		padding-top: 0px;
+	}
 	#container
 	{
 		width: 190mm;
 		border: 1px solid black;
-		padding-left: 10mm;
+		padding-left: 8mm;
 		vertical-align: top;
 	}
 	.clear
@@ -14,7 +16,7 @@
 	.headers
 	{
 		padding-top:59mm;
-		height: 30mm;
+		height: 33mm;
 	}
 	.leftInfo
 	{
@@ -28,23 +30,36 @@
 	}
 	.kwNo{
 		height: 10mm;
+		padding-right: 10mm;
+		line-height: 4mm;
 	}
 	.dateInv{
 		height: 10mm;
+		line-height: 4mm;
 	}
 	.pages
 	{
+		border-top: 1px solid lime;
 		border-bottom: 1px solid red;
 		page-break-after: always;
-		height: 290mm;
+		height: 294mm;
+		background: grey;
 	}
+	#container .pages:not(:first-child){
+		padding-top: 4mm;
+	}
+
+
 	.containerLines{
-		min-height: 121mm;
+		min-height: 116mm;
 		background: lime;
 		font-size: 11pt;
 		border-bottom: 1px solid black;
+		/*color: white;*/
 
 	}
+
+	
 	.containerLines table tr td{
 		vertical-align: top;
 	}
@@ -63,8 +78,9 @@
 		clear: both;
 	}
 	.terb{
-		padding-top:15mm;
+		padding-top:12mm;
 		font-size: 10pt;
+		font-weight: bold;
 		background: yellow;
 		height: 20mm;
 		width: 135mm;
@@ -99,6 +115,7 @@
 		}
 		.containerLines{
 			border-bottom: 1px solid black;
+
 
 		}
 	}
@@ -135,9 +152,21 @@
 			<div class="notes">
 				<div class="terb" contenteditable="true">
 					<?php
-					if($model->currency->name == 'USD'):
-						echo '# United State Dollar ';
-					endif;
+					
+					switch (trim($model->currency->name)) {
+						case 'USD':
+							# code...
+							$preCur = '# United State Dollar ';
+							break;
+						case 'SGD':
+							$preCur = '# Singapore Dollar ';
+							break;
+						default:
+							# code...
+							$preCur='';
+							break;
+					}
+					echo $preCur;
 					?>
 					<?=ucwords(Yii::$app->numericLib->convertToWords($model->amount_total,$model->currency->name))?>
 
