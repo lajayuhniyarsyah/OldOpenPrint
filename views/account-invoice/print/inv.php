@@ -5,7 +5,7 @@
 	#container
 	{
 		width: 190mm;
-		border: 1px solid black;
+		/*border: 1px solid black;*/
 		padding-left: 8mm;
 		vertical-align: top;
 	}
@@ -39,8 +39,8 @@
 	}
 	.pages
 	{
-		border-top: 1px solid lime;
-		border-bottom: 1px solid red;
+		/*border-top: 1px solid lime;
+		border-bottom: 1px solid red;*/
 		page-break-after: always;
 		height: 294mm;
 		background: grey;
@@ -54,7 +54,7 @@
 		min-height: 116mm;
 		background: lime;
 		font-size: 11pt;
-		border-bottom: 1px solid black;
+		/*border-bottom: 1px solid black;*/
 		/*color: white;*/
 
 	}
@@ -114,7 +114,7 @@
 			border: none;
 		}
 		.containerLines{
-			border-bottom: 1px solid black;
+			/*border-bottom: 1px solid black;*/
 
 
 		}
