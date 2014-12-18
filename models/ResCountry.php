@@ -17,15 +17,15 @@ use Yii;
  * @property string $code
  * @property string $name
  *
- * @property DeliveryGridCountryRel[] $deliveryGridCountryRels
- * @property HrEmployee[] $hrEmployees
+ * @property ResCountryState[] $resCountryStates
+ * @property ResCurrency $currency
+ * @property ResUsers $writeU
+ * @property ResUsers $createU
  * @property ResBank[] $resBanks
  * @property ResPartnerBank[] $resPartnerBanks
- * @property ResUsers $writeU
- * @property ResCurrency $currency
- * @property ResUsers $createU
- * @property ResCountryState[] $resCountryStates
  * @property ResPartner[] $resPartners
+ * @property HrEmployee[] $hrEmployees
+ * @property DeliveryGridCountryRel[] $deliveryGridCountryRels
  */
 class ResCountry extends \yii\db\ActiveRecord
 {
@@ -75,17 +75,33 @@ class ResCountry extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getDeliveryGridCountryRels()
+    public function getResCountryStates()
     {
-        return $this->hasMany(DeliveryGridCountryRel::className(), ['country_id' => 'id']);
+        return $this->hasMany(ResCountryState::className(), ['country_id' => 'id']);
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getHrEmployees()
+    public function getCurrency()
     {
-        return $this->hasMany(HrEmployee::className(), ['country_id' => 'id']);
+        return $this->hasOne(ResCurrency::className(), ['id' => 'currency_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getWriteU()
+    {
+        return $this->hasOne(ResUsers::className(), ['id' => 'write_uid']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCreateU()
+    {
+        return $this->hasOne(ResUsers::className(), ['id' => 'create_uid']);
     }
 
     /**
@@ -107,40 +123,24 @@ class ResCountry extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getWriteU()
-    {
-        return $this->hasOne(ResUsers::className(), ['id' => 'write_uid']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getCurrency()
-    {
-        return $this->hasOne(ResCurrency::className(), ['id' => 'currency_id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getCreateU()
-    {
-        return $this->hasOne(ResUsers::className(), ['id' => 'create_uid']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getResCountryStates()
-    {
-        return $this->hasMany(ResCountryState::className(), ['country_id' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
     public function getResPartners()
     {
         return $this->hasMany(ResPartner::className(), ['country_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getHrEmployees()
+    {
+        return $this->hasMany(HrEmployee::className(), ['country_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDeliveryGridCountryRels()
+    {
+        return $this->hasMany(DeliveryGridCountryRel::className(), ['country_id' => 'id']);
     }
 }

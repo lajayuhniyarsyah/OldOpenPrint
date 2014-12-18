@@ -79,7 +79,7 @@
 	}
 	.terb{
 		padding-top:12mm;
-		font-size: 11pt;
+		font-size: 10pt;
 		font-weight: bold;
 		background: yellow;
 		height: 20mm;
@@ -108,10 +108,6 @@
 		
 	}
 
-	.invFootNotes{
-		padding-top: 10mm;
-	}
-
 	@media print
 	{
 		#container{
@@ -129,14 +125,14 @@
 		<div class="headers">
 			<div class="leftInfo">
 				<div class="partnerName"><?=$model->partner->name?></div>
-				<div class="partnerAddr" contenteditable="true"><?=$model->partner->street?></div>
-				<div class="partnerAddr2" contenteditable="true"><?=$model->partner->street2?></div>
-				<div class="partnerAddr2" contenteditable="true"><?=$model->partner->zip?></div>
-				<div class="partnerPhone" contenteditable="true"><?=$model->partner->phone?></div>
+				<div class="partnerAddr"><?=$model->partner->street?></div>
+				<div class="partnerAddr2"><?=$model->partner->street2?></div>
+				<div class="partnerAddr2"><?=$model->partner->zip?></div>
+				<div class="partnerPhone"><?=$model->partner->phone?></div>
 			</div>
 			<div class="rightInfo">
 				<div class="kwNo"><?=$model->kwitansi?></div>
-				<div class="dateInv" contenteditable="true"><?=Yii::$app->formatter->asDatetime($model->date_invoice, "php:d-m-Y")?></div>
+				<div class="dateInv"><?=$model->date_invoice?></div>
 			</div>
 			<div class="clear">&nbsp;</div>
 		</div>
@@ -167,7 +163,7 @@
 							break;
 						default:
 							# code...
-							$preCur='#';
+							$preCur='';
 							break;
 					}
 					echo $preCur;
@@ -175,16 +171,8 @@
 					<?=ucwords(Yii::$app->numericLib->convertToWords($model->amount_total,$model->currency->name))?>
 
 				</div>
-				<div class="dueDate"><?=$model->paymentTerm->name?></div>
-				<div class="invFootNotes" contenteditable="true">
-					BANK MANDIRI CAB. KETAPANG INDAH, JAKARTA -> A/C : 115-000-122-6655 (IDR)
-					<br>
-					BANK MANDIRI CAB. SUNTER MALL, JAKARTA -> A/C : 120-000-669-0205 (USD)
-					<br/>
-					BANK MANDIRI CAB. SUNTER MALL, JAKARTA -> A/C : 120-000-991-1988 (EUR)
-					<br/>
-					BANK CIMB NIAGA CAB. WAHID HASYIM, JAKARTA -> A/C : 4230-3000-02-008 (AUD)
-				</div>
+				<div class="dueDate"><?=Yii::$app->formatter->asDatetime($model->date_invoice, "php:d-m-Y")?></div>
+				<div class="invFootNotes"></div>
 			</div>
 		</div>
 	</div>
