@@ -5,36 +5,33 @@ namespace app\models;
 use Yii;
 
 /**
- * This is the model class for table "res_country".
+ * This is the model class for table "res_country_state".
  *
  * @property integer $id
  * @property integer $create_uid
  * @property string $create_date
  * @property string $write_date
  * @property integer $write_uid
- * @property string $address_format
- * @property integer $currency_id
  * @property string $code
+ * @property integer $country_id
  * @property string $name
  *
- * @property DeliveryGridCountryRel[] $deliveryGridCountryRels
- * @property HrEmployee[] $hrEmployees
+ * @property DeliveryGridStateRel[] $deliveryGridStateRels
  * @property ResBank[] $resBanks
  * @property ResPartnerBank[] $resPartnerBanks
  * @property ResUsers $writeU
- * @property ResCurrency $currency
  * @property ResUsers $createU
- * @property ResCountryState[] $resCountryStates
+ * @property ResCountry $country
  * @property ResPartner[] $resPartners
  */
-class ResCountry extends \yii\db\ActiveRecord
+class ResCountryState extends \yii\db\ActiveRecord
 {
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return 'res_country';
+        return 'res_country_state';
     }
 
     /**
@@ -43,14 +40,11 @@ class ResCountry extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['create_uid', 'write_uid', 'currency_id'], 'integer'],
+            [['create_uid', 'write_uid', 'country_id'], 'integer'],
             [['create_date', 'write_date'], 'safe'],
-            [['address_format'], 'string'],
-            [['name'], 'required'],
-            [['code'], 'string', 'max' => 2],
-            [['name'], 'string', 'max' => 64],
-            [['code'], 'unique'],
-            [['name'], 'unique']
+            [['code', 'country_id', 'name'], 'required'],
+            [['code'], 'string', 'max' => 3],
+            [['name'], 'string', 'max' => 64]
         ];
     }
 
@@ -65,27 +59,18 @@ class ResCountry extends \yii\db\ActiveRecord
             'create_date' => 'Create Date',
             'write_date' => 'Write Date',
             'write_uid' => 'Write Uid',
-            'address_format' => 'Address Format',
-            'currency_id' => 'Currency',
-            'code' => 'Country Code',
-            'name' => 'Country Name',
+            'code' => 'State Code',
+            'country_id' => 'Country',
+            'name' => 'State Name',
         ];
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getDeliveryGridCountryRels()
+    public function getDeliveryGridStateRels()
     {
-        return $this->hasMany(DeliveryGridCountryRel::className(), ['country_id' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getHrEmployees()
-    {
-        return $this->hasMany(HrEmployee::className(), ['country_id' => 'id']);
+        return $this->hasMany(DeliveryGridStateRel::className(), ['state_id' => 'id']);
     }
 
     /**
@@ -93,7 +78,7 @@ class ResCountry extends \yii\db\ActiveRecord
      */
     public function getResBanks()
     {
-        return $this->hasMany(ResBank::className(), ['country' => 'id']);
+        return $this->hasMany(ResBank::className(), ['state' => 'id']);
     }
 
     /**
@@ -101,7 +86,7 @@ class ResCountry extends \yii\db\ActiveRecord
      */
     public function getResPartnerBanks()
     {
-        return $this->hasMany(ResPartnerBank::className(), ['country_id' => 'id']);
+        return $this->hasMany(ResPartnerBank::className(), ['state_id' => 'id']);
     }
 
     /**
@@ -115,14 +100,6 @@ class ResCountry extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getCurrency()
-    {
-        return $this->hasOne(ResCurrency::className(), ['id' => 'currency_id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
     public function getCreateU()
     {
         return $this->hasOne(ResUsers::className(), ['id' => 'create_uid']);
@@ -131,9 +108,9 @@ class ResCountry extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getResCountryStates()
+    public function getCountry()
     {
-        return $this->hasMany(ResCountryState::className(), ['country_id' => 'id']);
+        return $this->hasOne(ResCountry::className(), ['id' => 'country_id']);
     }
 
     /**
@@ -141,6 +118,6 @@ class ResCountry extends \yii\db\ActiveRecord
      */
     public function getResPartners()
     {
-        return $this->hasMany(ResPartner::className(), ['country_id' => 'id']);
+        return $this->hasMany(ResPartner::className(), ['state_id' => 'id']);
     }
 }
