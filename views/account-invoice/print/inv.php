@@ -1,7 +1,13 @@
 <style type="text/css">
 	body{
+		font-family: Tahoma, Geneva, sans-serif;
 		padding-top: 0px;
 	}
+	.signName{
+		padding-left:127mm;
+		margin-top: 3mm;
+	}
+	
 	#container
 	{
 		width: 190mm;
@@ -23,6 +29,8 @@
 		background: red;
 		float: left;
 		margin-top: -5mm;
+		width: 130mm;
+		max-height: 36mm;
 	}
 	.rightInfo
 	{
@@ -42,7 +50,7 @@
 		/*border-top: 1px solid lime;
 		border-bottom: 1px solid red;*/
 		page-break-after: always;
-		height: 294mm;
+		height: 330mm;
 		background: grey;
 	}
 	#container .pages:not(:first-child){
@@ -52,6 +60,7 @@
 
 	.containerLines{
 		min-height: 116mm;
+		max-height: 116mm;
 		background: lime;
 		font-size: 11pt;
 		/*border-bottom: 1px solid black;*/
@@ -78,7 +87,8 @@
 		clear: both;
 	}
 	.terb{
-		padding-top:12mm;
+		padding-top:13mm;
+		padding-left:5mm;
 		font-size: 11pt;
 		font-weight: bold;
 		background: yellow;
@@ -87,8 +97,9 @@
 		vertical-align: top;
 	}
 	.dueDate{
-		margin-left: 40mm;
-		font-size: 10pt;
+		margin-left: 50mm;
+		/*padding-top:0mm;*/
+		font-size: 11pt;
 	}
 
 
@@ -109,7 +120,11 @@
 	}
 
 	.invFootNotes{
-		padding-top: 10mm;
+		margin-left: -2mm;
+		padding-top: 16mm;
+		font-size:10pt;
+		font-weight: bold;
+		letter-spacing: -1px;
 	}
 
 	@media print
@@ -128,11 +143,22 @@
 	<div class="pages">
 		<div class="headers">
 			<div class="leftInfo">
-				<div class="partnerName"><?=$model->partner->name?></div>
+				<div class="partnerName" contenteditable="true">
+					<?php
+						$expPartnerName = explode(',',$model->partner->name );
+						if(is_array($expPartnerName) && isset($expPartnerName[1])){
+							$partnerName = $expPartnerName[1].'.'.$expPartnerName[0];
+						}else{
+							$partnerName = $model->partner->name;
+						}
+						echo $partnerName;
+
+					?>
+				</div>
 				<div class="partnerAddr" contenteditable="true"><?=$model->partner->street?></div>
 				<div class="partnerAddr2" contenteditable="true"><?=$model->partner->street2?></div>
-				<div class="partnerAddr2" contenteditable="true"><?=$model->partner->zip?></div>
-				<div class="partnerPhone" contenteditable="true"><?=$model->partner->phone?></div>
+				<div class="partnerAddr2" contenteditable="true"><?=$model->partner->city.' '.$model->partner->state->name.' - '.$model->partner->zip?></div>
+				
 			</div>
 			<div class="rightInfo">
 				<div class="kwNo"><?=$model->kwitansi?></div>
@@ -175,16 +201,17 @@
 					<?=ucwords(Yii::$app->numericLib->convertToWords($model->amount_total,$model->currency->name))?>
 
 				</div>
-				<div class="dueDate"><?=$model->paymentTerm->name?></div>
+				<div class="dueDate"><?=(isset($model->paymentTerm->name) ? $model->paymentTerm->name:"")?></div>
 				<div class="invFootNotes" contenteditable="true">
-					BANK MANDIRI CAB. KETAPANG INDAH, JAKARTA -> A/C : 115-000-122-6655 (IDR)
+					Bank Mandiri Cab. Ketapang Indah, Jakarta -> A/C : 115-000-122-6655 (IDR)
 					<br>
-					BANK MANDIRI CAB. SUNTER MALL, JAKARTA -> A/C : 120-000-669-0205 (USD)
+					Bank Mandiri Cab. Sunter Mall, Jakarta -> A/C : 120-000-669-0205 (USD)
 					<br/>
-					BANK MANDIRI CAB. SUNTER MALL, JAKARTA -> A/C : 120-000-991-1988 (EUR)
+					Bank Mandiri Cab. Sunter Mall, Jakarta -> A/C : 120-000-991-1988 (EUR)
 					<br/>
-					BANK CIMB NIAGA CAB. WAHID HASYIM, JAKARTA -> A/C : 4230-3000-02-008 (AUD)
+					Bank CIMB Niaga Cab. Wahid Hasyim, Jakarta -> A/C : 4230-3000-02-008 (AUD)
 				</div>
+				<div class="signName" contenteditable="true"><?=strtoupper($model->approver0->partner->name)?></div>
 			</div>
 		</div>
 	</div>

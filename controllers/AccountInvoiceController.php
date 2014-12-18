@@ -48,12 +48,20 @@ class AccountInvoiceController extends Controller
         
         $model = $this->findModel($id);
 
+        $lines = [];
+        foreach($model->accountInvoiceLines as $invLine):
+            $lines[] = [
+                'name'=>$invLine->product->name_template.'<br/>P/N : '.$invLine->product->default_code,
+                'price_subtotal'=>$invLine->price_subtotal,
+            ];
+        endforeach;
+        // print_r($lines);
         if($model->currency->name=='IDR' and $model->currency->id==13)
         {
             // if Rupiah
-            return $this->render('print/fp_rp',['model'=>$model]);
+            return $this->render('print/fp_rp',['model'=>$model,'lines'=>$lines]);
         }else{
-            return $this->render('print/fp_valas',['model'=>$model]);
+            return $this->render('print/fp_valas',['model'=>$model,'lines'=>$lines]);
         }
         
     }
@@ -62,13 +70,25 @@ class AccountInvoiceController extends Controller
         $this->layout = 'printout';
         $model=$this->findModel($id);
         $lines = [];
+        $ar = 0;
         foreach($model->accountInvoiceLines as $k=>$line):
+            $ar = $k;
             $lines[$k]['no'] = $line->sequence;
             $lines[$k]['qty'] = $line->quantity.(isset($line->uos->name) ? ' '.$line->uos->name:null);
-            $lines[$k]['desc'] = (isset($line->product->name_template) ? $line->product->name_template.' '.nl2br($line->name).'<br/>Material No : '.$line->product->default_code:nl2br($line->name));
+            $lines[$k]['desc'] = (isset($line->product->name_template) ? $line->product->name_template.'<br/>P/N : '.$line->product->default_code:nl2br($line->name));
             $lines[$k]['unit_price'] = $model->currency->name.' '.$line->price_unit;
             $lines[$k]['ext_price'] = $model->currency->name.' '.$line->price_subtotal;
+
         endforeach;
+        $ar+=1;
+        $lines[$ar]['no'] = '';
+        $lines[$ar]['qty'] = '';
+        $lines[$ar]['desc'] = 'PO No : '.$model->name;
+        if($model->comment){
+            $lines[$ar]['desc'] .= '<br/>'.$model->comment;
+        }
+        $lines[$ar]['unit_price'] = '';
+        $lines[$ar]['ext_price'] = '';
 
         return $this->render('print/inv',['model'=>$model,'lines'=>$lines]);
     }

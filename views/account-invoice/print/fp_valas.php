@@ -32,6 +32,21 @@
     .contentLines{
         font-size: 11pt;
     }
+
+    .xxx{
+        position: absolute;
+        margin-left: -118mm;
+        margin-top: -1mm;
+        font-weight: bold;
+    }
+    .fontAddr{
+        font-size: 13px;
+    }
+    @media print{
+        .xxx table, .xxx table tr, .xxx table tr td{
+            border: 0px;
+        }
+    }
 </style>
 <div id="pageContainer">
 <div class="pages">
@@ -53,21 +68,23 @@
                         <td>
                             <div class="pkp" style="margin-top:7mm;margin-left:36mm;">
                                 <div style="margin-bottom:1mm;">PT. SUPRABAKTI MANDIRI</div>
-                                <div style="height:10mm;"><span>Jl. Danau Sunter Utara Blok. A No. 9 Tanjung Priok - Jakarta Utara 14350</span></div>
+                                <div class="fontAddr" style="height:10mm;"><span>Jl. Danau Sunter Utara Blok. A No. 9 Tanjung Priok - Jakarta Utara 14350</span></div>
                                 <div>01.327.742.1-038.000</div>
                             </div>
                         </td>
                     </tr>
                     <tr>
-                        <td>
+                        <td style="height:129px;">
                             <div class="pbkp" style="margin-top:12mm;margin-left:36mm;">
                                 <div style="margin-bottom:2mm;"><?= $model->partner->name; ?></div>
-                                <div style="height:10mm;">
+                                <div class="fontAddr" contenteditable="true">
                                     <span>
                                         <?= $model->partner->street; ?><?= '<br/>'.$model->partner->street2 ?> <?= $model->partner->city ?> <?= $model->partner->zip ?>
                                     </span>
                                 </div>
-                                <div><span><?= ($model->partner->npwp ? $model->partner->npwp:'-'); ?></span></div>
+                                <div>
+                                    <span contenteditable="true"><?= ($model->partner->npwp ? $model->partner->npwp:'-'); ?></span>
+                                </div>
                             </div>
                         </td>
                     </tr>
@@ -84,10 +101,17 @@
                     <tr>
                         <td>
                             <div class="amount">
-                                <span>
-                                    <?= '<div style="float:left;width:13mm;">'.$model->currency->name.'</div><div>'.Yii::$app->numericLib->indoStyle($model->amount_untaxed).'</div><div style="clear:both;"></div>';
-                                    ?>
-                                </span>
+                                <div class="xxx">
+                                    <table border="1px solid black">
+                                        <tr>
+                                            <td style="width:18mm;" contenteditable="true">XXXXXX</td>
+                                            <td style="width:18mm;" contenteditable="true">XXXXXX</td>
+                                            <td style="width:18mm;" contenteditable="true">XXXXXX</td>
+                                            <td style="width:18mm;" contenteditable="true">XXXXXX</td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                    <?='<div style="float:left;width:13mm;">'.$model->currency->name.'</div><div>'.Yii::$app->numericLib->indoStyle($model->amount_untaxed).'</div><div style="clear:both;"></div>';?>
                             </div>
                             <div style="height:11mm;">&nbsp;</div>
                         </td>
@@ -147,7 +171,7 @@ $this->registerJs('
     var rateSymbol = "'.$model->currency->name.'";
     // save page template to var
     var tmpl = \'<div style="height:2mm;">&nbsp;</div>\'+jQuery(\'div#pageContainer\').html();
-    
+    var poNo = "'.$model->name.'";
     // add id to container
     jQuery(\'div.pages\').attr(\'id\',\'page\'+currPage);
     jQuery(\'table.contentLines:last\').attr(\'id\',\'lines\'+currPage);
@@ -155,7 +179,8 @@ $this->registerJs('
     
 
     // data to render
-    var lines = '.\yii\helpers\Json::encode($model->accountInvoiceLines).';
+    //var lines = '.\yii\helpers\Json::encode($model->accountInvoiceLines).';
+    var lines = '.\yii\helpers\Json::encode($lines).';
     var maxLinesHeight = jQuery(\'.tdLines:last\').height();
     
 
@@ -166,6 +191,11 @@ $this->registerJs('
     function prepareRow(rowNo,data)
     {
         return "<tr class=\'cRows rows"+rowNo+"\'><td style=\"width:6%;\">"+eval(rowNo+1)+"</td><td contenteditable=\"true\" style=\"width:56%\">"+data.name+"</td><td><div style=\"float:left;width:13mm;\">"+rateSymbol+"</div><div>"+data.price_subtotal+"</div><div style=\"clear:both;\"></div></td><td>&nbsp;</td></tr>";
+    }
+
+    function prepareNoteRow(rowNo,data)
+    {
+        return "<tr class=\'cRows rows"+rowNo+"\'><td style=\"width:6%;\">&nbsp;</td><td contenteditable=\"true\" style=\"width:56%\">"+data.name+"</td><td><div style=\"float:left;width:13mm;\">&nbsp;</div><div>&nbsp;</div><div style=\"clear:both;\"></div></td><td>&nbsp;</td></tr>";
     }
     var rowPage = 0;
     jQuery.each(lines,function(key,line){
@@ -202,6 +232,9 @@ $this->registerJs('
         console.log(\'Rendering Page \'+currPage+\' Row \'+currRow+\' Height => \'+currLineHeight);
         currRow=currRow+1;
     });
+    
+    var noteRow = prepareNoteRow(currRow,{name:\'PO No : \'+poNo});
+    jQuery(\'table#lines\'+currPage+\' tr:last\').after(noteRow);
     // end loop
 ');
 ?>

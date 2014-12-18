@@ -11,7 +11,7 @@
 	}
 	.pages{
 		height: 245mm;
-		padding-top:16mm;
+		padding-top:17mm;
 		padding-left:4mm;
 		page-break-after: always;
 	}
@@ -35,6 +35,22 @@
 	.contentLines{
 		font-size: 11pt;
 	}
+	.cRows{
+		vertical-align: top;
+	}
+
+    .xxx{
+        position: absolute;
+        margin-left: -143mm;
+        margin-top: -1mm;
+        font-weight: bold;
+    }
+
+    @media print{
+        .xxx table, .xxx table tr, .xxx table tr td{
+            border: 0px;
+        }
+    }
 </style>
 <div id="pageContainer">
 <div class="pages">
@@ -54,7 +70,7 @@
 					</tr>
 					<tr>
 						<td>
-							<div class="pkp" style="margin-top:7mm;margin-left:36mm;">
+							<div class="pkp" style="margin-top:8mm;margin-left:36mm;">
 								<div style="margin-bottom:1mm;">PT. SUPRABAKTI MANDIRI</div>
 								<div style="height:10mm;"><span>Jl. Danau Sunter Utara Blok. A No. 9 Tanjung Priok - Jakarta Utara 14350</span></div>
 								<div>01.327.742.1-038.000</div>
@@ -75,7 +91,7 @@
 						</td>
 					</tr>
 					<tr>
-						<?php $maxHeight = '105mm'; ?>
+						<?php $maxHeight = '103mm'; ?>
 						<td class="tdLines" style="height:<?=$maxHeight?>;vertical-align:top;">
 							<div class="contentArea">
 								<table class="contentLines" style="width:100%;margin-top:18mm;">
@@ -92,7 +108,19 @@
 					</tr>
 					<tr>
 						<td>
-							<div class="amount"><?= $model->amount_untaxed; ?></div>
+							<div class="amount">
+								<div class="xxx">
+                                    <table border="1px solid black">
+                                        <tr>
+                                            <td style="width:18mm;" contenteditable="true">XXXXXX</td>
+                                            <td style="width:18mm;" contenteditable="true">XXXXXX</td>
+                                            <td style="width:18mm;" contenteditable="true">XXXXXX</td>
+                                            <td style="width:18mm;" contenteditable="true">XXXXXX</td>
+                                        </tr>
+                                    </table>
+                                </div>
+								<?= Yii::$app->numericLib->indoStyle($model->amount_untaxed); ?>
+							</div>
 						</td>
 					</tr>
 					<tr>
@@ -101,10 +129,10 @@
 						</td>
 					</tr>
 					<tr>
-						<td><div class="amount"><?= (isset($model->amount_untaxed) ? $model->amount_untaxed:''); ?></div></td>
+						<td><div class="amount"><?= (isset($model->amount_untaxed) ? Yii::$app->numericLib->indoStyle($model->amount_untaxed):''); ?></div></td>
 					</tr>
 					<tr>
-						<td><div class="amount"><?= (isset($model->amount_tax) ? $model->amount_tax:''); ?></div></td>
+						<td><div class="amount"><?= (isset($model->amount_tax) ? Yii::$app->numericLib->indoStyle($model->amount_tax):''); ?></div></td>
 					</tr>
 					<tr>
 						<td>
@@ -126,7 +154,7 @@ $this->registerJs('
 
 	// save page template to var
 	var tmpl = \'<div style="height:2mm;">&nbsp;</div>\'+jQuery(\'div#pageContainer\').html();
-	
+	var poNo = "'.$model->name.'";
 	// add id to container
 	jQuery(\'div.pages\').attr(\'id\',\'page\'+currPage);
 	jQuery(\'table.contentLines:last\').attr(\'id\',\'lines\'+currPage);
@@ -134,7 +162,7 @@ $this->registerJs('
 	
 
 	// data to render
-	var lines = '.\yii\helpers\Json::encode($model->accountInvoiceLines).';
+	var lines = '.\yii\helpers\Json::encode($lines).';
 	var maxLinesHeight = jQuery(\'.tdLines:last\').height();
 	
 
@@ -144,8 +172,13 @@ $this->registerJs('
 
 	function prepareRow(rowNo,data)
 	{
-		return "<tr class=\'cRows rows"+rowNo+"\'><td style=\"width:38px;\">"+eval(rowNo+1)+"</td><td style=\"width:440px;\">"+data.name+"</td><td>"+data.price_subtotal+"</td></tr>";
+		return "<tr class=\'cRows rows"+rowNo+"\'><td style=\"width:38px;\">"+eval(rowNo+1)+"</td><td contenteditable=\"true\" style=\"width:440px;\">"+data.name+"</td><td>"+data.price_subtotal+"</td></tr>";
 	}
+
+	function prepareNoteRow(rowNo,data)
+    {
+        return "<tr class=\'cRows rows"+rowNo+"\'><td>&nbsp;</td><td colspan=\"2\" contenteditable=\"true\">"+data.name+"</td></tr>";
+    }
 	var rowPage = 0;
 	jQuery.each(lines,function(key,line){
 		var getRow = prepareRow(currRow,line);
@@ -181,6 +214,9 @@ $this->registerJs('
 		console.log(\'Rendering Page \'+currPage+\' Row \'+currRow+\' Height => \'+currLineHeight);
 		currRow=currRow+1;
 	});
+
+	var noteRow = prepareNoteRow(currRow,{name:\'PO No : \'+poNo});
+    jQuery(\'table#lines\'+currPage+\' tr:last\').after(noteRow);
 	// end loop
 ');
 ?>
