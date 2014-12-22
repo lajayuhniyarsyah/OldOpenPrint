@@ -1,3 +1,8 @@
+<?php
+use yii\helpers\Html;
+use yii\helpers\Url;
+?>
+
 <style type="text/css">
 	table{
 		/* border-top: 1px solid black;
@@ -45,13 +50,41 @@
         margin-top: -1mm;
         font-weight: bold;
     }
+	.choosePrinter{
+		position: absolute;
+		z-index: 9999;
+		right: 0;
+	}
+
+	<?php
+    if($printer=='sri'):
+        echo '.pages{padding-top: 11mm;}';
+    endif;
+
+    ?>
 
     @media print{
         .xxx table, .xxx table tr, .xxx table tr td{
             border: 0px;
         }
+
+		.choosePrinter{
+			display: none;
+		}
     }
 </style>
+
+<div class="choosePrinter">
+	<form method="get" id="formSelectPrinter">
+			<input type="hidden" value="<?=Url::to('account-invoice/print')?>" name="r" />
+			<input type="hidden" value="<?=$model->id?>" name="id" />
+			<input type="hidden" value="<?=Yii::$app->request->get('uid')?>" name="uid" />
+		Print To : <select name="printer" onchange="jQuery('#formSelectPrinter').submit();">
+			<option <?=($printer=='refa' ? 'selected ':null)?> value="refa">Refa</option>
+			<option <?=($printer=='sri' ? 'selected ':null)?> value="sri">Sri</option>
+		</select>
+	</form>
+</div>
 <div id="pageContainer">
 <div class="pages">
 	<table style="width:190mm;height:100%;border-right:0px solid black;">
@@ -83,7 +116,7 @@
 								<div style="margin-bottom:2mm;"><?= $model->partner->name; ?></div>
 								<div style="height:10mm;">
 									<span>
-										<?= $model->partner->street; ?><?= '<br/>'.$model->partner->street2 ?> <?= $model->partner->city ?> <?= $model->partner->zip ?>
+										<?= $model->partner->street; ?><?= '<br/>'.$model->partner->street2 ?> <?= $model->partner->city ?>, <?= $model->partner->state->name.($model->partner->zip ? ' - '.$model->partner->zip:"") ?>
 									</span>
 								</div>
 								<div><span><?= ($model->partner->npwp ? $model->partner->npwp:'-'); ?></span></div>

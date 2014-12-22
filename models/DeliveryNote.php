@@ -182,6 +182,6 @@ class DeliveryNote extends \yii\db\ActiveRecord
      */
     public function getDeliveryNoteLines()
     {
-        return $this->hasMany(DeliveryNoteLine::className(), ['note_id' => 'id']);
+        return $this->hasMany(DeliveryNoteLine::className(), ['note_id' => 'id'])->orderBy('no, id ASC');
     }
 }

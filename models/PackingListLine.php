@@ -105,6 +105,6 @@ class PackingListLine extends \yii\db\ActiveRecord
      */
     public function getProductListLines()
     {
-        return $this->hasMany(ProductListLine::className(), ['packing_id' => 'id']);
+        return $this->hasMany(ProductListLine::className(), ['packing_id' => 'id'])->orderBy('no, id ASC');
     }
 }

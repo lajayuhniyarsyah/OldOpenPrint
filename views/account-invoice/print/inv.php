@@ -1,3 +1,7 @@
+<?php
+use yii\helpers\Html;
+use yii\helpers\Url;
+?>
 <style type="text/css">
 	body{
 		font-family: Tahoma, Geneva, sans-serif;
@@ -93,7 +97,7 @@
 		font-weight: bold;
 		background: yellow;
 		height: 20mm;
-		width: 135mm;
+		width: 433px;
 		vertical-align: top;
 	}
 	.dueDate{
@@ -126,7 +130,11 @@
 		font-weight: bold;
 		letter-spacing: -1px;
 	}
-
+	.choosePrinter{
+		position: absolute;
+		z-index: 9999;
+		right: 0;
+	}
 	@media print
 	{
 		#container{
@@ -137,8 +145,29 @@
 
 
 		}
+		.choosePrinter{
+			display: none;
+		}
 	}
+
+	<?php
+	if($printer=='sri'):
+		echo '.headers{padding-top:56mm;height: 32mm;}.kwNo{line-height: 2mm;}.terb{padding-top: 12mm;}';
+	endif;
+
+	?>
 </style>
+<div class="choosePrinter">
+	<form method="get" id="formSelectPrinter">
+			<input type="hidden" value="<?=Url::to('account-invoice/print-invoice')?>" name="r" />
+			<input type="hidden" value="<?=$model->id?>" name="id" />
+			<input type="hidden" value="<?=Yii::$app->request->get('uid')?>" name="uid" />
+		Print To : <select name="printer" onchange="jQuery('#formSelectPrinter').submit();">
+			<option <?=($printer=='refa' ? 'selected ':null)?> value="refa">Refa</option>
+			<option <?=($printer=='sri' ? 'selected ':null)?> value="sri">Sri</option>
+		</select>
+	</form>
+</div>
 <div id="container">
 	<div class="pages">
 		<div class="headers">
@@ -294,3 +323,4 @@ EOD;
 unset($jsonLines);
 $this->registerJs($scr);
 ?>
+

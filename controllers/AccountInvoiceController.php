@@ -43,7 +43,7 @@ class AccountInvoiceController extends Controller
 
 
     // action print
-    public function actionPrint($id,$tp=1){
+    public function actionPrint($id,$uid=null,$printer="refa"){
         $this->layout = 'printout';
         
         $model = $this->findModel($id);
@@ -59,14 +59,14 @@ class AccountInvoiceController extends Controller
         if($model->currency->name=='IDR' and $model->currency->id==13)
         {
             // if Rupiah
-            return $this->render('print/fp_rp',['model'=>$model,'lines'=>$lines]);
+            return $this->render('print/fp_rp',['model'=>$model,'lines'=>$lines,'uid'=>$uid,'printer'=>$printer]);
         }else{
-            return $this->render('print/fp_valas',['model'=>$model,'lines'=>$lines]);
+            return $this->render('print/fp_valas',['model'=>$model,'lines'=>$lines,'uid'=>$uid,'printer'=>$printer]);
         }
         
     }
 
-    public function actionPrintInvoice($id,$uid=null){
+    public function actionPrintInvoice($id,$uid=null,$printer="refa"){
         $this->layout = 'printout';
         $model=$this->findModel($id);
         $lines = [];
@@ -90,7 +90,7 @@ class AccountInvoiceController extends Controller
         $lines[$ar]['unit_price'] = '';
         $lines[$ar]['ext_price'] = '';
 
-        return $this->render('print/inv',['model'=>$model,'lines'=>$lines]);
+        return $this->render('print/inv',['model'=>$model,'lines'=>$lines,'printer'=>$printer]);
     }
 
     /**
@@ -171,3 +171,4 @@ class AccountInvoiceController extends Controller
         }
     }
 }
+
