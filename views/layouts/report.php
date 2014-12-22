@@ -22,6 +22,12 @@ use app\assets\AppAsset;
     <?php $this->head() ?>
 </head>
 <style type="text/css">
+    .content{
+        width: 1000px;
+        margin-left: auto;
+        margin-right: auto;
+        border:1px solid black;
+    }
     .ReportTable {
         margin:0px;padding:0px;
         width:100%;
@@ -127,9 +133,28 @@ use app\assets\AppAsset;
         color: black;
         font-family: Tahoma Bold,sans-serif;
         font-size: 15px;
-        font-weight: bold;
         display: block;
         text-align: center;
+    }
+    .font12{
+        color: black;
+        font-family: Tahoma Bold,sans-serif;
+        font-size: 12px;
+        display: block;
+        text-align: center;   
+    }
+    .italic{
+        font-style: italic;
+    }
+    .price{
+        text-align: right;
+    }
+    .bgdark{
+        background:-o-linear-gradient(bottom, #cccccc 5%, #b2b2b2 100%);    background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #cccccc), color-stop(1, #b2b2b2) );
+        background:-moz-linear-gradient( center top, #cccccc 5%, #b2b2b2 100% );
+        filter:progid:DXImageTransform.Microsoft.gradient(startColorstr="#cccccc", endColorstr="#b2b2b2");  background: -o-linear-gradient(top,#cccccc,b2b2b2);
+
+        background-color:#cccccc;
     }
 </style>
 <body>

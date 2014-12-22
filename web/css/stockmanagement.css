@@ -1,0 +1,46 @@
+body{
+	background-color: white;
+}
+.navbar-inner {
+  background-color: #45aeea;
+  background-image: linear-gradient(to bottom, #54b4eb, #2fa4e7);
+  background-repeat: repeat-x;
+  border: 1px solid #1990d5;
+  border-radius: 4px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.067);
+  min-height: 40px;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+.navbar-brand{
+	color:white !important;
+	text-transform:uppercase;
+	font-size: 20px;
+	height: 20px !important;
+}
+.navbar-nav > li > a{
+	color:white !important;
+}
+.container{
+	width: 100% !important;
+}
+.table th{
+	font-size: 11px !important;
+	text-align: center;
+}
+.table td{
+	font-size: 10px !important;
+}
+.table td .right{
+	text-align: right !important;
+}
+.judul{
+    color: black;
+    font-family: Tahoma Bold,sans-serif;
+    font-size: 20px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    font-weight: bold;
+    display: block;
+    text-align: center;
+}

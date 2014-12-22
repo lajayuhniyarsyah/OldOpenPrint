@@ -114,31 +114,96 @@ class ReportAccountingController extends Controller
     	return $this->render('stockmove',['data'=>$query->all(), 'jenis'=>$jenisreport, 'from'=>$from , 'to'=>$to]);
     }
 
-     public function actionTransaksiAccount()
+     public function actionTransaksiAccount($account,$from,$to)
      {
-     	$from='2014-10-01';
-     	$to='2014-10-30';
+     	$this->layout = 'report';
      	$query = new Query;
+
+     	if ($account == "False"){
      		$query
-     		->select('
-     					aml.id as id,
-     					am.ref as ref,
-     					ac.code as code,
-     					ac.name as account,
-     					aml.name as keterangan,
-     					aml.debit as debit,
-     					aml.credait as credit
-     				 ')
+     		->select ('aml.account_id as account_id')
+     		->distinct('aml.account_id')
      		->from('account_move_line as aml')
-     		->join('LEFT JOIN','account_account as ac','ac.id=aml.account_id')
-     		->join('LEFT JOIN','account_move as am','am.id=aml.move_id')
      		->where(['>=','aml.date',$from])
      		->andWhere(['<=','aml.date',$to])
-     		->limit(100);
-     	echo '<pre>';
-     	print_r($query->all());
-     	echo '</pre>';
-     	return $this->render('transaksiaccount',['data'=>$query]);
+			->addOrderBy(['aml.account_id' => SORT_ASC]);
+		
+			return $this->render('transaksiaccount',['data'=>$query->all(), 'from' =>$from, 'to'=>$to, 'account'=>$account]);
+
+     	}else{
+			return $this->render('transaksiaccount',['account'=>$account, 'from' =>$from, 'to'=>$to]);
+     	}
+
+     	
+     }
+
+     public function actionAgingArSummary()
+     {
+     	$this->layout = 'report';
+     	$from ='2014-08-15';
+     	$query = new Query;
+		     		$query
+		     		->select ('aml.partner_id as partner_id, partner.name as name')
+		     		->distinct('aml.partner_id')
+		     		->from('account_move_line as aml')
+		     		->join('LEFT JOIN','res_partner as partner','partner.id=aml.partner_id')
+		     		->where(['<=','aml.date',$from])
+		     		->andWhere(['customer'=>TRUE]);
+
+     	return $this->render('agingarsummary',['data'=>$query->all(), 'date'=>$from]);
+     }
+
+     public function actionTurnOver($id)
+     {
+     	$this->layout = 'stockmanagement';
+     	
+     	$query = new Query;
+     			$query
+				->select(
+	    				'
+	    				 s.type as jenis,
+	    				 m.date as date,
+	    				 s.lbm_no as lbm,
+	    				 s.name as no_int,
+	    				 p.default_code as part_number,
+	    				 p.name_template as name_template,
+	    				 m.product_qty as qty,
+	    				 u.name as uom,
+	    				 l.name as location,
+	    				 sl.name as desc_location,       
+	    				 r.name as partner,
+	    				 s.name as type,
+	    				 s.lbm_no as lbm,
+	    				 s.cust_doc_ref as ref_cus,
+	    				 dn.name as dn,
+	    				 op.name as op,
+	    				 s.origin as ori,
+	    				 m.origin as origin,
+	    				 m.state as state,
+	    				 m.name as product_name
+	    				')
+			    ->from('stock_move as m')
+			    ->join('LEFT JOIN','stock_picking as s','s.id=m.picking_id')
+			    ->join('LEFT JOIN','purchase_order as po','po.id=s.purchase_id')
+			    ->join('LEFT JOIN','product_product as p','p.id=m.product_id')
+			    ->join('LEFT JOIN','product_template as pt','pt.id=m.product_id')
+			    ->join('LEFT JOIN','delivery_note as dn','dn.id=s.note_id')
+			    ->join('LEFT JOIN','order_preparation as op','op.id=dn.prepare_id')
+			    ->join('JOIN','product_uom as u','u.id=m.product_uom')
+			    ->join('JOIN','res_partner as r','r.id=m.partner_id')
+			    ->join('JOIN','stock_location as l','m.location_id=l.id')
+			    ->join('JOIN','stock_location as sl','m.location_dest_id=sl.id')
+			    ->join('LEFT JOIN','stock_production_lot as batch','batch.id=m.prodlot_id')
+			    ->join('LEFT JOIN','product_pricelist as ppl','ppl.id = po.pricelist_id')
+			    ->where(['m.product_id'=>$id])
+			    ->andWhere(['m.state'=>'done'])
+			    ->addOrderBy(['m.date' => SORT_DESC]);
+
+			$data = $query->all();
+			// echo '<pre>';
+			// print_r($query->all()[0]['product_name']);
+			// echo '</pre>';
+     	return $this->render('turnover',['data'=>$data,'nameproduct'=>$data[0]['product_name']]);	
      }
 }
 
