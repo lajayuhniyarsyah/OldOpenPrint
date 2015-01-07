@@ -50,8 +50,15 @@ class AccountInvoiceController extends Controller
 
         $lines = [];
         foreach($model->accountInvoiceLines as $invLine):
+            $nameLine = $invLine->product->name_template;
+
+            if(!empty(trim($invLine->name))):
+                $nameLine .= '<br/>'.$invLine->name;
+            endif;
+
+            $nameLine .= '<br/>P/N : '.$invLine->product->default_code;
             $lines[] = [
-                'name'=>$invLine->product->name_template.'<br/>P/N : '.$invLine->product->default_code,
+                'name'=>$nameLine,
                 'price_subtotal'=>$invLine->price_subtotal,
             ];
         endforeach;
@@ -171,4 +178,3 @@ class AccountInvoiceController extends Controller
         }
     }
 }
-
