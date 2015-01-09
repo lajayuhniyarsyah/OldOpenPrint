@@ -25,7 +25,7 @@ use yii\helpers\Url;
 	}
 	.headers
 	{
-		padding-top:59mm;
+		padding-top:58mm;
 		height: 33mm;
 	}
 	.leftInfo
@@ -63,8 +63,8 @@ use yii\helpers\Url;
 
 
 	.containerLines{
-		min-height: 116mm;
-		max-height: 116mm;
+		min-height: 117mm;
+		max-height: 117mm;
 		background: lime;
 		font-size: 11pt;
 		/*border-bottom: 1px solid black;*/
@@ -78,11 +78,25 @@ use yii\helpers\Url;
 	}
 	.amounts{
 		float: right;
-		font-size: 11pt
+		font-size: 11pt;
+		
 	}
-	.amounts div{
-		height: 25px;
+	.amounts div.am{
+		text-align: right;
+		height: 24px;
+		width: 130px;
 		padding-right: 5mm;
+		/*background: lime;*/
+	}
+	.amounts .currSymbol{
+		width: 30px;
+		float: left;
+		
+	}
+	.amounts .amountNumber{
+		float: left;
+		text-align: right;
+		width: 86px;
 	}
 	.amLine3{
 		margin-top: 6mm;
@@ -99,6 +113,7 @@ use yii\helpers\Url;
 		height: 20mm;
 		width: 433px;
 		vertical-align: top;
+		line-height: 29px;
 	}
 	.dueDate{
 		margin-left: 50mm;
@@ -143,7 +158,6 @@ use yii\helpers\Url;
 		.containerLines{
 			/*border-bottom: 1px solid black;*/
 
-
 		}
 		.choosePrinter{
 			display: none;
@@ -154,7 +168,6 @@ use yii\helpers\Url;
 	if($printer=='sri'):
 		echo '.headers{padding-top:56mm;height: 32mm;}.kwNo{line-height: 2mm;}.terb{padding-top: 12mm;}';
 	endif;
-
 	?>
 </style>
 <div class="choosePrinter">
@@ -186,7 +199,7 @@ use yii\helpers\Url;
 				</div>
 				<div class="partnerAddr" contenteditable="true"><?=$model->partner->street?></div>
 				<div class="partnerAddr2" contenteditable="true"><?=$model->partner->street2?></div>
-				<div class="partnerAddr2" contenteditable="true"><?=$model->partner->city.' '.$model->partner->state->name.' - '.$model->partner->zip?></div>
+				<div class="partnerAddr2" contenteditable="true"><?=$model->partner->city.' '.(isset($model->partner->state->name) ? $model->partner->state->name.' - ':'').$model->partner->zip?></div>
 				
 			</div>
 			<div class="rightInfo">
@@ -202,11 +215,11 @@ use yii\helpers\Url;
 		</div>
 		<div class="footers">
 			<div class="amounts">
-				<div class="amLine1"><?=$model->currency->name.' '.Yii::$app->numericLib->indoStyle($model->amount_untaxed)?></div>
-				<div class="amLine2">&nbsp;</div>
-				<div class="amLine3"><?=$model->currency->name.' '.Yii::$app->numericLib->indoStyle($model->amount_untaxed)?></div>
-				<div class="amLine4"><?=$model->currency->name.' '.Yii::$app->numericLib->indoStyle($model->amount_tax)?></div>
-				<div class="amLine5"><?=$model->currency->name.' '.Yii::$app->numericLib->indoStyle($model->amount_total)?></div>
+				<div class="amLine1 am"><?='<div class="currSymbol">'.$model->currency->name.'</div><div class="amountNumber">'.Yii::$app->numericLib->indoStyle($model->amount_untaxed).'</div><div class="clear"></div>'?></div>
+				<div class="amLine2 am">&nbsp;</div>
+				<div class="amLine3 am"><?='<div class="currSymbol">'.$model->currency->name.'</div><div class="amountNumber">'.Yii::$app->numericLib->indoStyle($model->amount_untaxed).'</div><div class="clear"></div>'?></div>
+				<div class="amLine4 am"><?='<div class="currSymbol">'.$model->currency->name.'</div><div class="amountNumber">'.Yii::$app->numericLib->indoStyle($model->amount_tax).'</div><div class="clear"></div>'?></div>
+				<div class="amLine5 am"><?='<div class="currSymbol">'.$model->currency->name.'</div><div class="amountNumber">'.Yii::$app->numericLib->indoStyle($model->amount_total).'</div><div class="clear"></div>'?></div>
 			</div>
 			<div class="notes">
 				<div class="terb" contenteditable="true">
@@ -323,4 +336,3 @@ EOD;
 unset($jsonLines);
 $this->registerJs($scr);
 ?>
-

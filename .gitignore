@@ -1,3 +1,4 @@
+*.md
 assets/*
 !assets/.gitignore
 protected/runtime/*
@@ -8,3 +9,4 @@ runtime/*
 vendor/*
 config/*
 config/db.php
+/web/js/ckeditor/*

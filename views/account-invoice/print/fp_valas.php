@@ -51,7 +51,31 @@ use yii\helpers\Url;
         z-index: 9999;
         right: 0;
     }
-
+    .wid1{
+        width: 110px;
+        padding-right: 10px;
+        text-align: right;
+    }
+    .pkp{
+        /*background: lime;*/
+        height: 80px;
+    }
+    .pbkp{
+        margin-top:10mm;margin-left:36mm;
+    }
+    .partnerStreet{
+        height: 37px;
+        vertical-align: middle;
+    }
+    .ptSupra{
+        margin-bottom:1mm;padding-top:8px;
+    }
+    .tdPartner{
+        height:129px;vertical-align:top;
+    }
+    .partnerName{
+        margin-bottom:2mm;padding-top:4px;
+    }
     <?php
     if($printer=='sri'):
         echo '.pages{padding-top: 12mm;}';
@@ -101,19 +125,19 @@ use yii\helpers\Url;
                     <tr>
                         <td>
                             <div class="pkp" style="margin-top:7mm;margin-left:36mm;">
-                                <div style="margin-bottom:1mm;">PT. SUPRABAKTI MANDIRI</div>
+                                <div class="ptSupra">PT. SUPRABAKTI MANDIRI</div>
                                 <div class="fontAddr" style="height:10mm;"><span>Jl. Danau Sunter Utara Blok. A No. 9 Tanjung Priok - Jakarta Utara 14350</span></div>
                                 <div>01.327.742.1-038.000</div>
                             </div>
                         </td>
                     </tr>
                     <tr>
-                        <td style="height:129px;">
-                            <div class="pbkp" style="margin-top:12mm;margin-left:36mm;">
-                                <div style="margin-bottom:2mm;"><?= $model->partner->name; ?></div>
-                                <div class="fontAddr" contenteditable="true">
+                        <td class="tdPartner">
+                            <div class="pbkp">
+                                <div class="partnerName"><?= $model->partner->name; ?></div>
+                                <div class="fontAddr partnerStreet" contenteditable="true">
                                     <span>
-                                        <?= $model->partner->street; ?><?= '<br/>'.$model->partner->street2 ?> <?= $model->partner->city ?>, <?= $model->partner->state->name.($model->partner->zip ? ' - '.$model->partner->zip:"") ?>
+                                        <?= $model->partner->street; ?><?= '<br/>'.$model->partner->street2 ?> <?= $model->partner->city ?>, <?= (isset($model->partner->state->name) ? $model->partner->state->name:'').($model->partner->zip ? ' - '.$model->partner->zip:"") ?>
                                     </span>
                                 </div>
                                 <div>
@@ -145,7 +169,7 @@ use yii\helpers\Url;
                                         </tr>
                                     </table>
                                 </div>
-                                    <?='<div style="float:left;width:13mm;">'.$model->currency->name.'</div><div>'.Yii::$app->numericLib->indoStyle($model->amount_untaxed).'</div><div style="clear:both;"></div>';?>
+                                    <?='<div style="float:left;width:13mm;">'.$model->currency->name.'</div><div class="wid1">'.Yii::$app->numericLib->indoStyle($model->amount_untaxed).'</div><div style="clear:both;"></div>';?>
                             </div>
                             <div style="height:11mm;">&nbsp;</div>
                         </td>
@@ -155,8 +179,8 @@ use yii\helpers\Url;
                             <div class="amount">
                                 <table style="width:100%;" cellpadding="0" cellspacing="0">
                                     <tr>
-                                        <td style="width:61%;"><?='<div style="width:13mm;float:left;">'.  $model->currency->name.'</div><div>'.Yii::$app->numericLib->indoStyle($model->amount_untaxed).'</div>'?></td>
-                                        <td><?=Yii::$app->numericLib->indoStyle((round($model->amount_untaxed*$model->pajak)))?></td>
+                                        <td style="width:61%;"><?='<div style="width:13mm;float:left;">'.  $model->currency->name.'</div><div class="wid1">'.Yii::$app->numericLib->indoStyle($model->amount_untaxed).'</div>'?></td>
+                                        <td style="text-align:right;"><?=Yii::$app->numericLib->indoStyle((round($model->amount_untaxed*$model->pajak)))?></td>
                                     </tr>
                                 </table>
                             </div>
@@ -165,8 +189,8 @@ use yii\helpers\Url;
                     <tr>
                         <td>
                             <div class="amount" style="margin-top:-3px;">
-                                <div style="width:43mm;float:left;"><?= (isset($model->amount_tax) ? '<div style="float:left;width:13mm;">'.$model->currency->name.'</div><div>'.Yii::$app->numericLib->indoStyle($model->amount_tax).'</div><div style="clear:both;"></div>':''); ?></div>
-                                <div><?=Yii::$app->numericLib->indoStyle((round($model->amount_tax*$model->pajak)))?></div>
+                                <div style="width:43mm;float:left;"><?= (isset($model->amount_tax) ? '<div style="float:left;width:13mm;">'.$model->currency->name.'</div><div class="wid1">'.Yii::$app->numericLib->indoStyle($model->amount_tax).'</div><div style="clear:both;"></div>':''); ?></div>
+                                <div style="text-align:right;"><?=Yii::$app->numericLib->indoStyle((round($model->amount_tax*$model->pajak)))?></div>
                                 <div class="clear:both;"></div>
                             </div>
                         </td>

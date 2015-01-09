@@ -55,6 +55,20 @@ use yii\helpers\Url;
 		z-index: 9999;
 		right: 0;
 	}
+	.amVal{
+		text-align: right;
+		padding-right: 	20px;
+	}
+	.pbkp{
+		margin-top: 41px;
+		margin-left: 36mm;
+		height: 88px;
+	}
+
+	.lineVal{
+		text-align: right;
+		padding-right: 20px;
+	}
 
 	<?php
     if($printer=='sri'):
@@ -62,11 +76,19 @@ use yii\helpers\Url;
     endif;
 
     ?>
-
+    .xxx{
+    	margin-left: -147mm !important;
+    }
+    .spacerTd{
+    	height: 8mm;
+    }
     @media print{
         .xxx table, .xxx table tr, .xxx table tr td{
             border: 0px;
+
         }
+
+
 
 		.choosePrinter{
 			display: none;
@@ -112,11 +134,11 @@ use yii\helpers\Url;
 					</tr>
 					<tr>
 						<td>
-							<div class="pbkp" style="margin-top:12mm;margin-left:36mm;">
-								<div style="margin-bottom:2mm;"><?= $model->partner->name; ?></div>
-								<div style="height:10mm;">
+							<div class="pbkp">
+								<div style="margin-bottom:2mm;" contenteditable="true"><?= $model->partner->name; ?></div>
+								<div style="height:10mm;" contenteditable="true">
 									<span>
-										<?= $model->partner->street; ?><?= '<br/>'.$model->partner->street2 ?> <?= $model->partner->city ?>, <?= $model->partner->state->name.($model->partner->zip ? ' - '.$model->partner->zip:"") ?>
+										<?= $model->partner->street; ?><?= '<br/>'.$model->partner->street2 ?> <?= $model->partner->city ?>, <?= (isset($model->partner->state->name) ? $model->partner->state->name:'').($model->partner->zip ? ' - '.$model->partner->zip:"") ?>
 									</span>
 								</div>
 								<div><span><?= ($model->partner->npwp ? $model->partner->npwp:'-'); ?></span></div>
@@ -127,7 +149,7 @@ use yii\helpers\Url;
 						<?php $maxHeight = '103mm'; ?>
 						<td class="tdLines" style="height:<?=$maxHeight?>;vertical-align:top;">
 							<div class="contentArea">
-								<table class="contentLines" style="width:100%;margin-top:18mm;">
+								<table class="contentLines" style="width:100%;margin-top:16mm;">
 									<!-- <?php foreach($model->accountInvoiceLines as $cSeq=>$invoiceLine): ?>
 									<tr class="cRows rows<?=$cSeq?>" style="vertical-align:top;">
 										<td style="width:6%;"><?=$invoiceLine->sequence?></td>
@@ -143,29 +165,33 @@ use yii\helpers\Url;
 						<td>
 							<div class="amount">
 								<div class="xxx">
-                                    <table border="1px solid black">
+                                    <table border="1px solid black" cellpadding="0">
                                         <tr>
-                                            <td style="width:18mm;" contenteditable="true">XXXXXX</td>
+                                            <td style="width:18mm;" contenteditable="true">XXXXXXX</td>
                                             <td style="width:18mm;" contenteditable="true">XXXXXX</td>
                                             <td style="width:18mm;" contenteditable="true">XXXXXX</td>
                                             <td style="width:18mm;" contenteditable="true">XXXXXX</td>
                                         </tr>
                                     </table>
                                 </div>
-								<?= Yii::$app->numericLib->indoStyle($model->amount_untaxed); ?>
+                                <div class="amVal">
+										<?= Yii::$app->numericLib->indoStyle($model->amount_untaxed); ?>
+								</div>
 							</div>
 						</td>
 					</tr>
 					<tr>
-						<td style="height:10mm;">
+						<td class="spacerTd">
 							<div class="amount">&nbsp;</div>
 						</td>
 					</tr>
 					<tr>
-						<td><div class="amount"><?= (isset($model->amount_untaxed) ? Yii::$app->numericLib->indoStyle($model->amount_untaxed):''); ?></div></td>
+						<td>
+							<div class="amount"><div class="amVal"><?= (isset($model->amount_untaxed) ? Yii::$app->numericLib->indoStyle($model->amount_untaxed):''); ?></div></div>
+						</td>
 					</tr>
 					<tr>
-						<td><div class="amount"><?= (isset($model->amount_tax) ? Yii::$app->numericLib->indoStyle($model->amount_tax):''); ?></div></td>
+						<td><div class="amount"><div class="amVal"><?= (isset($model->amount_tax) ? Yii::$app->numericLib->indoStyle($model->amount_tax):''); ?></div></div></td>
 					</tr>
 					<tr>
 						<td>
@@ -205,7 +231,7 @@ $this->registerJs('
 
 	function prepareRow(rowNo,data)
 	{
-		return "<tr class=\'cRows rows"+rowNo+"\'><td style=\"width:38px;\">"+eval(rowNo+1)+"</td><td contenteditable=\"true\" style=\"width:440px;\">"+data.name+"</td><td>"+data.price_subtotal+"</td></tr>";
+		return "<tr class=\'cRows rows"+rowNo+"\'><td style=\"width:38px;\">"+eval(rowNo+1)+"</td><td contenteditable=\"true\" style=\"width:440px;\">"+data.name+"</td><td class=\"lineVal\">"+data.price_subtotal+"</td></tr>";
 	}
 
 	function prepareNoteRow(rowNo,data)
