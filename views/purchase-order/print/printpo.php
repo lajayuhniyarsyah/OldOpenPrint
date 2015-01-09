@@ -273,15 +273,32 @@ use yii\helpers\Url;
 	}
 </style>
 	<?php 
-
-		$test="EKA CHANDRA";
-		echo ucwords("EKA CHANDRA");
 		$no=1;
+		$diskon=0;
+		$subtotal=0;
 		foreach ($model->purchaseOrderLines as $value){
+				if($value->part_number==""){
+					$pn="";
+				}else{
+					$pn=$value->part_number;
+				}
+				// echo $value->discount;
+				if($value->discount_nominal=="0.000"){
+					if($value->discount=="0.000"){
+						$diskon=$diskon+0;
+					}else{
+						$hitungdiscount=($value->price_unit*$value->discount)/100;
+						$diskon=$diskon+$hitungdiscount;
+					}
+				}else{
+					$diskon=$diskon+$value->discount_nominal;
+				}
+
+				$subtotal=$subtotal+($value->price_unit*$value->product_qty);
 				$data2[]=array(
 								$no,
 								$value->name,
-								$value->product->default_code,
+								$pn,
 								$value->product_qty,
 								$value->productUom->name,
 								app\components\NumericLib::indoStyle($value->price_unit,2,',','.'),
@@ -414,12 +431,12 @@ use yii\helpers\Url;
 													<tr>
 														<td colspan="3" width="199px"></td>
 														<td colspan="3" width="106px">TOTAL AMOUNT</td>
-														<td width="94px" align="right"><?php echo app\components\NumericLib::indoStyle($model->amount_untaxed,2,',','.') ?></td>
+														<td width="94px" align="right"><?php echo app\components\NumericLib::indoStyle($subtotal,2,',','.') ?></td>
 													</tr>
 													<tr>
 														<td colspan="3"></td>
 														<td colspan="3">Discount</td>
-														<td align="right"></td>
+														<td align="right"><?php echo app\components\NumericLib::indoStyle($diskon,2,',','.') ?></td>
 													</tr>
 													<tr>
 														<td colspan="3"></td>
@@ -519,7 +536,7 @@ $this->registerJs('
 			// alert(pageHeight);
 			var setLineHeight=439-pageHeight;
 			
-			var resLine = "<tr class=\'cRows rows"+rowNo+"\'><td width=\'30px\' style=\"text-align:center;\"></td><td style=\"text-align:left;\" width=\'265px\'></td><td width=\'89px\'><div class=\"leftdata\"></div></td><td width=\'60px\' style=\"text-align:center;\"><div class=\"center\"></div></td><td style=\"text-align:center;\" width=\'50px\'></td><td style=\"text-align:right;\" width=\'93px\'></td><td width=\'94px\' style=\"text-align:right;\"></td></tr>";";
+			var resLine = "<tr class=\'cRows rows"+rowNo+"\'><td width=\'30px\' style=\"text-align:center;\"></td><td style=\"text-align:left;\" width=\'265px\'></td><td width=\'89px\'><div class=\"leftdata\"></div></td><td width=\'60px\' style=\"text-align:center;\"><div class=\"center\"></div></td><td style=\"text-align:center;\" width=\'50px\'></td><td style=\"text-align:right;\" width=\'93px\'></td><td width=\'94px\' style=\"text-align:right;\"></td></tr>";
 			jQuery(\'#lines\'+currPage+\' tr:last\').after(resLine);
 
 			// add new page container
