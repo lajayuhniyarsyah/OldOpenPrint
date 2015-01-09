@@ -247,7 +247,6 @@ use yii\helpers\Url;
 	}
 </style>
 	<?php 
-
 		foreach ($model->orderPreparationLines as $value) {
 				$databatch=[];
 				foreach ($value->orderPreparationBatches as $batch) {
@@ -255,8 +254,7 @@ use yii\helpers\Url;
 						$databatch[]='Batch No : '.$batch->name0->name.' '.$batch->name0->desc.' Qty :'.$batch->qty.' '.$no=$value->productUom->name.'<br/>';
 					}else{
 						$databatch[]='Batch No : '.$batch->name0->name.' '.$batch->name0->desc.' Exp Date : '.$batch->name0->exp_date.' Qty :'.$batch->qty.' '.$no=$value->productUom->name.'<br/>';	
-					}
-					
+					}	
 				}
 				$desc=$value->name.'<br/>'.$value->detail.'<br/>'.implode($databatch);
 				if ($value->no==""){
@@ -269,6 +267,7 @@ use yii\helpers\Url;
 
 		}
 		$data2[]=array('','','<br/><br/>'.$model->terms,'');
+		// print_r($data2)
 	?>
 <div id="pageContainer">
 <div class="pages">
@@ -301,8 +300,7 @@ use yii\helpers\Url;
 									<fieldset>
 										<div class="isicus">
 										<b><?php echo $model->partner->name; ?></b><br/>
-										<?php echo $model->partner->street; ?><br/>
-											021-2591818<br/>
+										<?php echo $model->partner->street; ?><br/><br/>
 										</div>
 									</fieldset>
 								</div>

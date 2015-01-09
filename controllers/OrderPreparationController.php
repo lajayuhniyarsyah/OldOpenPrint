@@ -57,7 +57,7 @@ class OrderPreparationController extends Controller
         $this->layout = 'printout';
         
         $model = $this->findModel($id);
-
+        
         return $this->render('print/op',['model'=>$model]);
     }
 
