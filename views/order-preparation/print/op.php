@@ -250,15 +250,28 @@ use yii\helpers\Url;
 
 		foreach ($model->orderPreparationLines as $value) {
 				$databatch=[];
+				// var_dump($value->product->superNotes);
+
 				foreach ($value->orderPreparationBatches as $batch) {
-					if ($batch->exp_date==""){
+					if ($batch->exp_date=="")
+					{
 						$databatch[]='Batch No : '.$batch->name0->name.' '.$batch->name0->desc.' Qty :'.$batch->qty.' '.$no=$value->productUom->name.'<br/>';
-					}else{
+					}
+					else{
 						$databatch[]='Batch No : '.$batch->name0->name.' '.$batch->name0->desc.' Exp Date : '.$batch->name0->exp_date.' Qty :'.$batch->qty.' '.$no=$value->productUom->name.'<br/>';	
 					}
 					
 				}
-				$desc=$value->name.'<br/>'.$value->detail.'<br/>'.implode($databatch);
+				// end foreach
+
+				$desc=$value->name.($value->detail ? '<br/>'.$value->detail:"").(count($databatch) ? '<br/>'.implode($databatch):"");
+
+				if($value->product->superNotes):
+					foreach($value->product->superNotes as $notes):
+						if($notes->show_in_do_line) $desc.='<br />'.$notes->template_note; #SHOW ETRA NOTES PRODUCT INTO LINE
+					endforeach;
+				endif;
+
 				if ($value->no==""){
 					$no='';
 				}else{
@@ -302,7 +315,7 @@ use yii\helpers\Url;
 										<div class="isicus">
 										<b><?php echo $model->partner->name; ?></b><br/>
 										<?php echo $model->partner->street; ?><br/>
-											021-2591818<br/>
+											
 										</div>
 									</fieldset>
 								</div>
