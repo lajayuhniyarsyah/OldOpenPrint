@@ -369,7 +369,7 @@ class MovesController extends Controller
 
 	private function preparePrintInternalMoveLine($line)
 	{
-		$productField = $line->product->name_template;
+		$productField = $line->product->name_template.($line->desc ? "<br/>".$line->desc:null);
 
 		$product = $line->product;
 		$sNoteLine = False;
@@ -382,7 +382,7 @@ class MovesController extends Controller
 
 		if($line->internalMoveLineDetails):
 			$detailField = "";
-			$productField .="<br/><ul>";
+			$productField .="<br/>Consist Of :<ul>";
 			foreach($line->internalMoveLineDetails as $detail):
 				if($detail->product->superNotes):
 					foreach($detail->product->superNotes as $superNoteD):

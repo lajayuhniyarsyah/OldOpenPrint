@@ -210,7 +210,7 @@ use yii\helpers\Html;
 										<div>
 											<div>Catatan :</div>
 											<div>
-												
+												<?=nl2br($model->notes)?>
 											</div>
 										</div>
 									</td>
