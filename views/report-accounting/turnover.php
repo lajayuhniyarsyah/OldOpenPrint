@@ -33,8 +33,8 @@
 				$no_surat=$value['ref_cus'];
 				$no_pb='LBM No '.$value['lbm'];
 			}else{
-				$no_surat=substr($value['dn'], 0,6);
-				$no_pb=substr($value['op'], 0,6);
+				$no_surat=substr($value['dn'], 0,7);
+				$no_pb=substr($value['op'], 0,7);
 			}
 
 			if($value['jenis']==""){
