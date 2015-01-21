@@ -247,26 +247,43 @@ use yii\helpers\Url;
 	}
 </style>
 	<?php 
+
 		foreach ($model->orderPreparationLines as $value) {
 				$databatch=[];
+				// EXTRA JIKA ADA BATCH LEBIH DARI 6 LINE
+				$extra = false;
+				$extraDatabatch=[];
 				// var_dump($value->product->superNotes);
 
-				foreach ($value->orderPreparationBatches as $batch) {
-					if ($batch->exp_date=="")
-					{
-						$databatch[]='Batch No : '.$batch->name0->name.' '.$batch->name0->desc.' Qty :'.$batch->qty.' '.$no=$value->productUom->name.'<br/>';
-					}
-					else{
-						$databatch[]='Batch No : '.$batch->name0->name.' '.$batch->name0->desc.' Exp Date : '.$batch->name0->exp_date.' Qty :'.$batch->qty.' '.$no=$value->productUom->name.'<br/>';	
-					}	
+				foreach ($value->orderPreparationBatches as $index=>$batch) {
+					if($index<6):
+						if ($batch->exp_date=="")
+						{
+							$databatch[]='Batch No : '.$batch->name0->name.' '.$batch->name0->desc.' Qty :'.$batch->qty.' '.$no=$value->productUom->name.'<br/>';
+						}
+						else{
+							$databatch[]='Batch No : '.$batch->name0->name.' '.$batch->name0->desc.' Exp Date : '.$batch->name0->exp_date.' Qty :'.$batch->qty.' '.$no=$value->productUom->name.'<br/>';	
+						}
+					else:
+						$extra = true;
+						if ($batch->exp_date=="")
+						{
+							$extraDatabatch[]='Batch No : '.$batch->name0->name.' '.$batch->name0->desc.' Qty :'.$batch->qty.' '.$no=$value->productUom->name.'<br/>';
+						}
+						else{
+							$extraDatabatch[]='Batch No : '.$batch->name0->name.' '.$batch->name0->desc.' Exp Date : '.$batch->name0->exp_date.' Qty :'.$batch->qty.' '.$no=$value->productUom->name.'<br/>';	
+						}
+					endif;
+					
 				}
 				// end foreach
 
 				$desc=$value->name.($value->detail ? '<br/>'.$value->detail:"").(count($databatch) ? '<br/>'.implode($databatch):"");
 
+
 				if($value->product->superNotes):
 					foreach($value->product->superNotes as $notes):
-						if($notes->show_in_do_line) $desc.='<br />'.$notes->template_note; #SHOW ETRA NOTES PRODUCT INTO LINE
+						if($notes->show_in_do_line) $desc.='<br />'.$notes->template_note; #SHOW SUPER NOTES PRODUCT INTO LINE
 					endforeach;
 				endif;
 
@@ -276,11 +293,16 @@ use yii\helpers\Url;
 					$no=$value->no;					
 				}
 
-				$data2[]=array($no,$value->product_qty.' '.$no=$value->productUom->name,$desc,$value->product->default_code);
+				$data2[]=array($no,$value->product_qty.' '.$value->productUom->name,$desc,$value->product->default_code);
+				// JIKA ADA EXTRA MAKA TARUH DI ROW BARU
+				if($extra)
+				{
+					$extraDesc=$value->name.($value->detail ? '<br/>'.$value->detail:"").(count($extraDatabatch) ? '<br/>'.implode($extraDatabatch):"");
+					$data2[]=array($no,$value->product_qty.' '.$value->productUom->name,$extraDesc,$value->product->default_code);
+				}
 
 		}
 		$data2[]=array('','','<br/><br/>'.$model->terms,'');
-		// print_r($data2)
 	?>
 <div id="pageContainer">
 <div class="pages">
@@ -313,8 +335,8 @@ use yii\helpers\Url;
 									<fieldset>
 										<div class="isicus">
 										<b><?php echo $model->partner->name; ?></b><br/>
-
-										<?php echo $model->partner->street; ?><br/><br/>
+										<?php echo $model->partner->street; ?><br/>
+											
 										</div>
 									</fieldset>
 								</div>
