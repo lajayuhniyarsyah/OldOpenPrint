@@ -99,7 +99,30 @@ use yii\helpers\Url;
 		width: 86px;
 	}
 	.amLine2{
+		/*border: 1px solid black;*/
+	}
+	.am2Words{
 		border: 1px solid black;
+		float: left;
+		width: 150px;
+		height: 100%;
+		margin-left: -171px;
+
+	}
+	.kursAm2{
+		border: 1px solid black;
+		float: left;
+		width: 35px;
+		height: 100%;
+		margin-left: -6px;
+
+	}
+	.valAm2{
+		border: 1px solid black;
+		height: 100%;
+		padding-right: 10px;
+		width: 80px;
+		float: right;
 	}
 	.amLine3{
 		margin-top: 6mm;
@@ -135,10 +158,11 @@ use yii\helpers\Url;
 		width: 85mm;
 	}
 	.td4{
-		width:36mm;
+		/*width:36mm;*/
+		width: 31mm;
 	}
 	.td5{
-		
+		width: 120px;
 	}
 
 	.invFootNotes{
@@ -169,11 +193,22 @@ use yii\helpers\Url;
 		.amLine2{
 			border: none;
 		}
+
+		.am2Words{
+			border: none;
+
+		}
+		.kursAm2{
+			border: none;
+		}
+		.valAm2{
+			border: none;
+		}
 	}
 
 	<?php
 	if($printer=='sri'):
-		echo '.headers{padding-top:56mm;height: 32mm;}.kwNo{line-height: 2mm;}.terb{padding-top: 12mm;}';
+		echo '.headers{padding-top:56mm;height: 32mm;}.kwNo{line-height: 2mm;}.terb{padding-top: 11mm;line-height: 35px;}';
 	endif;
 	?>
 </style>
@@ -223,7 +258,11 @@ use yii\helpers\Url;
 		<div class="footers">
 			<div class="amounts">
 				<div class="amLine1 am"><?='<div class="currSymbol">'.$model->currency->name.'</div><div class="amountNumber">'.Yii::$app->numericLib->indoStyle($model->amount_untaxed).'</div><div class="clear"></div>'?></div>
-				<div class="amLine2 am" contenteditable="true">&nbsp;</div>
+				<div class="amLine2 am">
+					<div class="am2Words" contenteditable="true">&nbsp;</div>
+					<div class="kursAm2" contenteditable="true">&nbsp;</div>
+					<div class="valAm2" contenteditable="true">&nbsp;</div>
+				</div>
 				<div class="amLine3 am"><?='<div class="currSymbol">'.$model->currency->name.'</div><div class="amountNumber">'.Yii::$app->numericLib->indoStyle($model->amount_untaxed).'</div><div class="clear"></div>'?></div>
 				<div class="amLine4 am"><?='<div class="currSymbol">'.$model->currency->name.'</div><div class="amountNumber">'.Yii::$app->numericLib->indoStyle($model->amount_tax).'</div><div class="clear"></div>'?></div>
 				<div class="amLine5 am"><?='<div class="currSymbol">'.$model->currency->name.'</div><div class="amountNumber">'.Yii::$app->numericLib->indoStyle($model->amount_total).'</div><div class="clear"></div>'?></div>
