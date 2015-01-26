@@ -3,38 +3,62 @@ use yii\helpers\Url;
 use yii\helpers\Html;
 ?>
 <style type="text/css">
+	body{
+		font-size: 9pt;
+	}
 	table{
 		/*border: 1px solid black;*/
 		border-collapse: collapse;
+	}
+	thead{
+	  display:table-header-group;/*repeat table headers on each page*/
+	  height: 250px;
+	  max-height: 251px;
+	}
+	tbody{
+	  display:table-row-group;
+	}
+	tfoot{
+	  display:table-footer-group;/*repeat table footers on each page*/
 	}
 	table tr td{
 		vertical-align: top;
 	}
 	#tblMain{
-		width: 1000px;
+		width: 600px;
 		/*border: 1px solid black;*/
 	}
 
 	.tblHeader{
 		width: 100%;
 	}
-	h1.title{
+	.title{
+		font-size: 14pt;
 		text-decoration: underline;
 	}
+	.title{
+		padding-left: 100px;
+	}
+	.subtitle{
+		padding-left:126px;
+	}
+	
 	#tdHeaderLogo{
-		width: 230px;
+		width: 100px;
 	}
 	img#headerLogo{
-		width: 200px;
+		width: 100px;
 	}
 
 	.leftInfo{
 		float: left;
 		text-align: left;
+		width: 280px;
 	}
 	.rightInfo{
 		float: right;
 		text-align: left;
+		width: 250px;
 	}
 
 	#headerContent{
@@ -48,11 +72,12 @@ use yii\helpers\Html;
 	#footer1{
 		width: 100%;
 		border-top:1px solid black;
-		line-height: 28px;
+		line-height: 2em;
+		margin-bottom: 20px;
 	}
 
 	#leftFooter1{
-		width: 450px;
+		width: 275px;
 		float: left;
 	}
 
@@ -66,11 +91,11 @@ use yii\helpers\Html;
 
 	#footer2{
 		width: 100%;
-		margin-top: 80px;
+		
 		text-align: center;
 	}
 	#footer2 tr:first-child{
-		height: 130px;
+		height: 70px;
 	}
 	#tblLines{
 		width: 100%;
@@ -90,13 +115,13 @@ use yii\helpers\Html;
 	}
 
 	.content1{
-		width: 47px;
+		width: 27px;
 	}
 	.content2{
-		width: 107px;
+		width: 54px;
 	}
 	.content3{
-		width: 474px;
+		width: 352px;
 	}
 
 	.expInfoHead{
@@ -107,14 +132,20 @@ use yii\helpers\Html;
 	}
 
 	.info1{
-		width: 90px;
+		width: 30px;
 	}
 
 	.info2{
 		width: 9px;
 	}
 	.info3{
-		width: 262px;
+		width: 200px;
+	}
+
+	.noteContainer{
+		padding-left: 7px;
+		vertical-align: top;
+		text-align: left;
 	}
 </style>
 <table id="tblMain">
@@ -127,18 +158,21 @@ use yii\helpers\Html;
 						<td id="tdHeaderLogo">
 							<img id="headerLogo" src="img/logo.png" alt="Suprabakti Mandiri" />
 						</td>
-						<td>
-							<h1 class="title">INTERNAL MOVE</h1>
-							<h4><?=$model->name?></h4>
+						<td style="text-align:left;">
+							<div class="title">INTERNAL MOVE</div>
+							<div class="subtitle"><?=$model->name?></div>
 						</td>
 					</tr>
+
+
 				</table>
+
 			</th>
 		</tr>
 		<tr id="trHeader2">
 			<th>
 				<div class="leftInfo">
-					<table>
+					<table style="width:100%">
 						<tr>
 							<td class="info1">Dari</td>
 							<td class="info2">:</td>
@@ -152,23 +186,26 @@ use yii\helpers\Html;
 					</table>
 				</div>
 				<div class="rightInfo">
-					<table>
+					<table style="width:100%">
 						<tr>
 							<td class="info1">Tanggal</td>
 							<td class="info2">:</td>
-							<td class="info3"><?=Html::encode(date('d-m-Y'))?></td>
+							<td class="info3"><?=Html::encode(Yii::$app->formatter->asDateTime($model->date_transfered,"php:d-M-Y"))?></td>
 						</tr>
 						<tr>
-							<td class="info1">No PB.</td>
-							<td class="info2">:</td>
-							<td class="info3"><?=Html::encode($model->internalMoveRequest->name.($model->manual_pb_no ? " | ".$model->manual_pb_no:""))?></td>
+							<td class="info1R">No PB.</td>
+							<td class="info2R">:</td>
+							<!-- <td class="info3R"><?=Html::encode($model->internalMoveRequest->name.($model->manual_pb_no ? " | ".$model->manual_pb_no:""))?></td> -->
+							<td class="info3R"><?=Html::encode($model->manual_pb_no)?></td>
 						</tr>
 					</table>
 				</div>
+				<div style="clear:both;" class="clear"></div>
 			</th>
 		</tr>
+		
 		<tr id="trHeader3">
-			<td style="padding-top: 52px;">
+			<td style="padding-top: 32px;">
 				<table id="headerContent">
 					<tr>
 						<td class="content1 text-center">No.</td>
@@ -209,7 +246,7 @@ use yii\helpers\Html;
 									<td id="leftFooter1">
 										<div>
 											<div>Catatan :</div>
-											<div>
+											<div class="noteContainer">
 												<?=nl2br($model->notes)?>
 											</div>
 										</div>
