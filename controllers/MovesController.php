@@ -333,15 +333,33 @@ class MovesController extends Controller
 						if($detail->desc):
 							$desc .= '&nbsp;'.$detail->desc;
 						endif;
+						
+					endif;
+					// if super notes
+					if($detail->product->superNotes):
+						foreach($detail->product->superNotes as $sNote):
+							$desc .= '<br/>'.$sNote->template_note;
+						endforeach;
 					endif;
 					$code = $detail->product->default_code;
 					$data[]=[$no,$qty,$desc,$code];
 				endforeach;
 			else:
+				
 				$no = $line->no;
 				$qty = $line->qty.' '.$line->uom->name;
 				$desc = $line->product->name_template;
 				$code = $line->product->default_code;
+
+
+				if($line->product->superNotes):
+					foreach($line->product->superNotes as $sNote):
+						if($sNote->show_in_do_line):
+							$desc .= '<br/>'.$sNote->template_note;
+						endif;
+					endforeach;
+				endif;
+
 				$data[]=[$no,$qty,$desc,$code];
 			endif;
 
@@ -379,7 +397,7 @@ class MovesController extends Controller
 				$sNoteLine .= "<br/>".$superNote->template_note;
 			endforeach;
 		endif;
-
+		// IF HAS DETAILS
 		if($line->internalMoveLineDetails):
 			$detailField = "";
 			$productField .="<br/>Consist Of :<ul>";
@@ -391,7 +409,7 @@ class MovesController extends Controller
 				endif;
 
 				$detailField.="<li>";
-				$detailField.=$detail->product->name_template.' '.($detail->desc ? '<br/>'.$detail->desc:null).($sNoteDetail ? $sNoteDetail:null);
+				$detailField.=$detail->product->name_template.' '.($detail->desc ? '<br/>'.$detail->desc.($detail->stock_prod_lot_id ? "<br/>B/N :".$detail->stockProdLot->name." - ".$detail->qty." ".$detail->uom->name:null):null).($sNoteDetail ? $sNoteDetail:null);
 				$detailField.="</li>";
 			endforeach;
 			$productField.=$detailField;

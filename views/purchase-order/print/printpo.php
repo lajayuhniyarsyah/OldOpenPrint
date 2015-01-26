@@ -297,7 +297,7 @@ use yii\helpers\Url;
 				$subtotal=$subtotal+($value->price_unit*$value->product_qty);
 				$data2[]=array(
 								$no,
-								$value->name,
+								nl2br($value->name),
 								$pn,
 								$value->product_qty,
 								$value->productUom->name,
@@ -305,7 +305,7 @@ use yii\helpers\Url;
 								app\components\NumericLib::indoStyle($value->price_unit*$value->product_qty,2,',','.'));
 						$no++;
 				}
-		$data2[]=array('','<br/><br/>'.$model->notes,'','','','','');
+		$data2[]=array('','<br/><br/>'.nl2br($model->notes),'','','','','');
 	?>
 <div id="pageContainer">
 <div class="pages">
