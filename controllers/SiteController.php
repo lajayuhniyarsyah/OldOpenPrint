@@ -8,10 +8,12 @@ use yii\web\Controller;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
+
 use app\models\SalesActivityForm;
 use yii\db\Query;
 use yii\db\QueryBuilder;
 use yii\db\Command;
+
 class SiteController extends Controller
 {
     public function behaviors()
@@ -200,13 +202,14 @@ class SiteController extends Controller
         // return $this->render('/report-sales/activityreport',['model'=>$model]);      
            
     }
+
     public function actionIndex()
     {
         return $this->render('index');
     }
 
     public function actionTes(){
-        
+        echo 1111;
     }
 
     public function actionLogin()
