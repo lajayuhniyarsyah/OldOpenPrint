@@ -1,24 +1,20 @@
 <?php
 use yii\helpers\Url;
-
-
 ?>
 <style type="text/css">
 	#pageContainer{
-		width: 198mm;
+		width: 150mm;
 		margin-left: auto; margin-right: auto;
 		page-break-after: always;
-		font-family: Arial, Helvetica, sans-serif;
+		font-family: "Arial";
 	}
 	table{
-		/* border-top: 1px solid black;
-		border-bottom: 1px solid black; */
 	}
 	.contener{
 		border: 1px solid black;
 		margin-left: auto; margin-right: auto;
 		page-break-after: always;
-		font-family: Arial, Helvetica, sans-serif;
+		font-family: "Arial";
 	}
 	.header{
 		height: 10%;
@@ -33,7 +29,7 @@ use yii\helpers\Url;
 		page-break-after: always;
 	}
 	.logo{
-		width: 140mm;
+		width: 100mm;
 		margin-top: -85px;
 		float: left;
 	}
@@ -46,8 +42,7 @@ use yii\helpers\Url;
 		font-size: 22px;
 		margin-top: -35px;
 		margin-left: 15px;
-		font-family: Geneva, Arial, Helvetica, sans-serif;
-		
+		font-family: "Arial";
 		float: center;
 		letter-spacing: 1px;
 	}
@@ -59,20 +54,17 @@ use yii\helpers\Url;
 	.do{
 		font-size: 16px;
 		font-weight: bold;
-		margin-left: 16px;
+		/*margin-left: 16px;*/
 		margin-top: 10px;
-		/*position: absolute;*/
-		/*font-family: Times New Roman;*/
 		float: left;
 	}
 	.yth{
 		display: block;
 		float: left;
-		/*font-family: Times New Roman;*/
-		font-size: 12px;
-		margin-left: 16px;
-		width: 98%;
-		line-height: 17px;
+		font-size: 9px;
+		/*margin-left: 16px;*/
+		width: 100%;
+		line-height: 15px;
 	}
 	.customer{
 		float: right;
@@ -94,7 +86,7 @@ use yii\helpers\Url;
 	}
 	.headtable{
 		border: 1px black solid;
-		margin-left: 15px;
+		/*margin-left: 15px;*/
 		margin-top: 5px;
 	}
 	.isicus{
@@ -122,7 +114,9 @@ use yii\helpers\Url;
 		border: 1px solid black;
 	}
 	.tablefooter{
-		float:left; width:100%; border-left:1px solid black; border-right:1px solid black; height:185px;
+		float:left; 
+		width: 150mm;
+		border-left:1px solid black; border-right:1px solid black; height:185px;
 		border-bottom:1px solid black;
 	}
 	.tablefooter td{
@@ -195,8 +189,8 @@ use yii\helpers\Url;
 	}
 	.contentLines{
 		border-collapse: collapse;
-		margin-left: 15px;
-		width: 186mm;
+		/*margin-left: 15px;*/
+		width: 150mm;
 		margin-top: -9px;
 		border-bottom:  1px solid black;
 	}
@@ -226,7 +220,9 @@ use yii\helpers\Url;
 		height:100mm;
 	}
 	.tablettd{
-		width:98%; float:left;  margin-left: 15px;margin-top: -9px;
+		width:98%; float:left; 
+		/*margin-left: 15px;*/
+		margin-top: -9px;
 	}
 	.tblkirim{
 		border-collapse: collapse;
@@ -246,11 +242,11 @@ use yii\helpers\Url;
 	}
 	.rigthheadtable{
 		float: right;
-		width: 50%;
+		width: 45%;
 	}
 	.leftheadtable{
 		float: left;
-		width: 50%;
+		width: 55%;
 		border-right: 1px solid black;
 	}
 	.cus{
@@ -258,14 +254,22 @@ use yii\helpers\Url;
 		font-weight: bold;
 	}
 	.almt{
-		font-size: 10px;
+		font-size: 12px;
 	}
 	.dtlcus{
-		font-size: 13px;
+		font-size: 12px;
 		margin-left: 5px;
+		line-height: 11px;
+	}
+	.dtlcus1{
+		font-size: 12px;
+		margin-left: 5px;
+		line-height: 16px;
 	}
 	.total{
-		 width:186mm; border:1px solid black; border-collapse: collapse; margin-left:15px;margin-top:-9px;
+		 width:150mm; border:1px solid black; border-collapse: collapse;
+		  /*margin-left:15px;*/
+		  margin-top:-9px;
 	}
 	.total td{
 		border:1px solid black;
@@ -276,19 +280,20 @@ use yii\helpers\Url;
 		$no=1;
 		$diskon=0;
 		$subtotal=0;
+		$persendiskon="";
 		foreach ($model->purchaseOrderLines as $value){
 				if($value->part_number==""){
 					$pn="";
 				}else{
 					$pn=$value->part_number;
 				}
-				// echo $value->discount;
 				if($value->discount_nominal=="0.000"){
 					if($value->discount=="0.000"){
 						$diskon=$diskon+0;
 					}else{
-						$hitungdiscount=($value->price_unit*$value->discount)/100;
+						$hitungdiscount=(($value->price_unit*$value->product_qty)*$value->discount)/100;
 						$diskon=$diskon+$hitungdiscount;
+						$persendiskon=$value->discount.'%';
 					}
 				}else{
 					$diskon=$diskon+$value->discount_nominal;
@@ -297,7 +302,7 @@ use yii\helpers\Url;
 				$subtotal=$subtotal+($value->price_unit*$value->product_qty);
 				$data2[]=array(
 								$no,
-								$value->name,
+								nl2br($value->name),
 								$pn,
 								$value->product_qty,
 								$value->productUom->name,
@@ -305,7 +310,7 @@ use yii\helpers\Url;
 								app\components\NumericLib::indoStyle($value->price_unit*$value->product_qty,2,',','.'));
 						$no++;
 				}
-		$data2[]=array('','<br/><br/>'.$model->notes,'','','','','');
+		$data2[]=array('','<br/><br/>'.nl2br($model->notes),'','','','','');
 	?>
 <div id="pageContainer">
 <div class="pages">
@@ -361,7 +366,8 @@ use yii\helpers\Url;
 																$att=$model->attention0->name;
 															}
 															echo $att;
-															?></td>
+															?>
+														</td>
 													</tr>
 												</table>
 											</td>												
@@ -371,7 +377,7 @@ use yii\helpers\Url;
 										<tr>
 											<td>
 												<br/>
-												<table class="dtlcus">
+												<table class="dtlcus1">
 													<tr>
 														<td width="100px">Nomor PO</td>
 														<td><?php echo $model->name; ?></td>
@@ -402,24 +408,25 @@ use yii\helpers\Url;
 					</tr>
 					<tr>
 						<td>
-							<table class="headtablepages" style="width:186mm; border:1px solid black; border-collapse: collapse; margin-left:15px;">
+							<table class="headtablepages" style="width:150mm; border:1px solid black; border-collapse: collapse;">
+							<!-- <table class="headtablepages" style="width:186mm; border:1px solid black; border-collapse: collapse; margin-left:15px;"> -->
 									<tr>
 										<th width="30px">No.</th>
-										<th width="265px">DESCRIPTION</th>
-										<th width="89px">PART NO</th>
+										<th width="196px">DESCRIPTION</th>
+										<th width="70px">PART NO</th>
 										<th width="60px">QTY</th>
 										<th width="50px">UNIT</th>
-										<th width="93px">HARGA<br/>IDR</th>
-										<th width="94px">TOTAL<br/>IDR</th>
+										<th width="80px">HARGA<br/><?php echo $model->pricelist->name; ?></th>
+										<th width="80px">TOTAL<br/><?php echo $model->pricelist->name; ?></th>
 									</tr>
 							</table>
 										</td>
 									</tr>
 									<tr>
-										<?php $maxHeight = '100mm'; ?>
+										<?php $maxHeight = '80mm'; ?>
 										<td class="tdLines" style="height:<?=$maxHeight?>;vertical-align:top;">
 											<div class="contentArea">
-												<table class="contentLines">
+												<table class="contentLines" style="width:150mm;">
 														
 												</table>
 											</div>
@@ -429,13 +436,13 @@ use yii\helpers\Url;
 										<td>
 											<table class="total">
 													<tr>
-														<td colspan="3" width="199px"></td>
-														<td colspan="3" width="106px">TOTAL AMOUNT</td>
-														<td width="94px" align="right"><?php echo app\components\NumericLib::indoStyle($subtotal,2,',','.') ?></td>
+														<td colspan="3" width="190px"></td>
+														<td colspan="3" width="116px">TOTAL AMOUNT</td>
+														<td width="86px" align="right"><?php echo app\components\NumericLib::indoStyle($subtotal,2,',','.') ?></td>
 													</tr>
 													<tr>
 														<td colspan="3"></td>
-														<td colspan="3">Discount</td>
+														<td colspan="3">Discount <?php echo app\components\NumericLib::indoStyle($persendiskon,0,',','.'); ?>%</td>
 														<td align="right"><?php echo app\components\NumericLib::indoStyle($diskon,2,',','.') ?></td>
 													</tr>
 													<tr>
@@ -510,8 +517,9 @@ $this->registerJs('
 	function prepareRow(rowNo,data)
 	{
 		console.log(data[0]);
-		return "<tr class=\'cRows rows"+rowNo+"\'><td width=\'30px\' style=\"text-align:center;\">"+data[0]+"</td><td style=\"text-align:left;\" width=\'265px\'>"+data[1]+"</td><td width=\'89px\'><div class=\"leftdata\">"+data[2]+"</div></td><td width=\'60px\' style=\"text-align:center;\"><div class=\"center\">"+data[3]+"</div></td><td style=\"text-align:center;\" width=\'50px\'>"+data[4]+"</td><td style=\"text-align:right;\" width=\'93px\'>"+data[5]+"</td><td width=\'94px\' style=\"text-align:right;\">"+data[6]+"</td></tr>";
+			return "<tr class=\'cRows rows"+rowNo+"\'><td width=\'30px\' style=\"text-align:center;\">"+data[0]+"</td><td style=\"text-align:left;\" width=\'196px\'>"+data[1]+"</td><td width=\'71px\'><div class=\"leftdata\">"+data[2]+"</div></td><td width=\'59px\' style=\"text-align:center;\"><div class=\"center\">"+data[3]+"</div></td><td style=\"text-align:center;\" width=\'51px\'>"+data[4]+"</td><td style=\"text-align:right;\" width=\'78px\'>"+data[5]+"</td><td width=\'77px\' style=\"text-align:right;\">"+data[6]+"</td></tr>";
 	}
+
 
 	var rowPage = 0;
 	jQuery.each(lines,function(key,line){
