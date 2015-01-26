@@ -104,6 +104,7 @@ use yii\helpers\Url;
 		text-align: center;
 	}
 	.td2{
+		padding-left: 5px;
 		width: 16mm;
 	}
 	.td3{
@@ -191,6 +192,10 @@ use yii\helpers\Url;
 			.td1{
 				width: 21mm;
 			}
+			.sign{
+				/*margin-top: 31mm;*/
+				text-decoration: underline;
+			}
 		</style>
 		<?php
 	}
@@ -246,7 +251,7 @@ use yii\helpers\Url;
 				</div>
 				<div class="colorCode"></div>
 			</div>
-			<div class="sign">Susanti Pheng</div>
+			<div class="sign" contenteditable="true">Susanti Pheng</div>
 		</div>
 	</div>
 </div>

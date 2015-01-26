@@ -84,8 +84,8 @@ class AccountInvoiceController extends Controller
             $lines[$k]['no'] = $line->sequence;
             $lines[$k]['qty'] = $line->quantity.(isset($line->uos->name) ? ' '.$line->uos->name:null);
             $lines[$k]['desc'] = (isset($line->product->name_template) ? $line->product->name_template.'<br/>'.$line->name.'<br/>P/N : '.$line->product->default_code:nl2br($line->name));
-            $lines[$k]['unit_price'] = $model->currency->name.' '.$line->price_unit;
-            $lines[$k]['ext_price'] = $model->currency->name.' '.$line->price_subtotal;
+            $lines[$k]['unit_price'] = '<div style="float:left;">'.$model->currency->name.'</div><div style="float:right;padding-right:8px;">'.$line->price_unit.'</div>';
+            $lines[$k]['ext_price'] = '<div style="float:left;">'.$model->currency->name.'</div><div style="float:right;">'.$line->price_subtotal.'</div>';
 
         endforeach;
         $ar+=1;
