@@ -135,7 +135,19 @@ use yii\helpers\Url;
 					<tr>
 						<td>
 							<div class="pbkp">
-								<div style="margin-bottom:2mm;" contenteditable="true"><?= $model->partner->name; ?></div>
+								<div style="margin-bottom:2mm;" contenteditable="true">
+									
+									<?php
+										$expPartnerName = explode(',',$model->partner->name );
+										if(is_array($expPartnerName) && isset($expPartnerName[1])){
+											$partnerName = $expPartnerName[1].'.'.$expPartnerName[0];
+										}else{
+											$partnerName = $model->partner->name;
+										}
+										echo $partnerName;
+
+									?>
+								</div>
 								<div style="height:10mm;" contenteditable="true">
 									<span>
 										<?= $model->partner->street; ?><?= '<br/>'.$model->partner->street2 ?> <?= $model->partner->city ?>, <?= (isset($model->partner->state->name) ? $model->partner->state->name:'').($model->partner->zip ? ' - '.$model->partner->zip:"") ?>

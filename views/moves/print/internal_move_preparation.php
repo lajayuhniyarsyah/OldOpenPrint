@@ -163,9 +163,14 @@ use yii\helpers\Url;
 
 	}
 	.tablecontent{
+
 		line-height: 30px;
 		font-size: 11px;
 		/*font-family: Times New Roman;*/
+	}
+	.tablecontent tr td{
+		vertical-align: top;
+		line-height: 15px;
 	}
 	@media all {
 		.page-break	{ display: none; }
@@ -300,9 +305,9 @@ use yii\helpers\Url;
 								<div class="customer">
 									<fieldset>
 										<div class="isicus">
-										Untuk :
+										Untuk :<br/>
 										<b><?=$model->destination0->name?></b><br/>
-										<?php echo $model->destination0->comment; ?><br/>
+										<?php echo nl2br($model->destination0->comment); ?><br/>
 										</div>
 									</fieldset>
 								</div>
@@ -323,9 +328,9 @@ use yii\helpers\Url;
 											<td>:</td>
 											<td width="150px"><?= $model->internalMoveRequest->name?></td>
 
-											<td width="50px">No.WC</td>
+											<td width="50px">No.PB</td>
 											<td>:</td>
-											<td></td>							
+											<td><?=$model->manual_pb_no?></td>							
 										</tr>
 									</table>
 								</div>
@@ -340,9 +345,9 @@ use yii\helpers\Url;
 											<td>:</td>
 											<td width="150px"><?=Yii::$app->formatter->asDatetime($model->due_date_preparation, "php:d-M-Y")?></td>
 
-											<td width="50px">No.SPK</td>
+											<td width="50px">No.Ref</td>
 											<td>:</td>
-											<td></td>							
+											<td><?=$model->ref_no?></td>							
 										</tr>
 									</table>
 								</div>

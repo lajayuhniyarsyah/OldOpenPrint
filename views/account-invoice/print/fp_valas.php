@@ -134,7 +134,18 @@ use yii\helpers\Url;
                     <tr>
                         <td class="tdPartner">
                             <div class="pbkp">
-                                <div class="partnerName"><?= $model->partner->name; ?></div>
+                                <div class="partnerName" contenteditable="true">
+                                    <?php
+                                        $expPartnerName = explode(',',$model->partner->name );
+                                        if(is_array($expPartnerName) && isset($expPartnerName[1])){
+                                            $partnerName = $expPartnerName[1].'.'.$expPartnerName[0];
+                                        }else{
+                                            $partnerName = $model->partner->name;
+                                        }
+                                        echo $partnerName;
+
+                                    ?>
+                                </div>
                                 <div class="fontAddr partnerStreet" contenteditable="true">
                                     <span>
                                         <?= $model->partner->street; ?><?= '<br/>'.$model->partner->street2 ?> <?= $model->partner->city ?>, <?= (isset($model->partner->state->name) ? $model->partner->state->name:'').($model->partner->zip ? ' - '.$model->partner->zip:"") ?>
@@ -190,7 +201,7 @@ use yii\helpers\Url;
                         <td>
                             <div class="amount" style="margin-top:-3px;">
                                 <div style="width:43mm;float:left;"><?= (isset($model->amount_tax) ? '<div style="float:left;width:13mm;">'.$model->currency->name.'</div><div class="wid1">'.Yii::$app->numericLib->indoStyle($model->amount_tax).'</div><div style="clear:both;"></div>':''); ?></div>
-                                <div style="text-align:right;"><?=Yii::$app->numericLib->indoStyle((round($model->amount_tax*$model->pajak)))?></div>
+                                <div style="text-align:right;"><?=Yii::$app->numericLib->indoStyle((round(($model->amount_untaxed*$model->pajak)*0.10)))?></div>
                                 <div class="clear:both;"></div>
                             </div>
                         </td>
@@ -248,7 +259,7 @@ $this->registerJs('
 
     function prepareRow(rowNo,data)
     {
-        return "<tr class=\'cRows rows"+rowNo+"\'><td style=\"width:6%;\">"+eval(rowNo+1)+"</td><td contenteditable=\"true\" style=\"width:56%\">"+data.name+"</td><td><div style=\"float:left;width:13mm;\">"+rateSymbol+"</div><div>"+data.price_subtotal+"</div><div style=\"clear:both;\"></div></td><td>&nbsp;</td></tr>";
+        return "<tr class=\'cRows rows"+rowNo+"\'><td style=\"width:6%;\">"+data.no+"</td><td contenteditable=\"true\" style=\"width:56%\">"+data.name+"</td><td><div style=\"float:left;width:13mm;\">"+rateSymbol+"</div><div>"+data.price_subtotal+"</div><div style=\"clear:both;\"></div></td><td>&nbsp;</td></tr>";
     }
 
     function prepareNoteRow(rowNo,data)

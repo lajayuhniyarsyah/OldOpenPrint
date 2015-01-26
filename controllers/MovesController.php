@@ -291,12 +291,31 @@ class MovesController extends Controller
 	}
 
 
+	private function loadInternalMove($id)
+	{
+		$model = InternalMove::findOne($id);
 
+		if($model)
+		{
+			return $model;
+		}
+		else
+		{
+			throw new NotFoundHttpException('The requested page does not exist.');
+		}
+	}
+
+	/**
+	 * [actionPrintInternalMovePreparation description]
+	 * @param  Integer
+	 * @param  [type]
+	 * @return [type]
+	 */
 	public function actionPrintInternalMovePreparation($id,$uid)
 	{
 		$this->layout = 'printout';
 		
-		$model = InternalMove::findOne($id);
+		$model = $this->loadInternalMove($id);
 		// var_dump($model);
 		$data = [];
 		foreach($model->internalMoveLines as $line):
@@ -330,5 +349,63 @@ class MovesController extends Controller
 		endforeach;
 		// var_dump($data);
 		return $this->render('print/internal_move_preparation',['model'=>$model,'data'=>$data]);
+	}
+
+	
+	public function actionPrintInternalMove($id,$uid)
+	{
+		$this->layout='printout';
+		$model = $this->loadInternalMove($id);
+
+		$lines = [];
+
+		foreach($model->internalMoveLines as $line):
+			$lines[] = $this->preparePrintInternalMoveLine($line);
+		endforeach;
+		
+		// var_dump($lines);
+		return $this->render('print/internal_move_note',['model'=>$model,'lines'=>$lines]);
+	}
+
+	private function preparePrintInternalMoveLine($line)
+	{
+		$productField = $line->product->name_template.($line->desc ? "<br/>".$line->desc:null);
+
+		$product = $line->product;
+		$sNoteLine = False;
+		$sNoteDetail = False;
+		if($product->superNotes):
+			foreach($product->superNotes as $superNote):
+				$sNoteLine .= "<br/>".$superNote->template_note;
+			endforeach;
+		endif;
+
+		if($line->internalMoveLineDetails):
+			$detailField = "";
+			$productField .="<br/>Consist Of :<ul>";
+			foreach($line->internalMoveLineDetails as $detail):
+				if($detail->product->superNotes):
+					foreach($detail->product->superNotes as $superNoteD):
+						$sNoteDetail .= "<br/>".$superNoteD->template_note;
+					endforeach;
+				endif;
+
+				$detailField.="<li>";
+				$detailField.=$detail->product->name_template.' '.($detail->desc ? '<br/>'.$detail->desc:null).($sNoteDetail ? $sNoteDetail:null);
+				$detailField.="</li>";
+			endforeach;
+			$productField.=$detailField;
+			$productField.="</ul>";
+
+		endif;
+		
+		$res = [
+			'no'=>$line->no,
+			'qty'=>$line->qty.' '.$line->uom->name,
+			'product'=>$productField.($sNoteLine ? $sNoteLine:null),
+			'part_no'=>$line->product->default_code,
+		];
+
+		return $res;
 	}
 }

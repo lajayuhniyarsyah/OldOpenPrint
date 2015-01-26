@@ -190,7 +190,22 @@ use yii\helpers\Url;
 										<?= $move->no ?>
 									</td>
 									<td class="border-left canEdit" contenteditable="true"><?=$move->product_qty.' '.$move->productUom->name?></td>
-									<td class="border-left canEdit" contenteditable="true"><?=($move->desc ? nl2br($move->desc):nl2br($move->name))?></td>
+									<td class="border-left canEdit" contenteditable="true">
+										<?=($move->desc ? nl2br($move->desc):nl2br($move->name))?>
+										<?php
+										if($move->prodlot_id):
+											echo '<br/>Taken From B/N: '.$move->prodlot->name.'('.$move->name.')';
+										endif;
+										?>
+										
+										<?php
+										if($move->product->superNotes):
+											foreach($move->product->superNotes as $note):
+												echo '<br/>'.$note->template_note;
+											endforeach;
+										endif;
+										?>
+									</td>
 									<td class="border-left border-right canEdit" contenteditable="true"><?=$move->product->default_code?> <a class="deleteRow hideOnPrint" style="position:absolute;right:0;cursor:pointer;" ref="<?=$k?>">X</a></td>
 								</tr>
 							<?php
@@ -284,7 +299,13 @@ foreach($move_set_printed as $set=>$childs):
 	foreach($childs as $child):
 		$moveChild = app\models\StockMove::findOne($child);
 		// echo $moveChild->product->name_template;
-		$setTo .='<li>['.$moveChild->product->default_code.'] '.$moveChild->product->name_template.'</li>';
+		if($moveChild->product->superNotes):
+			$nts='';
+			foreach($moveChild->product->superNotes as $note):
+				$nts .= '<br/>'.$note->template_note;
+			endforeach;
+		endif;
+		$setTo .='<li>['.$moveChild->product->default_code.'] '.$moveChild->product->name_template.$nts.'</li>';
 	endforeach;
 	$scr = '
 		jQuery(\'#listConsistOf'.$set.'\').html(\''.$setTo.'\')

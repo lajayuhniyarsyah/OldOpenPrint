@@ -98,6 +98,9 @@ use yii\helpers\Url;
 		text-align: right;
 		width: 86px;
 	}
+	.amLine2{
+		border: 1px solid black;
+	}
 	.amLine3{
 		margin-top: 6mm;
 	}
@@ -113,7 +116,7 @@ use yii\helpers\Url;
 		height: 20mm;
 		width: 433px;
 		vertical-align: top;
-		line-height: 29px;
+		line-height: 18px;
 	}
 	.dueDate{
 		margin-left: 50mm;
@@ -161,6 +164,10 @@ use yii\helpers\Url;
 		}
 		.choosePrinter{
 			display: none;
+		}
+
+		.amLine2{
+			border: none;
 		}
 	}
 
@@ -216,7 +223,7 @@ use yii\helpers\Url;
 		<div class="footers">
 			<div class="amounts">
 				<div class="amLine1 am"><?='<div class="currSymbol">'.$model->currency->name.'</div><div class="amountNumber">'.Yii::$app->numericLib->indoStyle($model->amount_untaxed).'</div><div class="clear"></div>'?></div>
-				<div class="amLine2 am">&nbsp;</div>
+				<div class="amLine2 am" contenteditable="true">&nbsp;</div>
 				<div class="amLine3 am"><?='<div class="currSymbol">'.$model->currency->name.'</div><div class="amountNumber">'.Yii::$app->numericLib->indoStyle($model->amount_untaxed).'</div><div class="clear"></div>'?></div>
 				<div class="amLine4 am"><?='<div class="currSymbol">'.$model->currency->name.'</div><div class="amountNumber">'.Yii::$app->numericLib->indoStyle($model->amount_tax).'</div><div class="clear"></div>'?></div>
 				<div class="amLine5 am"><?='<div class="currSymbol">'.$model->currency->name.'</div><div class="amountNumber">'.Yii::$app->numericLib->indoStyle($model->amount_total).'</div><div class="clear"></div>'?></div>
@@ -232,6 +239,9 @@ use yii\helpers\Url;
 							break;
 						case 'SGD':
 							$preCur = '# Singapore Dollar ';
+							break;
+						case 'EUR':
+							$preCur = '# EURO';
 							break;
 						default:
 							# code...

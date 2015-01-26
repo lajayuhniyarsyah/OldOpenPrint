@@ -37,53 +37,60 @@ use Yii;
  * @property boolean $not_stock
  *
  * @property AccountAnalyticLine[] $accountAnalyticLines
- * @property ProductTemplate $productTmpl
- * @property ResUsers $writeU
- * @property ResUsers $createU
- * @property ProductPricelistItem[] $productPricelistItems
- * @property ProductPackaging[] $productPackagings
- * @property DetailPb[] $detailPbs
- * @property WizardDetailPb[] $wizardDetailPbs
- * @property RentRequisitionDetail[] $rentRequisitionDetails
- * @property WizardRentRequisitionDetail[] $wizardRentRequisitionDetails
- * @property AccountInvoiceLine[] $accountInvoiceLines
- * @property ProductListLine[] $productListLines
- * @property SaleAdvancePaymentInv[] $saleAdvancePaymentInvs
- * @property StockMoveScrap[] $stockMoveScraps
- * @property StockMoveConsume[] $stockMoveConsumes
- * @property StockInventoryLineSplit[] $stockInventoryLineSplits
- * @property StockChangeProductQty[] $stockChangeProductQties
- * @property StockReturnPickingMemory[] $stockReturnPickingMemories
- * @property StockProductionLot[] $stockProductionLots
- * @property StockPartialPickingLine[] $stockPartialPickingLines
- * @property StockInventoryLine[] $stockInventoryLines
- * @property StockPartialMoveLine[] $stockPartialMoveLines
- * @property StockMoveSplit[] $stockMoveSplits
- * @property StockMove[] $stockMoves
- * @property MakeProcurement[] $makeProcurements
- * @property StockWarehouseOrderpoint[] $stockWarehouseOrderpoints
- * @property SaleOrderLine[] $saleOrderLines
- * @property PurchaseOrderLine[] $purchaseOrderLines
- * @property MrpProductionProductLine[] $mrpProductionProductLines
- * @property ProcurementOrder[] $procurementOrders
- * @property MrpBom[] $mrpBoms
- * @property MrpBom $mrpBom
- * @property MrpWorkcenter[] $mrpWorkcenters
- * @property MrpProduction[] $mrpProductions
- * @property HrExpenseLine[] $hrExpenseLines
- * @property DeliveryNoteLine[] $deliveryNoteLines
- * @property OrderPreparationLine[] $orderPreparationLines
- * @property PerintahKerjaLine[] $perintahKerjaLines
- * @property WeekStatusLine[] $weekStatusLines
+ * @property AccountMoveLine[] $accountMoveLines
  * @property CatatanLine[] $catatanLines
  * @property DeliveryCarrier[] $deliveryCarriers
- * @property AccountMoveLine[] $accountMoveLines
+ * @property DetailPb[] $detailPbs
+ * @property HrExpenseLine[] $hrExpenseLines
+ * @property MakeProcurement[] $makeProcurements
+ * @property MrpProductionProductLine[] $mrpProductionProductLines
+ * @property MoveSetData[] $moveSetDatas
+ * @property MrpWorkcenter[] $mrpWorkcenters
  * @property PerintahKerjaLineInternal[] $perintahKerjaLineInternals
- * @property RawMaterialLine[] $rawMaterialLines
- * @property PurchaseRequisitionSubcontSendLine[] $purchaseRequisitionSubcontSendLines
+ * @property PurchaseOrderLineCancel[] $purchaseOrderLineCancels
+ * @property WizardPoCancelItemLine[] $wizardPoCancelItemLines
+ * @property StockMoveScrap[] $stockMoveScraps
+ * @property StockMoveConsume[] $stockMoveConsumes
+ * @property MrpProduction[] $mrpProductions
+ * @property OrderPreparationLine[] $orderPreparationLines
+ * @property DeliveryNoteLine[] $deliveryNoteLines
+ * @property MrpBom[] $mrpBoms
+ * @property PerintahKerjaLine[] $perintahKerjaLines
+ * @property ProductBatchLine[] $productBatchLines
+ * @property ProcurementOrder[] $procurementOrders
+ * @property ProductPackaging[] $productPackagings
+ * @property ProductListLine[] $productListLines
+ * @property ProductPricelistItem[] $productPricelistItems
+ * @property InternalMoveRequestLine[] $internalMoveRequestLines
+ * @property InternalMoveLine[] $internalMoveLines
+ * @property AccountInvoiceLine[] $accountInvoiceLines
+ * @property StockMove[] $stockMoves
+ * @property PurchaseOrderLine[] $purchaseOrderLines
+ * @property PurchaseOrderSubcontSentLine[] $purchaseOrderSubcontSentLines
  * @property PurchaseRequisitionSubcontLine[] $purchaseRequisitionSubcontLines
  * @property PurchaseRequisitionSubcontLineToSend[] $purchaseRequisitionSubcontLineToSends
- * @property PurchaseOrderSubcontSentLine[] $purchaseOrderSubcontSentLines
+ * @property PurchaseRequisitionSubcontSendLine[] $purchaseRequisitionSubcontSendLines
+ * @property RawMaterialLine[] $rawMaterialLines
+ * @property ResUsers $writeU
+ * @property ProductTemplate $productTmpl
+ * @property ResUsers $createU
+ * @property RentRequisitionDetail[] $rentRequisitionDetails
+ * @property SaleAdvancePaymentInv[] $saleAdvancePaymentInvs
+ * @property SaleOrderLine[] $saleOrderLines
+ * @property StockChangeProductQty[] $stockChangeProductQties
+ * @property StockInventoryLineSplit[] $stockInventoryLineSplits
+ * @property StockProductionLot[] $stockProductionLots
+ * @property StockInventoryLine[] $stockInventoryLines
+ * @property StockMoveSplit[] $stockMoveSplits
+ * @property StockPartialPickingLine[] $stockPartialPickingLines
+ * @property StockPartialMoveLine[] $stockPartialMoveLines
+ * @property StockReturnPickingMemory[] $stockReturnPickingMemories
+ * @property WeekStatusLine[] $weekStatusLines
+ * @property StockWarehouseOrderpoint[] $stockWarehouseOrderpoints
+ * @property SuperNoteProductRel[] $superNoteProductRels
+ * @property InternalMoveLineDetail[] $internalMoveLineDetails
+ * @property WizardDetailPb[] $wizardDetailPbs
+ * @property WizardRentRequisitionDetail[] $wizardRentRequisitionDetails
  */
 class ProductProduct extends \yii\db\ActiveRecord
 {
@@ -111,8 +118,8 @@ class ProductProduct extends \yii\db\ActiveRecord
             [['default_code', 'variants', 'partner_code', 'batch_code'], 'string', 'max' => 64],
             [['name_template'], 'string', 'max' => 128],
             [['partner_desc'], 'string', 'max' => 254],
-            [['name_template'], 'unique'],
-            [['default_code'], 'unique']
+            [['default_code'], 'unique'],
+            [['name_template'], 'unique']
         ];
     }
 
@@ -164,305 +171,9 @@ class ProductProduct extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getProductTmpl()
+    public function getAccountMoveLines()
     {
-        return $this->hasOne(ProductTemplate::className(), ['id' => 'product_tmpl_id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getWriteU()
-    {
-        return $this->hasOne(ResUsers::className(), ['id' => 'write_uid']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getCreateU()
-    {
-        return $this->hasOne(ResUsers::className(), ['id' => 'create_uid']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getProductPricelistItems()
-    {
-        return $this->hasMany(ProductPricelistItem::className(), ['product_id' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getProductPackagings()
-    {
-        return $this->hasMany(ProductPackaging::className(), ['product_id' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getDetailPbs()
-    {
-        return $this->hasMany(DetailPb::className(), ['name' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getWizardDetailPbs()
-    {
-        return $this->hasMany(WizardDetailPb::className(), ['product' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getRentRequisitionDetails()
-    {
-        return $this->hasMany(RentRequisitionDetail::className(), ['name' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getWizardRentRequisitionDetails()
-    {
-        return $this->hasMany(WizardRentRequisitionDetail::className(), ['product' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getAccountInvoiceLines()
-    {
-        return $this->hasMany(AccountInvoiceLine::className(), ['product_id' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getProductListLines()
-    {
-        return $this->hasMany(ProductListLine::className(), ['product_id' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getSaleAdvancePaymentInvs()
-    {
-        return $this->hasMany(SaleAdvancePaymentInv::className(), ['product_id' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getStockMoveScraps()
-    {
-        return $this->hasMany(StockMoveScrap::className(), ['product_id' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getStockMoveConsumes()
-    {
-        return $this->hasMany(StockMoveConsume::className(), ['product_id' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getStockInventoryLineSplits()
-    {
-        return $this->hasMany(StockInventoryLineSplit::className(), ['product_id' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getStockChangeProductQties()
-    {
-        return $this->hasMany(StockChangeProductQty::className(), ['product_id' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getStockReturnPickingMemories()
-    {
-        return $this->hasMany(StockReturnPickingMemory::className(), ['product_id' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getStockProductionLots()
-    {
-        return $this->hasMany(StockProductionLot::className(), ['product_id' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getStockPartialPickingLines()
-    {
-        return $this->hasMany(StockPartialPickingLine::className(), ['product_id' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getStockInventoryLines()
-    {
-        return $this->hasMany(StockInventoryLine::className(), ['product_id' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getStockPartialMoveLines()
-    {
-        return $this->hasMany(StockPartialMoveLine::className(), ['product_id' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getStockMoveSplits()
-    {
-        return $this->hasMany(StockMoveSplit::className(), ['product_id' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getStockMoves()
-    {
-        return $this->hasMany(StockMove::className(), ['product_id' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getMakeProcurements()
-    {
-        return $this->hasMany(MakeProcurement::className(), ['product_id' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getStockWarehouseOrderpoints()
-    {
-        return $this->hasMany(StockWarehouseOrderpoint::className(), ['product_id' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getSaleOrderLines()
-    {
-        return $this->hasMany(SaleOrderLine::className(), ['product_id' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getPurchaseOrderLines()
-    {
-        return $this->hasMany(PurchaseOrderLine::className(), ['product_id' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getMrpProductionProductLines()
-    {
-        return $this->hasMany(MrpProductionProductLine::className(), ['product_id' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getProcurementOrders()
-    {
-        return $this->hasMany(ProcurementOrder::className(), ['product_id' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getMrpBoms()
-    {
-        return $this->hasMany(MrpBom::className(), ['product_id' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getMrpBom()
-    {
-        return $this->hasOne(MrpBom::className(), ['product_id' => 'id'])->where(['bom_id'=>null]);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getMrpWorkcenters()
-    {
-        return $this->hasMany(MrpWorkcenter::className(), ['product_id' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getMrpProductions()
-    {
-        return $this->hasMany(MrpProduction::className(), ['product_id' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getHrExpenseLines()
-    {
-        return $this->hasMany(HrExpenseLine::className(), ['product_id' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getDeliveryNoteLines()
-    {
-        return $this->hasMany(DeliveryNoteLine::className(), ['product_id' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getOrderPreparationLines()
-    {
-        return $this->hasMany(OrderPreparationLine::className(), ['product_id' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getPerintahKerjaLines()
-    {
-        return $this->hasMany(PerintahKerjaLine::className(), ['product_id' => 'id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getWeekStatusLines()
-    {
-        return $this->hasMany(WeekStatusLine::className(), ['product_id' => 'id']);
+        return $this->hasMany(AccountMoveLine::className(), ['product_id' => 'id']);
     }
 
     /**
@@ -484,9 +195,49 @@ class ProductProduct extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getAccountMoveLines()
+    public function getDetailPbs()
     {
-        return $this->hasMany(AccountMoveLine::className(), ['product_id' => 'id']);
+        return $this->hasMany(DetailPb::className(), ['name' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getHrExpenseLines()
+    {
+        return $this->hasMany(HrExpenseLine::className(), ['product_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getMakeProcurements()
+    {
+        return $this->hasMany(MakeProcurement::className(), ['product_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getMrpProductionProductLines()
+    {
+        return $this->hasMany(MrpProductionProductLine::className(), ['product_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getMoveSetDatas()
+    {
+        return $this->hasMany(MoveSetData::className(), ['product_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getMrpWorkcenters()
+    {
+        return $this->hasMany(MrpWorkcenter::className(), ['product_id' => 'id']);
     }
 
     /**
@@ -500,17 +251,161 @@ class ProductProduct extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getRawMaterialLines()
+    public function getPurchaseOrderLineCancels()
     {
-        return $this->hasMany(RawMaterialLine::className(), ['product_id' => 'id']);
+        return $this->hasMany(PurchaseOrderLineCancel::className(), ['product_id' => 'id']);
     }
 
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getPurchaseRequisitionSubcontSendLines()
+    public function getWizardPoCancelItemLines()
     {
-        return $this->hasMany(PurchaseRequisitionSubcontSendLine::className(), ['product_id' => 'id']);
+        return $this->hasMany(WizardPoCancelItemLine::className(), ['product_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStockMoveScraps()
+    {
+        return $this->hasMany(StockMoveScrap::className(), ['product_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStockMoveConsumes()
+    {
+        return $this->hasMany(StockMoveConsume::className(), ['product_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getMrpProductions()
+    {
+        return $this->hasMany(MrpProduction::className(), ['product_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getOrderPreparationLines()
+    {
+        return $this->hasMany(OrderPreparationLine::className(), ['product_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDeliveryNoteLines()
+    {
+        return $this->hasMany(DeliveryNoteLine::className(), ['product_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getMrpBoms()
+    {
+        return $this->hasMany(MrpBom::className(), ['product_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPerintahKerjaLines()
+    {
+        return $this->hasMany(PerintahKerjaLine::className(), ['product_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getProductBatchLines()
+    {
+        return $this->hasMany(ProductBatchLine::className(), ['product_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getProcurementOrders()
+    {
+        return $this->hasMany(ProcurementOrder::className(), ['product_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getProductPackagings()
+    {
+        return $this->hasMany(ProductPackaging::className(), ['product_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getProductListLines()
+    {
+        return $this->hasMany(ProductListLine::className(), ['product_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getProductPricelistItems()
+    {
+        return $this->hasMany(ProductPricelistItem::className(), ['product_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getInternalMoveRequestLines()
+    {
+        return $this->hasMany(InternalMoveRequestLine::className(), ['product_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getInternalMoveLines()
+    {
+        return $this->hasMany(InternalMoveLine::className(), ['product_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getAccountInvoiceLines()
+    {
+        return $this->hasMany(AccountInvoiceLine::className(), ['product_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStockMoves()
+    {
+        return $this->hasMany(StockMove::className(), ['product_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPurchaseOrderLines()
+    {
+        return $this->hasMany(PurchaseOrderLine::className(), ['product_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPurchaseOrderSubcontSentLines()
+    {
+        return $this->hasMany(PurchaseOrderSubcontSentLine::className(), ['product_id' => 'id']);
     }
 
     /**
@@ -532,8 +427,188 @@ class ProductProduct extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getPurchaseOrderSubcontSentLines()
+    public function getPurchaseRequisitionSubcontSendLines()
     {
-        return $this->hasMany(PurchaseOrderSubcontSentLine::className(), ['product_id' => 'id']);
+        return $this->hasMany(PurchaseRequisitionSubcontSendLine::className(), ['product_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRawMaterialLines()
+    {
+        return $this->hasMany(RawMaterialLine::className(), ['product_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getWriteU()
+    {
+        return $this->hasOne(ResUsers::className(), ['id' => 'write_uid']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getProductTmpl()
+    {
+        return $this->hasOne(ProductTemplate::className(), ['id' => 'product_tmpl_id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCreateU()
+    {
+        return $this->hasOne(ResUsers::className(), ['id' => 'create_uid']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getRentRequisitionDetails()
+    {
+        return $this->hasMany(RentRequisitionDetail::className(), ['name' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getSaleAdvancePaymentInvs()
+    {
+        return $this->hasMany(SaleAdvancePaymentInv::className(), ['product_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getSaleOrderLines()
+    {
+        return $this->hasMany(SaleOrderLine::className(), ['product_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStockChangeProductQties()
+    {
+        return $this->hasMany(StockChangeProductQty::className(), ['product_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStockInventoryLineSplits()
+    {
+        return $this->hasMany(StockInventoryLineSplit::className(), ['product_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStockProductionLots()
+    {
+        return $this->hasMany(StockProductionLot::className(), ['product_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStockInventoryLines()
+    {
+        return $this->hasMany(StockInventoryLine::className(), ['product_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStockMoveSplits()
+    {
+        return $this->hasMany(StockMoveSplit::className(), ['product_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStockPartialPickingLines()
+    {
+        return $this->hasMany(StockPartialPickingLine::className(), ['product_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStockPartialMoveLines()
+    {
+        return $this->hasMany(StockPartialMoveLine::className(), ['product_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStockReturnPickingMemories()
+    {
+        return $this->hasMany(StockReturnPickingMemory::className(), ['product_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getWeekStatusLines()
+    {
+        return $this->hasMany(WeekStatusLine::className(), ['product_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStockWarehouseOrderpoints()
+    {
+        return $this->hasMany(StockWarehouseOrderpoint::className(), ['product_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getSuperNoteProductRels()
+    {
+        return $this->hasMany(SuperNoteProductRel::className(), ['product_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getInternalMoveLineDetails()
+    {
+        return $this->hasMany(InternalMoveLineDetail::className(), ['product_id' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getWizardDetailPbs()
+    {
+        return $this->hasMany(WizardDetailPb::className(), ['product' => 'id']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getWizardRentRequisitionDetails()
+    {
+        return $this->hasMany(WizardRentRequisitionDetail::className(), ['product' => 'id']);
+    }
+
+    /**
+     * [getSuperNotes description]
+     * @return ActiveRecord
+     */
+    public function getSuperNotes()
+    {
+        // return $this->hasMany(SuperNoteProductRel::className(),['product_id'=>'id'])->viaTable(SuperNotes::className(),['id'=>'id']);
+
+        // return $this->hasMany(SuperNoteProductRel::className(),['product_id'=>'id']);
+        return $this->hasMany(SuperNotes::className(),['id'=>'super_note_id'])->via('superNoteProductRels');
     }
 }

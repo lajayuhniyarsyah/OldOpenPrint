@@ -139,7 +139,6 @@ class DeliveryNoteController extends Controller
         else:
             return $this->render('print/test/dn_batch_test',['model'=>$model,'linesData'=>$linesData]);
         endif;
-        
     }
 
     
@@ -193,15 +192,14 @@ class DeliveryNoteController extends Controller
                 'name'=>$l['name'],
                 'part_no'=>$l['part_no']
             ];
+
+            // if PRODUCT IS SET TYPE
             if(array_key_exists('set', $l)){
                 $res[$k]['name'].='<br/>Consist Of : <ul style="margin:0;">';
                 foreach($l['set'] as $set){
                     $res[$k]['name'] .= '<li>'.$set['name'].'</li>';
                     if(array_key_exists('batches', $set) && count($set['batches'])>=1):
-                        
-
                         $res[$k]['name'].=$this->prepareBathesRender($set);
-
                     endif;
                 }
                 $res[$k]['name'].='</ul>';
@@ -214,6 +212,9 @@ class DeliveryNoteController extends Controller
                 $res[$k]['name'].='<br/>'.$this->prepareBathesRender($l);
             }
         endforeach;
+        /*echo '----------';
+        var_dump($res);*/
+
         return $res;
     }
 
@@ -249,14 +250,22 @@ class DeliveryNoteController extends Controller
                         'no'=>$line->no,
                         'qty'=>$moveDest->product_qty,
                         'uom'=>$moveDest->productUom->name,
-                        'name'=>($moveDest->desc ? nl2br($moveDest->desc):nl2br($moveDest->name)),
+                        'name'=>($moveDest->desc ? nl2br($moveDest->desc):nl2br($moveDest->name)).'aa',
                         'set'=>[
                             $this->prepareSetPrint($line),
                         ],
                         'part_no'=>$line->product->default_code,
                     ];
 
+                   
+
                 }
+                /*var_dump($line->product->name_template);
+                if($line->product->superNotes):
+                    foreach($line->product->superNotes as $notes):
+                        if($notes->show_in_do_line && isset($res[$moveDest->id]['name'])) $res[$moveDest->id]['name'].='<br/>'.$notes->template_note; #SHOW ETRA NOTES PRODUCT INTO LINE
+                    endforeach;
+                endif;*/
 
 
             }
@@ -266,6 +275,8 @@ class DeliveryNoteController extends Controller
                 $res[$line->id]=$this->prepareLine($line);
             }
         endforeach;
+
+        
         return $res;
     }
 
@@ -299,6 +310,13 @@ class DeliveryNoteController extends Controller
                     'part_no'=>(isset($line->product->default_code) ? $line->product->default_code:'-')
                 ];
         }
+
+        if($line->product->superNotes):
+            foreach($line->product->superNotes as $notes):
+                if($notes->show_in_do_line) $res['name'].='<br/>'.$notes->template_note; #SHOW ETRA NOTES PRODUCT INTO LINE
+            endforeach;
+        endif;
+
         return $res;
     }
 
@@ -314,12 +332,20 @@ class DeliveryNoteController extends Controller
     }
 
     private function prepareSetPrint($line){
-        return [
+        $res =  [
             'qty'=>$line->product_qty,
             'uom'=>$line->productUom->name,
             'name'=>($line->name ? nl2br($line->name):$line->product->name),
             'batches'=>$this->prepareBatches($line),
             'part_no'=>$line->product->default_code,
         ];
+
+        if($line->product->superNotes):
+            foreach($line->product->superNotes as $note):
+                $res['name'].='<br/>'.$note->template_note;
+            endforeach;
+        endif;
+
+        return $res;
     }
 }
