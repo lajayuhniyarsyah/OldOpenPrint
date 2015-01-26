@@ -1,0 +1,110 @@
+.openerp{
+  background-color: white;
+}
+.oe_topbar {
+  background-color: #454343;
+  background-image: linear-gradient(to bottom, #646060, #262626);
+  height: 32px;
+  width: 100%;
+}
+.navbar-inverse .navbar-nav > li > a{
+  color: #eee !important;
+  font-size: 13px;
+}
+
+.openerp .navbar {
+  border: 1px solid transparent;
+  margin-bottom: 20px;
+  min-height: 32px;
+  position: relative;
+}
+.openerp .nav > li > a {
+  display: block;
+  padding: 5px 15px;
+  position: relative;
+}
+.openerp .oe_menu > li > .oe_active {
+  background: none repeat scroll 0 0 rgba(0, 0, 0, 0.3);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4) inset;
+  text-shadow: 0 0 3px black;
+}
+.openerp .navbar-inverse .navbar-nav > .active > a, .navbar-inverse .navbar-nav > .active > a:hover, .navbar-inverse .navbar-nav > .active > a:focus {
+   background: none repeat scroll 0 0 rgba(0, 0, 0, 0.3);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4) inset;
+  text-shadow: 0 0 3px black;
+}
+.openerp .container {
+  width: 100% !important;
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+}
+.openerp .navbar-brand {
+  float: left !important;
+  font-size: 13px !important;
+  height: 32px !important;
+  color: #eee !important;
+  padding: 0px;
+}
+.oe_view_manager{
+  margin-top: -17px;
+}
+.oe_view_manager .oe_view_manager_header {
+  border-collapse: separate;
+  table-layout: fixed;
+  width: 100%;
+  height: 50px;
+}
+.oe_view_manager_current > .oe_view_manager_header {
+  background-color: #ededed;
+  background-image: linear-gradient(to bottom, #fcfcfc, #dedede);
+  border-bottom: 1px solid #cacaca;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4), 0 0 9px rgba(0, 0, 0, 0.1);
+}
+.judul{
+  font-size: 20px;
+  color: #7c7bad;
+  padding-left: 20px;
+  text-transform: uppercase;
+  display: block;
+  text-align: center;
+  font-family: "Telex",sans-serif;
+  font-weight: bold;
+  line-height: 20px;
+  margin: 10px 0;
+  padding-top: 12px;
+  text-rendering: optimizelegibility;
+}
+.oe_form header {
+  background-color: #ededed;
+  background-image: linear-gradient(to bottom, #fcfcfc, #dedede);
+  border-bottom: 1px solid #cacaca;
+  padding-left: 2px;
+  position: relative;
+  min-height: 32px;
+}
+.oe_form_sheetbg {
+  background: url("../img/form_sheetbg.png") repeat scroll 0 0 rgba(0, 0, 0, 0);
+  border-bottom: 1px solid #dddddd;
+  min-height: 400px;
+  padding-top: 20px;
+}
+.oe_form_sheet {
+  border: 1px solid #c8c8d3;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+.oe_form_sheet_width {
+  margin-left: 2%;
+  margin-right: 2%;
+  max-width: 94% !important;
+  width: 94% !important;
+}
+.oe_form_sheet {
+  background: none repeat scroll 0 0 white;
+  min-height: 330px;
+  padding: 16px;
+}
+.oe_form_sheet_width {
+  margin: 0 auto;
+  max-width: 860px;
+  min-width: 650px;
+}
