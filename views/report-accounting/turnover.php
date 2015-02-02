@@ -8,7 +8,9 @@
 						<th>No</th>
 						<th>Type</th>
 						<th>Date</th>
+						<th>No PO</th>
 						<th>No doc</th>
+						
 						<th>No OP / LBM / PB</th>
 						<th>Qty</th>
 						<th>Source Loc</th>
@@ -46,7 +48,9 @@
 					<td>'.$no.'</td>
 					<td>'.$jenis.'</td>
 					<td>'.Yii::$app->formatter->asDatetime($value['date'], "php:d-m-Y").'</td>
+					<td>'.$value['no_po'].'</td>
 					<td>'.$no_surat.'</td>
+
 					<td>'.$no_pb.'</td>
 					<td class=right>'.floatval($qty).'</td>
 					<td>'.$value['location'].'</td>

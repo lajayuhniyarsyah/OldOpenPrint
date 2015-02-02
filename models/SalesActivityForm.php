@@ -38,7 +38,7 @@ class SalesActivityForm extends Model
         return [
             'sales' => 'Sales',
             'customer'=>'Customer',
-            'from'=>'from',
+            'from'=>'Date',
             'to'=>'to'
         ];
     }

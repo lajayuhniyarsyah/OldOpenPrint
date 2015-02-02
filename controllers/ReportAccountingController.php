@@ -180,6 +180,7 @@ class ReportAccountingController extends Controller
 	    				 s.origin as ori,
 	    				 m.origin as origin,
 	    				 m.state as state,
+	    				 po.name as no_po,
 	    				 m.name as product_name
 	    				')
 			    ->from('stock_move as m')
