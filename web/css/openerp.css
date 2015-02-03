@@ -108,3 +108,32 @@
   max-width: 860px;
   min-width: 650px;
 }
+.tabledashboard{
+    border-collapse: collapse;
+     /*border: 1px solid black;*/
+}
+.tabledashboard th{
+  background-color: #454343;
+  background-image: linear-gradient(to bottom, #646060, #262626);
+  color: white;
+  font-size: 16px;
+}
+.saleshead{
+   background-color: #ededed;
+  background-image: linear-gradient(to bottom, #fcfcfc, #dedede);
+  font-size: 14px;
+  font-weight: bold;
+}
+.justify{
+  text-align: justify;
+  padding-right: 5px; 
+}
+.hide{
+  display:none;
+}
+.show{
+  display: block;
+}
+.right{
+  float: right;
+}

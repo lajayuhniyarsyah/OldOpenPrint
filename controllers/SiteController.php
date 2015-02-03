@@ -1,5 +1,4 @@
 <?php
-
 namespace app\controllers;
 
 use Yii;
@@ -8,12 +7,10 @@ use yii\web\Controller;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
-
 use app\models\SalesActivityForm;
 use yii\db\Query;
 use yii\db\QueryBuilder;
 use yii\db\Command;
-
 class SiteController extends Controller
 {
     public function behaviors()
@@ -55,97 +52,151 @@ class SiteController extends Controller
 
     public function actionDashboard()
     {
+        $model = new salesActivityForm();
+        $model->load(Yii::$app->request->get());
+        
+        $allPartner = \yii\helpers\ArrayHelper::map(\app\models\ResPartner::find()->all(),'id','name');
+        
         $activities = [];
         $this->layout = 'dashboard';
         $query = new Query;
-        $date='2014-10-01';
+        $date='2014-10-15';
         $actual= new Query;
         $time=array('before','after');
-        // select * from sales_activity where begin = date_trunc('week', DATE '2015-01-21');
-        $query
-            ->select('s.user_id as user, r.login, s.id as act_id')
-            ->from('sales_activity as s')
-            ->join('JOIN', 'res_users as r', 'r.id=s.user_id')
-            ->where("begin = date_trunc('week', DATE '".$date."')")
-            ->addOrderBy(['s.user_id' => SORT_ASC]);
-        
+
         $day=date('w',strtotime($date));
         if($day=="1"){ $days="senin"; }else if($day=="2"){ $days="selasa"; }else if($day=="3"){ $days="rabu"; }else if($day=="4"){ $days="kamis"; }else if($day=="5"){ $days="jumat"; }else if($day=="6"){ $days="sabtu"; }
-        
-        $dataplan = [];
-        $datactual = [];
-        // Data Plan Activity
-        foreach($query->all() as $idx=>$value):
-            $activities[$idx] = [
-                'act_id'=>$value['act_id'],
-                'sales_name'=>$value['login'],
-                'activities'=>[
-                    'plan'=>[],
-                    'actual'=>[],
-                ],
-            ];
 
+        $alldays=array('senin','selasa','rabu','kamis','jumat');
+        // Penyesuaian Data Form 
+        if ($model->load(Yii::$app->request->get())) {
+            $date=$model->from;
+            
+            if($model->sales=="all"){
+                $query
+                    ->select('s.user_id as user, r.login, s.id as act_id, s.begin as begin, s.end as end')
+                    ->from('sales_activity as s')
+                    ->join('JOIN', 'res_users as r', 'r.id=s.user_id')
+                    // ->where("begin = date_trunc('week', DATE '".$date."')")
+                    ->addOrderBy(['s.begin' => SORT_DESC]);
+                
+                $dataplan = [];
+                $datactual = [];
+
+            foreach($query->all() as $idx=>$value):
+                $activities[$idx] = [
+                    'act_id'=>$value['act_id'],
+                    'sales_name'=>$value['login'].' '.$value['act_id'],
+                    'date'=>$value['begin'],
+                    'activities'=>[
+                        'plan'=>[],
+                        'actual'=>[],  
+                    ],
+                ];
+     
+                $dataplan = [];
+                    $plan= new Query;  
+                    $actual = new Query;
+                    foreach ($alldays as $day) {
+                        $plan->from('before_plan_'.$day)->union('select * from after_plan_'.$day.' WHERE partner_id='.$model->customer.' AND activity_id='.$value['act_id'])->where(['activity_id'=>$value['act_id']]);
+                        $activities[$idx]['activities']['plan'] = $plan->all();
+
+                        $actual->from('before_actual_'.$day)->union('select * from after_actual_'.$day.' WHERE partner_id='.$model->customer.' AND activity_id='.$value['act_id'])->where(['activity_id'=>$value['act_id']]);
+                        $activities[$idx]['activities']['actual'] = $actual->all();    
+                    }
+                    
+                $datactual[$value['user']] = [
+                    'name'=>$value['login'],
+                    'data'=>[]
+                ];
+
+            endforeach;
+
+            }else{
+
+                $query
+                    ->select('s.user_id as user, r.login, s.id as act_id, s.begin as begin, s.end as end')
+                    ->from('sales_activity as s')
+                    ->join('JOIN', 'res_users as r', 'r.id=s.user_id')
+                    // ->where("begin = date_trunc('week', DATE '".$date."')")
+                    ->where(['s.user_id'=>$model->sales])
+                    ->addOrderBy(['s.begin' => SORT_DESC]);
+                
+                $dataplan = [];
+                $datactual = [];
+
+                foreach($query->all() as $idx=>$value):
+                $activities[$idx] = [
+                    'act_id'=>$value['act_id'],
+                    'sales_name'=>$value['login'].' '.$value['act_id'],
+                    'date'=>$value['begin'],
+                    'activities'=>[
+                        'plan'=>[],
+                        'actual'=>[],  
+                    ],
+                ];
+     
+                $dataplan = [];
+                    $plan= new Query;  
+                    $actual = new Query;
+                    $plan->from('before_plan_'.$days)->union('select * from after_plan_'.$days.' WHERE partner_id='.$model->customer.' AND activity_id='.$value['act_id'])->where(['activity_id'=>$value['act_id']]);
+                    $activities[$idx]['activities']['plan'] = $plan->all();
+
+                    $actual->from('before_actual_'.$days)->union('select * from after_actual_'.$days.' WHERE partner_id='.$model->customer.' AND activity_id='.$value['act_id'])->where(['activity_id'=>$value['act_id']]);
+                    $activities[$idx]['activities']['actual'] = $actual->all();
+
+                $datactual[$value['user']] = [
+                    'name'=>$value['login'],
+                    'data'=>[]
+                ];
+
+            endforeach;
+
+            }
+
+            return $this->render('dashboard',['activities'=>$activities,'model'=>$model,'allPartner'=>$allPartner]);
+        }else{
+            $query
+                ->select('s.user_id as user, r.login, s.id as act_id')
+                ->from('sales_activity as s')
+                ->join('JOIN', 'res_users as r', 'r.id=s.user_id')
+                ->where("begin = date_trunc('week', DATE '".$date."')")
+                ->addOrderBy(['s.user_id' => SORT_ASC]);
 
             $dataplan = [];
-
-                $plan= new Query;  
-                /*$plan
-                    ->select('r.login as login,p.name as partner, s.name as name, s.location as loc')
-                    ->from(''.$val.'_plan_'.$days.' as s')
-                    ->join('LEFT JOIN', 'sales_activity as a', 'a.id=s.activity_id')
-                    ->join('LEFT JOIN', 'res_users as r', 'r.id=a.user_id')
-                    ->join('LEFT JOIN', 'res_partner as p', 'p.id=s.partner_id')
-                    ->where(['s.activity_id'=>$value['act_id']])
-                    ->addOrderBy(['a.user_id' => SORT_ASC]);*/
-                $plan->from('before_plan_'.$days)->union('select * from after_plan_'.$days.' WHERE activity_id='.$value['act_id'])->where(['activity_id'=>$value['act_id']]);
-                $activities[$idx]['activities']['plan'][] = $plan->all();
-
-
-            $datactual[$value['user']] = [
-                'name'=>$value['login'],
-                'data'=>[]
-            ];
-            foreach($time as $val){
-                $plan= new Query;  
-                $plan
-                    ->select('r.login as login,p.name as partner, s.name as name, s.location as loc')
-                    ->from(''.$val.'_actual_'.$days.' as s')
-                    ->join('LEFT JOIN', 'sales_activity as a', 'a.id=s.activity_id')
-                    ->join('LEFT JOIN', 'res_users as r', 'r.id=a.user_id')
-                    ->join('LEFT JOIN', 'res_partner as p', 'p.id=s.partner_id')
-                    ->where(['s.activity_id'=>$value['act_id']])
-                    ->addOrderBy(['a.user_id' => SORT_ASC]);
-                $datactual[$value['user']]['data'] = $plan->all();
-            }
-        endforeach;
-        echo '<pre>';
-        print_r($activities);
-        echo '</pre>';
-
-        /*$activities = [
-            [
-                'id_sales',
-                'nama_sales',
-                'activities'=>[
-                    'plan'=>[
-
+            $datactual = [];
+            // Data Plan Activity
+            foreach($query->all() as $idx=>$value):
+                $activities[$idx] = [
+                    'act_id'=>$value['act_id'],
+                    'sales_name'=>$value['login'],
+                    'date'=>$date,
+                    'activities'=>[
+                        'plan'=>[],
+                        'actual'=>[],  
                     ],
-                    'actual'=>[
+                ];
+     
+                $dataplan = [];
+                    $plan= new Query;  
+                    $actual = new Query;
+                    $plan->from('before_plan_'.$days)->union('select * from after_plan_'.$days.' WHERE activity_id='.$value['act_id'])->where(['activity_id'=>$value['act_id']]);
+                    $activities[$idx]['activities']['plan'] = $plan->all();
 
-                    ]
-                ]
-            ]
-        ];*/
+                    $actual->from('before_actual_'.$days)->union('select * from after_actual_'.$days.' WHERE activity_id='.$value['act_id'])->where(['activity_id'=>$value['act_id']]);
+                    $activities[$idx]['activities']['actual']    = $actual->all();
 
+                $datactual[$value['user']] = [
+                    'name'=>$value['login'],
+                    'data'=>[]
+                ];
 
-        
-        // Data Actual Activity
-        
+            endforeach;
+            return $this->render('dashboard',['activities'=>$activities,'model'=>$model,'allPartner'=>$allPartner]);
+        }
         // echo '<pre>';
-        // print_r($dataplan);
+        //     print_r($activities);
         // echo '</pre>';
-        // return $this->render('dashboard',['plan'=>$dataplan,'actual'=>$datactual]);
-
     }
     public function actionActivity()
     {
@@ -202,14 +253,13 @@ class SiteController extends Controller
         // return $this->render('/report-sales/activityreport',['model'=>$model]);      
            
     }
-
     public function actionIndex()
     {
         return $this->render('index');
     }
 
     public function actionTes(){
-        echo 1111;
+        
     }
 
     public function actionLogin()
