@@ -497,6 +497,7 @@ use Yii;
  */
 class ResUsers extends \yii\db\ActiveRecord
 {
+	public $name;
     /**
      * @inheritdoc
      */
@@ -522,7 +523,11 @@ class ResUsers extends \yii\db\ActiveRecord
             [['login'], 'unique']
         ];
     }
-
+    public function afterFind(){
+    	if($this->partner){
+    		$this->name = $this->partner->name;
+    	}
+    }
     /**
      * @inheritdoc
      */
