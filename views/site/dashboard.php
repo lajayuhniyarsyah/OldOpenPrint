@@ -7,6 +7,7 @@ use yii\widgets\ActiveForm;
 use yii\jui;
 use yii\web\View;
 use app\models\ResPartner;
+use kartik\widgets\Select2;
 ?>
 <?php
 $this->registerJs(
@@ -54,7 +55,17 @@ $this->registerJs(
 								]); 
 					?>
 						<div style="width:40%; float:left;">
-							<?= $form->field($model, 'sales')->textInput() ?>
+							<?php
+								echo $form->field($model, 'sales')->widget(Select2::classname(), [
+									'language' => 'de',
+									'data' => array_merge(["all" => "All Sales"],),
+									'options' => ['placeholder' => 'Select sales ...'],
+									'pluginOptions' => [
+									'allowClear' => true
+									],
+								]);
+							?>
+							<!-- // <?= $form->field($model, 'sales')->textInput() ?> -->
 						</div>
 						<div style="width:40%;float:right;">
 							<?= $form->field($model, 'customer')->textInput() ?>
@@ -102,7 +113,6 @@ $this->registerJs(
 											echo '<td valign="top">';
 											$noactual=1;
 											foreach ($value['activities']['actual'] as $b => $actual) {
-												// echo  '<tr><td></td><td></td><td>'.$actual['name'].'</td></tr>';
 												echo 
 													'<table>
 														<tr><td width="20px" valign="top">'.$noactual.'.</td><td class="justify">'.$actual['name'].'</td></tr>
