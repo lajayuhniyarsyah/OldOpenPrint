@@ -45,7 +45,9 @@
 		"kartik-v/yii2-widget-touchspin": "*",
 		"kartik-v/yii2-widget-typeahead": "*",
         "2amigos/yii2-highcharts-widget" : "*",
-        "kartik-v/yii2-field-range":"*"
+        "kartik-v/yii2-field-range":"*",
+        "kartik-v/yii2-grid":"*",
+        "kartik-v/yii2-mpdf":"*"
     },
     "config": {
         "process-timeout": 1800

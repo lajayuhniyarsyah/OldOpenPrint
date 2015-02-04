@@ -42,6 +42,11 @@ $config = [
             'class'=>'app\components\NumericLib',
         ]
     ],
+    'modules'=>[
+        'gridview'=>[
+            'class'=>'\kartik\grid\Module',
+        ]
+    ],
     'params' => $params,
 ];
 
