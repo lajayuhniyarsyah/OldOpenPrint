@@ -11,6 +11,12 @@ $config = [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
             'cookieValidationKey' => 'lajayuhniyarsyah',
         ],
+        'formatter'=>[
+            'dateFormat' => 'dd-MMM-yyyy',
+            'decimalSeparator'=>',',
+            'thousandSeparator'=>'.',
+            'currencyCode'=>"IDR"
+        ],
         'cache' => [
             'class' => 'yii\caching\FileCache',
         ],
@@ -47,6 +53,7 @@ $config = [
             'class'=>'\kartik\grid\Module',
         ]
     ],
+
     'params' => $params,
 ];
 
