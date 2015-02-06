@@ -91,9 +91,6 @@ echo \dosamigos\highcharts\HighCharts::widget([
 					'header'=>"Total",
 					'pageSummary'=>true,
 					'format'=>['currency']
-					/*'value'=>function($model,$key,$index,$column){
-						return Yii::$app->formatter->asCurrency($model['subtotal']);
-					}*/
 				]
 			]
 		]);?>

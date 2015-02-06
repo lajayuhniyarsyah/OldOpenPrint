@@ -153,6 +153,8 @@ use Yii;
 class SaleOrder extends \yii\db\ActiveRecord
 {
 
+    public $sales_man;
+
     private static $state_aliases = [
         'draft'=>'Draft',
         'sent'=>'Quotation Sent',
@@ -203,7 +205,7 @@ class SaleOrder extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'create_uid' => 'Create Uid',
+            'create_uid' => 'Creator',
             'create_date' => 'Create Date',
             'write_date' => 'Write Date',
             'write_uid' => 'Write Uid',
@@ -260,9 +262,16 @@ class SaleOrder extends \yii\db\ActiveRecord
             'attention' => 'Attention',
             'internal_notes' => 'Internal Notes',
             'due_date' => 'Due Date',
+            'sales_man'=>'Sales Man',
         ];
     }
 
+
+    public function afterFind(){
+        if($this->user){
+            $this->sales_man=$this->user->partner->name;
+        }
+    }
     /**
      * @return \yii\db\ActiveQuery
      */
