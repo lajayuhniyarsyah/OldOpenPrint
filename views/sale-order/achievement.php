@@ -18,7 +18,23 @@ $form = ActiveForm::begin([
 
 <?=Select2::widget([
 	'name' => 'sales',
-	'data' => \yii\helpers\ArrayHelper::merge($saleUsers,[0=>"All Sales"]),
+	'data' => \yii\helpers\ArrayHelper::merge(
+		$saleUsers,
+		[
+			'all'=>"All Sales",
+			"group:g1"=>"Group: G1",
+			"group:g2"=>"Group: G2",
+			"group:g3"=>"Group: G3",
+			"group:g4"=>"Group: G4",
+			"group:g5"=>"Group: G5",
+			"group:g6"=>"Group: G6",
+			"group:jabotabek"=>"Group: JABODETABEK",
+			"group:smb"=>'Group: SMB / Sumatera',
+			"group:jtt"=>"Group: Jawa Tengah / Timur",
+			"group:sls"=>"Group: Sulawesi",
+		]
+	),
+	'value'=>Yii::$app->request->get('sales'),
 	'options' => [
 		'placeholder' => 'Select Sales ...',
 		'multiple' => true,
@@ -33,10 +49,12 @@ $form = ActiveForm::begin([
 	'type' => DatePicker::TYPE_RANGE,
 	'form' => $form,
 	'pluginOptions' => [
-		'format' => 'dd-M-yyyy',
+		'format' => 'yyyy-MM-dd',
+		// 'format' => 'dd-MM-yyyy',
 		'autoclose' => true,
 		'startDate'=>'01/07/2014',
-	]
+	],
+	'convertFormat'=>true,
 ]);?>
 <div class="form-group">
     <?= Html::submitButton('Search', ['class' =>'btn btn-primary']) ?>
@@ -87,6 +105,31 @@ echo \dosamigos\highcharts\HighCharts::widget([
 					'header'=>'Period(s)',
 				],
 				[
+					'attribute'=>'subtotal_week_1',
+					'header'=>"Week 1",
+					'format'=>['currency']
+				],
+				[
+					'attribute'=>'subtotal_week_2',
+					'header'=>"Week 2",
+					'format'=>['currency']
+				],
+				[
+					'attribute'=>'subtotal_week_3',
+					'header'=>"Week 3",
+					'format'=>['currency']
+				],
+				[
+					'attribute'=>'subtotal_week_4',
+					'header'=>"Week 4",
+					'format'=>['currency']
+				],
+				[
+					'attribute'=>'subtotal_week_5',
+					'header'=>"Week 5",
+					'format'=>['currency']
+				],
+				[
 					'attribute'=>'subtotal',
 					'header'=>"Total",
 					'pageSummary'=>true,
@@ -103,7 +146,7 @@ if(isset($salesManSearchGrid) && $salesManSearchGrid){
 	?>
 	<div class="panel panel-default">
 	<div class="panel-heading">
-		<h3 class="panel-title">Monthly Order Received By Sale User</h3>
+		<h3 class="panel-title">Monthly Order Received By Sales Man</h3>
 	</div>
 	<div class="panel-body">
 		<?=GridView::widget([
