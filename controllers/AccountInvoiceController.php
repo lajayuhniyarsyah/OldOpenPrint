@@ -53,7 +53,7 @@ class AccountInvoiceController extends Controller
             $nameLine = $invLine->product->name_template;
 
             if(!empty(trim($invLine->name))):
-                $nameLine .= '<br/>'.$invLine->name;
+                $nameLine .= '<br/>'.nl2br($invLine->name);
             endif;
 
             $nameLine .= '<br/>P/N : '.$invLine->product->default_code;
