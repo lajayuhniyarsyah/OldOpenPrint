@@ -401,7 +401,9 @@ class MovesController extends Controller
 		if($line->internalMoveLineDetails):
 			$detailField = "";
 			$productField .="<br/>Consist Of :<ul>";
+			$sNoteLine = "";
 			foreach($line->internalMoveLineDetails as $detail):
+				$sNoteDetail = "";
 				if($detail->product->superNotes):
 					foreach($detail->product->superNotes as $superNoteD):
 						$sNoteDetail .= "<br/>".$superNoteD->template_note;
