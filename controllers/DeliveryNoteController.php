@@ -186,12 +186,19 @@ class DeliveryNoteController extends Controller
     private function renderLinesPrint($preparedLines)
     {
         $res = [];
+        // var_dump($preparedLines);
         foreach($preparedLines as $k=>$l):
             $res[$k]=[
                 'qty'=>'<div style="float:left;width:10mm;">'.($l['no'] ? $l['no']:'&nbsp;').'</div><div>'.floatval($l['qty']).' '.$l['uom'].'</div><div style="clear:both;"></div>',
-                'name'=>$l['name'],
+                
                 'part_no'=>$l['part_no']
             ];
+
+            if(isset($l['name2'])){
+                $res[$k]['name'] = $l['name2'];
+            }else{
+                $res[$k]['name'] = $l['name'];
+            }
 
             // if PRODUCT IS SET TYPE
             if(array_key_exists('set', $l)){
@@ -208,7 +215,6 @@ class DeliveryNoteController extends Controller
 
             if(array_key_exists('batches', $l) && count($l['batches'])>=1)
             {
-
                 $res[$k]['name'].='<br/>'.$this->prepareBathesRender($l);
             }
         endforeach;
@@ -232,29 +238,36 @@ class DeliveryNoteController extends Controller
     private function prepareLineData($lines)
     {
         $res = [];
+
         foreach($lines as $k=>$line):
 
             // if set
+            
             if(isset($line->opLine->move->move_dest_id) && $line->opLine->move->move_dest_id)
             {
+
                 $moveDest = $line->opLine->move->moveDest;
                 // before we must check if move dest id setted
                 if(array_key_exists($moveDest->id, $res))
                 {
+
                     $res[$moveDest->id]['set'][] = $this->prepareSetPrint($line);
                 }
                 else
                 {
                     // init to be printed
+                    
                     $res[$moveDest->id] = [
                         'no'=>$line->no,
                         'qty'=>$moveDest->product_qty,
                         'uom'=>$moveDest->productUom->name,
-                        'name'=>($moveDest->desc ? nl2br($moveDest->desc):nl2br($moveDest->name)).'aa',
+                        'name'=>($moveDest->desc ? nl2br($moveDest->desc):nl2br($moveDest->name)),
+                        'name2'=>$moveDest->name,
+                        'desc'=>$moveDest->desc,
                         'set'=>[
                             $this->prepareSetPrint($line),
                         ],
-                        'part_no'=>$line->product->default_code,
+                        'part_no'=>$moveDest->product->default_code,
                     ];
 
                    
@@ -266,12 +279,11 @@ class DeliveryNoteController extends Controller
                         if($notes->show_in_do_line && isset($res[$moveDest->id]['name'])) $res[$moveDest->id]['name'].='<br/>'.$notes->template_note; #SHOW ETRA NOTES PRODUCT INTO LINE
                     endforeach;
                 endif;*/
-
-
             }
             else
             {
                 // not set
+                
                 $res[$line->id]=$this->prepareLine($line);
             }
         endforeach;
@@ -331,6 +343,9 @@ class DeliveryNoteController extends Controller
         return $res;
     }
 
+
+    // METHOD TO PRINT SET PRODUCT
+    // IT A CONSIST OF PART
     private function prepareSetPrint($line){
         $res =  [
             'qty'=>$line->product_qty,
