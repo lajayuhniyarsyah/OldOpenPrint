@@ -85,7 +85,7 @@ class InternalMove extends \yii\db\ActiveRecord
      */
     public function getInternalMoveLines()
     {
-        return $this->hasMany(InternalMoveLine::className(), ['internal_move_id' => 'id']);
+        return $this->hasMany(InternalMoveLine::className(), ['internal_move_id' => 'id'])->orderBy('no, id ASC');
     }
 
     /**
