@@ -331,13 +331,21 @@ EOQ;
 			];
 			$countCurrColumn = 0;
 
+
+			// EACH SALESMAN
 			foreach($salesMonthlyOrderReceive as $row=>$saleMonthly){
 				$series[$seriesIdx] = [
+					'type'=>'line',
 					'name'=>$saleMonthly['sales_name'],
 					'data'=>[]
 				];
+				// var_dump($saleMonthly);
+				
+
 				$countCurrColumn = 0;
+				$total[$row]['value']=0;
 				foreach($saleMonthly as $fieldName=>$fieldValue):
+					
 					switch ($fieldName) {
 						case 'user_id':
 							# do nothoing
@@ -349,7 +357,7 @@ EOQ;
 						default:
 							# code...
 							# add to series
-							
+								$total[$row]['value']+=$fieldValue;
 								$series[$seriesIdx]['data'][] = (float) $fieldValue;
 								#add to salesMan Grid
 								
@@ -361,24 +369,59 @@ EOQ;
 								$explodeName = explode('_',$periodIdx);
 								$headerName = Yii::$app->formatter->asDate($explodeName[0].'-'.$explodeName[1].'-01','MMM-yyyy');
 
-							if($row==0):    
-								$salesManSearchGrid['columns'][] = [
-									'attribute'=>$fieldName,
-									'header'=>$headerName,
-									'format'=>['currency'],
-									'pageSummary'=>true,
+								if($row==0):    
+									$salesManSearchGrid['columns'][] = [
+										'attribute'=>$fieldName,
+										'header'=>$headerName,
+										'format'=>['currency'],
+										'pageSummary'=>true,
+									];
+								endif;
+
+								$pieSeries[$seriesIdx] = [
+
+									'name'=>$saleMonthly['sales_name'],
+									'y'=>$total[$row]['value'],
 								];
-								
-							endif;
-							$countCurrColumn++;
+								$countCurrColumn++;
 							break;
 					}
 				endforeach;
-				// var_dump($series);
+				
 				$seriesIdx++;
 
 			}
+			// var_dump($pieSeries);
+			// END FOREACH SERIES
 			// var_dump($series);
+			/*$series[] = [
+				'type'=>'pie',
+				'name'=>'Test Pie In Line',
+				'data'=>[
+					[
+						'name'=>'G1',
+						'y'=>20,
+					],
+					[
+						'name'=>'G2',
+						'y'=>40,
+					],
+					[
+						'name'=>'G3',
+						'y'=>30,
+					],
+					[
+						'name'=>'G4',
+						'y'=>10,
+					],
+				],
+				'center'=>[950,50],
+				'size'=>150,
+		    	'showInLegend'=>false,
+		    	'dataLabels'=>[
+		    		'enabled'=>false
+		    	]
+			];*/
 			$salesManSearchGrid['columns'][] = [
 				'class'=>'\kartik\grid\FormulaColumn',
 				'format'=>['currency'],
@@ -410,6 +453,7 @@ EOQ;
 				'allOrderTitle'=>$allOrderTitle,
 				'submited'=>$submited,
 				'salesManSearchGrid'=>(isset($salesManSearchGrid) ? $salesManSearchGrid:null),
+				'pieSeries'=>(isset($pieSeries) ? array_values($pieSeries):null),
 			]
 		);
 	}

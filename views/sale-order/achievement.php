@@ -6,6 +6,8 @@ use kartik\widgets\DatePicker;
 use kartik\widgets\Select2;
 use kartik\grid\GridView;
 
+use miloschuman\highcharts\Highcharts;
+
 ?>
 <?php 
 $form = ActiveForm::begin([
@@ -63,11 +65,11 @@ $form = ActiveForm::begin([
 
 <?php
 // var_dump($series);
-echo \dosamigos\highcharts\HighCharts::widget([
-    'clientOptions' => [
-        'chart' => [
+echo HighCharts::widget([
+    'options' => [
+        /*'chart' => [
                 'type' => 'line'
-        ],
+        ],*/
         'legend'=>[
         	// 'layout'=>'vertical',
         	// 'verticalAlign'=>'top',
@@ -145,16 +147,74 @@ echo \dosamigos\highcharts\HighCharts::widget([
 if(isset($salesManSearchGrid) && $salesManSearchGrid){
 	?>
 	<div class="panel panel-default">
-	<div class="panel-heading">
-		<h3 class="panel-title">Monthly Order Received By Sales Man</h3>
+		<div class="panel-heading">
+			<h3 class="panel-title">Order Received Composition By Sales Man</h3>
+		</div>
+		<div class="panel-body">
+			<?php
+				
+				echo HighCharts::widget([
+					'options'=>[
+						'title'=>['text'=>'Fruit'],
+						/*'series'=>[
+							[
+								'type'=>'pie',
+								'name'=>'test pie',
+								'data'=>[
+									[
+										'name'=>"A",
+										'y'=>1000
+									],
+									[
+										'name'=>"B",
+										'y'=>900
+									],
+									[
+										'name'=>"C",
+										'y'=>100
+									],
+								]
+							]
+						]*/
+						'plotOptions'=>[
+							'pie'=>[
+								'allowPointSelect'=>true,
+								'cursor'=>'pointer',
+								'dataLabels'=>[
+									'enabled'=>true,
+									'format'=>'<b>{point.name}</b>: {point.percentage:.1f} %'
+								]
+							]
+						],
+						'series'=>[
+							[
+								'type'=>'pie',
+								'name'=>"Order Receive Composition",
+								"data"=>$pieSeries,
+							]
+						]
+					]
+				]);
+			?>
+		</div>
 	</div>
-	<div class="panel-body">
-		<?=GridView::widget([
-			'dataProvider'=>$salesManSearchGrid['dataProvider'],
-			'showPageSummary' => true,
-			'columns'=>$salesManSearchGrid['columns']
-		]);?>
+
+	<div class="panel panel-default">
+		<div class="panel-heading">
+			<h3 class="panel-title">Monthly Order Received By Sales Man</h3>
+		</div>
+		<div class="panel-body">
+			<?=GridView::widget([
+				'id'=>'salesManAchievement',
+				'tableOptions'=>['id'=>'salesManAchievementTbl'],
+				'dataProvider'=>$salesManSearchGrid['dataProvider'],
+				'showPageSummary' => true,
+				'columns'=>$salesManSearchGrid['columns']
+			]);?>
+		</div>
 	</div>
-</div>
+
+
+	
 	<?php
 }

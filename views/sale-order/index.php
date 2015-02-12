@@ -28,20 +28,23 @@ $this->params['breadcrumbs'][] = $this->title;
 	<?php
 	$url = \yii\helpers\Url::to(['sale-order/get-all-user-list']);
 
+	$url2 = \yii\helpers\Url::to(['sale-order/get-all-creator-list']);
+
 	// Script to initialize the selection based on the value of the select2 element
-	$initScript = <<< SCRIPT
-	function (element, callback) {
-		var id=\$(element).val();
-		if (id !== "") {
-			\$.ajax("{$url}&id=" + id, {
-				dataType: "json"
-				}).done(function(data) { 
-					callback(data.results);
-				}
-			);
-		}
+
+	$script = function($uri){
+		return 'function (element, callback) {
+			var id=$(element).val();
+			if (id !== "") {
+				$.ajax("'.$uri.'&id=" + id, {
+					dataType: "json"
+					}).done(function(data) { 
+						callback(data.results);
+					}
+				);
+			}
+		}';
 	}
-SCRIPT;
 	?>
 	<?=GridView::widget([
 		'dataProvider' => $dataProvider,
@@ -71,7 +74,21 @@ SCRIPT;
 				'attribute'=>'create_uid',
 				'value'=>function($model,$key,$index,$column){
 					return $model->createU->partner->name;
-				}
+				},
+				'filterType'=>GridView::FILTER_SELECT2,
+				'filterWidgetOptions'=>[
+					'pluginOptions' => [
+						'allowClear' => true,
+						'minimumInputLength'=>2,
+						'ajax'=>[
+							'url'=>$url2,
+							'dataType'=>'json',
+							'data'=>new JsExpression('function(term,page){return {search:term}; }'),
+							'results'=>new JsExpression('function(data,page){ return {results:data.results}; }'),
+						],
+						'initSelection' => new JsExpression($script($url2))
+					],
+				],
 			],
 			// 'create_date',
 			// 'write_date',
@@ -93,7 +110,7 @@ SCRIPT;
 							'data'=>new JsExpression('function(term,page){return {search:term}; }'),
 							'results'=>new JsExpression('function(data,page){ return {results:data.results}; }'),
 						],
-						'initSelection' => new JsExpression($initScript)
+						'initSelection' => new JsExpression($script($url))
 					],
 				],
 				'filterInputOptions' => ['placeholder' => 'Sales Man'],
