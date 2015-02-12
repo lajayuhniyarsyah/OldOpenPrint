@@ -511,7 +511,7 @@ $this->registerJs('
 		}
 
 		
-		console.log(\'Rendering Page \'+currPage+\' Row \'+currRow+\' Height => \'+currLineHeight);
+		//console.log(\'Rendering Page \'+currPage+\' Row \'+currRow+\' Height => \'+currLineHeight);
 		currRow=currRow+1;
 	});
 		var HeightTable=jQuery(\'#tdLine\'+currPage).height();
@@ -519,9 +519,12 @@ $this->registerJs('
 		var SetHeight=HeightTable-cektable+35;
 
 		if (cektable < HeightTable){
-			var res = "<tr><td style=\"width:50px; height:"+SetHeight+"px;  text-align:center;\"></td><td style=\"width:130px; text-align:center;\"></td><td><div class=\"leftdata\"></div><div class=\"rightdata\"></div></td></tr>";
+			var res = "<tr><td style=\"width:50px; height:"+SetHeight+"px;  text-align:center;\"></td><td style=\"width:130px; text-align:center;\"></td><td><div class=\"leftdata\" contenteditable=\"true\">'.preg_replace('/\n/', '', nl2br($model->notes)).'</div><div class=\"rightdata\"></div></td></tr>";
 			jQuery(\'#lines\'+currPage+\' tr:last\').after(res);
 		}
+		var notes2 = "<tr><td style=\"width:50px; height:"+SetHeight+"px;  text-align:center;\"></td><td style=\"width:130px; text-align:center;\"></td><td><div class=\"leftdata\">'.preg_replace('/\n/', '', nl2br($model->notes)).'</div><div class=\"rightdata\"></div></td></tr>";
+		
+		
 	// end loop
 ');
 ?>
