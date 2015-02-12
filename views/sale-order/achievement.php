@@ -9,7 +9,10 @@ use kartik\grid\GridView;
 use miloschuman\highcharts\Highcharts;
 
 ?>
-<?php 
+<?php
+$this->title = 'Order Received Dashboard';
+$this->params['breadcrumbs'][] = ['label'=>'Sale Order','url'=>['index']];
+$this->params['breadcrumbs'][] = $this->title;
 $form = ActiveForm::begin([
 	'id'=>'saleAnnualReportForm',
 	'action'=>[''],
@@ -155,7 +158,7 @@ if(isset($salesManSearchGrid) && $salesManSearchGrid){
 				
 				echo HighCharts::widget([
 					'options'=>[
-						'title'=>['text'=>'Fruit'],
+						'title'=>['text'=>'Order Received Composition'],
 						/*'series'=>[
 							[
 								'type'=>'pie',
