@@ -36,6 +36,12 @@ use Yii;
  */
 class OrderPreparation extends \yii\db\ActiveRecord
 {
+    private static $state_aliases = [
+        'draft'=>"Draft",
+        'approve'=>'Approved',
+        'cancel'=>'Cancelled',
+        'done'=>'Done',
+    ];
     /**
      * @inheritdoc
      */
