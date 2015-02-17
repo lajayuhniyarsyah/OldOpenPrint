@@ -290,7 +290,7 @@ class AccountInvoice extends \yii\db\ActiveRecord
      */
     public function getAccountInvoiceLines()
     {
-        return $this->hasMany(AccountInvoiceLine::className(), ['invoice_id' => 'id'])->orderBy('sequence, id ASC');
+        return $this->hasMany(AccountInvoiceLine::className(), ['invoice_id' => 'id'])->orderBy('sequence ASC, id ASC');
     }
 
     /**
