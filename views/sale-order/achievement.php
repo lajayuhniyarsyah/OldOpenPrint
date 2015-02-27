@@ -155,30 +155,9 @@ if(isset($salesManSearchGrid) && $salesManSearchGrid){
 		</div>
 		<div class="panel-body">
 			<?php
-				
 				echo HighCharts::widget([
 					'options'=>[
 						'title'=>['text'=>'Order Received Composition'],
-						/*'series'=>[
-							[
-								'type'=>'pie',
-								'name'=>'test pie',
-								'data'=>[
-									[
-										'name'=>"A",
-										'y'=>1000
-									],
-									[
-										'name'=>"B",
-										'y'=>900
-									],
-									[
-										'name'=>"C",
-										'y'=>100
-									],
-								]
-							]
-						]*/
 						'plotOptions'=>[
 							'pie'=>[
 								'allowPointSelect'=>true,

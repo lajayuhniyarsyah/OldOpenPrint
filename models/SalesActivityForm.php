@@ -12,9 +12,7 @@ class SalesActivityForm extends Model
 {
     public $sales;
     public $customer;
-    public $from;
-    public $to;
-    public $type;
+    public $date_begin;
 
     /**
      * @return array the validation rules.
@@ -22,12 +20,12 @@ class SalesActivityForm extends Model
     public function rules()
     {
         return [
-            // name, email, subject and body are required
-            [['sales', 'customer', 'from', 'to','type'], 'required'],
-            // email has to be a valid email address
-            // ['email', 'email'],
-            
+            [['sales','customer','date_begin'],'safe'],
         ];
+    }
+
+    public function checkSalesArray(){
+        return true;
     }
 
     /**
@@ -38,8 +36,7 @@ class SalesActivityForm extends Model
         return [
             'sales' => 'Sales',
             'customer'=>'Customer',
-            'from'=>'Date',
-            'to'=>'to'
+            'date_begin'=>'Date',
         ];
     }
 

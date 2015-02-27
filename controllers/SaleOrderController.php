@@ -37,6 +37,12 @@ class SaleOrderController extends Controller
 			'access'=>[
 				'class'=>\yii\filters\AccessControl::className(),
 				'rules'=>[
+
+					[
+						'allow'=>true,
+						'roles'=>['?'],
+						'actions'=>['index']
+					],
 					[
 						'allow'=>true,
 						'roles'=>['@']
@@ -44,7 +50,7 @@ class SaleOrderController extends Controller
 					[
 						'allow'=>false,
 						'roles'=>['?']
-					]
+					],
 				]
 			]
 		];
@@ -160,45 +166,6 @@ class SaleOrderController extends Controller
 				$dateQuery = "so.date_order BETWEEN '{$model->date_from}' AND '{$model->date_to}'";
 			}
 		}
-		
-
-		/*$queryAllOrder = <<< EOQ
-SELECT 
-	CAST(EXTRACT(YEAR FROM "date_order") AS INTEGER) AS period_year,
-	CAST(EXTRACT(MONTH FROM "date_order") AS INTEGER) AS period_month,
-	CONCAT(TO_CHAR(TO_TIMESTAMP (CAST(EXTRACT(MONTH FROM "date_order") AS TEXT), 'MM'), 'TMmon'), '-',CAST(EXTRACT(YEAR FROM "date_order") AS TEXT)) as month_name,
-	SUM(so_rates.rates) AS subtotal
-	FROM(
-	select 
-		so.*,
-		(case when rcr.rating is null then(
-			(
-				case when 
-					(case when rcr.rating is null and rc.id=13 then 1 else case when rcr.rating is null then 0 end end) = 0
-				then 
-					(select rating from res_currency_rate where currency_id=rc.id and name < so.date_order order by name desc limit 1) * amount_total
-					
-				else 
-					(1*amount_total)
-				end
-			)
-		)
-		else
-			(rcr.rating*amount_total)
-		end) as rates
-	from 
-		sale_order as so
-	join product_pricelist as ppr on so.pricelist_id = ppr.id
-	join res_currency as rc on ppr.currency_id=rc.id
-	left outer join res_currency_rate as rcr on rcr.currency_id=rc.id and rcr.name = so.date_order
-	where 
-		{$dateQuery}
-		and
-		so.state not in ('draft','cancel')
-	order by so.date_order asc) AS so_rates
-GROUP BY period_year, period_month, month_name
-ORDER BY period_year ASC, period_month ASC
-EOQ;*/
 
 
 $queryAllOrder = <<< EOQ
@@ -287,19 +254,21 @@ EOQ;
 			// check if has sear for group
 			$sales_ids=[]; #sales ids
 			$group_ids=[]; #sale group ids
-			foreach($getSalesUsers as $searchFor):
-				if(preg_match('/group\:/', $searchFor)){
-					// search for group
-					$expl = explode(':', $searchFor);
-					$group = GroupSales::find()->where(['name'=>$expl[1]])->one();
-					foreach($group->groupSalesLines as $gLine):
-						$sales_ids[]=$gLine->name;
-					endforeach;
-					$group_ids[]=$group->id;
-				}else{
-					$sales_ids[]=$searchFor;
-				}
-			endforeach;
+			if($getSalesUsers):
+				foreach($getSalesUsers as $searchFor):
+					if(preg_match('/group\:/', $searchFor)){
+						// search for group
+						$expl = explode(':', $searchFor);
+						$group = GroupSales::find()->where(['name'=>$expl[1]])->one();
+						foreach($group->groupSalesLines as $gLine):
+							$sales_ids[]=$gLine->name;
+						endforeach;
+						$group_ids[]=$group->id;
+					}else{
+						$sales_ids[]=$searchFor;
+					}
+				endforeach;
+			endif;
 			/*var_dump($sales_ids);
 			die();*/
 
@@ -379,7 +348,6 @@ EOQ;
 								endif;
 
 								$pieSeries[$seriesIdx] = [
-
 									'name'=>$saleMonthly['sales_name'],
 									'y'=>$total[$row]['value'],
 								];
@@ -391,37 +359,8 @@ EOQ;
 				$seriesIdx++;
 
 			}
-			// var_dump($pieSeries);
-			// END FOREACH SERIES
-			// var_dump($series);
-			/*$series[] = [
-				'type'=>'pie',
-				'name'=>'Test Pie In Line',
-				'data'=>[
-					[
-						'name'=>'G1',
-						'y'=>20,
-					],
-					[
-						'name'=>'G2',
-						'y'=>40,
-					],
-					[
-						'name'=>'G3',
-						'y'=>30,
-					],
-					[
-						'name'=>'G4',
-						'y'=>10,
-					],
-				],
-				'center'=>[950,50],
-				'size'=>150,
-		    	'showInLegend'=>false,
-		    	'dataLabels'=>[
-		    		'enabled'=>false
-		    	]
-			];*/
+
+
 			$salesManSearchGrid['columns'][] = [
 				'class'=>'\kartik\grid\FormulaColumn',
 				'format'=>['currency'],
@@ -576,7 +515,7 @@ GROUP BY
 ORDER BY
 	p.name
 EOQ;
-		// echo '<text>'.$query.'</text>';
+		echo '<text>'.$query.'</text>';
 		$connection=Yii::$app->db;
 		return $connection->createCommand($query)->queryAll();
 	}
@@ -605,15 +544,6 @@ EOQ;
 		$out = ['more' => false];
 		$q = new \yii\db\Query;
 		if (!is_null($search)) {
-
-			
-			/*$q
-				->select('usr.id, prt.name as text')
-				->from(ResUsers::tableName().' usr')
-				->leftJoin(ResPartner::tableName().' prt','usr.partner_id=prt.id');
-			$users = $q->createCommand()->queryAll();*/
-
-
 			$q
 				->select('usr.id, prf.name as text')
 				->from(ResGroups::tableName().' rg')
