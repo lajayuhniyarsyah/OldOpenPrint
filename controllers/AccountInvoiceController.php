@@ -40,9 +40,12 @@ class AccountInvoiceController extends Controller
 	 * Lists all AccountInvoice models.
 	 * @return mixed
 	 */
-	public function actionIndex($type=null)
+	public function actionIndex($type=null,$start_date=null,$end_date=null,$uid=null)
 	{
 		$searchModel = new AccountInvoiceSearch();
+
+
+		
 		if($type):
 			if(preg_match('/out/', $type)){
 				$type = 'out_invoice';
@@ -53,11 +56,55 @@ class AccountInvoiceController extends Controller
 		endif;
 		
 
-		$dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+		if($start_date && $end_date){
+			$searchModel->date_invoice = $start_date.' To '.$end_date;
+		}
 
+		if($uid){
+			$searchModel->user_id=(int)$uid;
+		}
+
+		// $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+		$dataProvider = $searchModel->search();
+		if($searchModel->load(Yii::$app->request->queryParams) && $searchModel->validate()){
+			$dataProvider = $searchModel->search();
+		}
+		// var_dump(Yii::$app->request->queryParams);
+		
+		$paymentData = $searchModel->searchPaymentStatus();
+		
+
+		$pie=[
+			'series'=>[]
+		];
+		foreach($paymentData as $payment):
+			$pie['series'][] = [
+				'name'=>$payment['status'],
+				'y'=>floatval($payment['subtotal']),
+				'color'=>($payment['status']=='Canceled' ? '#DC3912':($payment['status']=='Paid'?'#109618':'#3366CC')),
+				'drilldown'=>str_replace(' ', '', strtolower($payment['status'])).'drill'
+			];
+			// prepare drill down
+			$listStatus = $searchModel->searchPaymentStatus(true,$payment['status']);
+			$drill = [];
+			foreach($listStatus as $status):
+				$drill[] = [
+					'name'=>$status['name'],
+					'y'=>floatval($status['subtotal']),
+				];
+			endforeach;
+			$pie['drilldown'][]=[
+				'id'=>str_replace(' ', '', strtolower($payment['status'])).'drill',
+				'name'=>$payment['status'],
+				'type'=>'pie',
+				'data'=>$drill
+			];
+		endforeach;
+		// var_dump($pie);
 		return $this->render('index', [
 			'searchModel' => $searchModel,
 			'dataProvider' => $dataProvider,
+			'pie'=>$pie,
 		]);
 	}
 
@@ -203,13 +250,16 @@ class AccountInvoiceController extends Controller
 
 
 	public function actionDashboard(){
+		$title['between'] = "";
 		$connection = \Yii::$app->db;
+
 		$model = new OrderInvoiceReportForm();
 
 		$saleGroup = ResGroups::findOne(['name'=>'All Sales User']);
 		$saleUsers = ArrayHelper::map($saleGroup->users,'id','name');
 		$aiSearch = new AccountInvoiceSearch();
 		$aiSearch->start_date = '2014-07-01'; #DEFAULT START DATE FROM JULLY 2014 CAUSE ERP START LIVE IN JULY 2014
+
 		$aiSearch->end_date = date('Y-m-d');
 		$submited = false;
 		$sales_ids=[]; #sales ids if empty then show all sales man data
@@ -245,7 +295,7 @@ class AccountInvoiceController extends Controller
 
 		$ai = $aiSearch->getSum(); #result from query->all()
 
-		
+
 		$resGrid['dataProvider'] = new \yii\data\ArrayDataProvider([
 			'allModels'=>$ai,
 			'pagination'=>[
@@ -260,7 +310,7 @@ class AccountInvoiceController extends Controller
 		# INIT GRID COLUMNS FORMAT
 		foreach($fields as $fieldName):
 			$summary=false;
-			$format='raw';
+			$format='html';
 			$header = ucwords(str_replace('_', ' ', $fieldName));
 			if(preg_match('/summary_/', $fieldName)){
 				$summary=true;
@@ -268,13 +318,28 @@ class AccountInvoiceController extends Controller
 				$expl = explode('_', $fieldName);
 				$monthName = \DateTime::createFromFormat('m',$expl[2]);
 				$header = $expl[1].'-'.$monthName->format('F');
+				$resGrid['columns'][]=[
+					'attribute'=>$fieldName,
+					'header'=>$header,
+					'format'=>$format,
+					'pageSummary'=>$summary,
+					/*'value'=>function($model,$key,$index,$grid) use($fieldName){
+						return Yii::$app->formatter->asCurrency($model[$fieldName]);
+					}*/
+				];
+			}else{
+				$resGrid['columns'][]=[
+					'attribute'=>$fieldName,
+					'header'=>$header,
+					'format'=>$format,
+					'pageSummary'=>$summary,
+					'value'=>function($model,$key,$index,$grid) use($fieldName, $aiSearch){
+						return \yii\helpers\Html::a($model[$fieldName],['account-invoice/index','uid'=>$model['user_id'],'type'=>'out','start_date'=>$aiSearch->start_date,'end_date'=>$aiSearch->end_date]);
+					}
+				];
+				
 			}
-			$resGrid['columns'][]=[
-				'attribute'=>$fieldName,
-				'header'=>$header,
-				'format'=>$format,
-				'pageSummary'=>$summary,
-			];
+			
 		endforeach;
 		
 
@@ -296,6 +361,17 @@ class AccountInvoiceController extends Controller
 			}
 		];
 
+		// ACTION COLUMN
+		/*$resGrid['columns'][]=[
+			'class'=>'\yii\grid\ActionColumn',
+			'template'=>'{view}',
+			'buttons'=>[
+				'view'=>function($url,$model,$key){
+					return 'Viewsss';
+				}
+			]
+		];*/
+
 		$pie = [];
 		$y = [];
 		foreach($ai as $idx=>$inv)
@@ -314,7 +390,7 @@ class AccountInvoiceController extends Controller
 				'y'=>$y[$idx]
 			];
 		}
-
-		return $this->render('order_invoice_dashboard',['model'=>$model,'saleUsers'=>$saleUsers,'resGrid'=>$resGrid,'pie'=>$pie]);
+		$title['between'] = ' Between '.\DateTime::createFromFormat('Y-m-d',$aiSearch->start_date)->format('d-F-Y').' and '.\DateTime::createFromFormat('Y-m-d',$aiSearch->end_date)->format('d-F-Y');
+		return $this->render('order_invoice_dashboard',['title'=>$title,'model'=>$model,'saleUsers'=>$saleUsers,'resGrid'=>$resGrid,'pie'=>$pie]);
 	}
 }

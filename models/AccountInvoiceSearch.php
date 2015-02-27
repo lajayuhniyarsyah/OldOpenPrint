@@ -49,6 +49,89 @@ class AccountInvoiceSearch extends AccountInvoice
 		return Model::scenarios();
 	}
 
+	public function searchPaymentStatus($groupByCustomer=false,$status=null){
+		$conn = Yii::$app->db;
+		$andUserIds="";
+		if(count($this->sales_ids)){
+			$implUid = implode(',', $userIds);
+			$andUserIds = " AND ai.user_id in ($implUid)";
+		}
+
+		if($this->date_invoice){
+			$dateInvoiceFilter = $this->date_invoice;
+			if(preg_match('/To/', $this->date_invoice))
+			{
+				// if date range
+				$expl = explode('To', $this->date_invoice);
+				$start_date=$expl[0];
+				$end_date=$expl[1];
+			}
+		}else{
+			$start_date=$this->start_date;
+			if(!$this->start_date){
+				$start_date = '2014-07-01';
+			}
+			$end_date = $this->end_date;
+			if(!$this->end_date){
+				$end_date = date('Y-m-d');
+			}
+
+		}
+		$andDateRange = " AND ai.date_invoice BETWEEN '{$start_date}' AND '{$end_date}'";
+		
+		$groupSection = 'ai_rated.status';
+		$selectSection = 'ai_rated.status,
+				SUM(ai_rated.total_rated) AS subtotal';
+		$orderSection = "ai_rated.status ASC";
+		$joinSection = "";
+		$whereSection = "";
+		if($groupByCustomer){
+			$selectSection = 'res_partner.name,
+				ai_rated.status,
+				SUM(ai_rated.total_rated) AS subtotal';
+			$groupSection = 'res_partner.name, ai_rated.status';
+			$orderSection = "res_partner.name ASC";
+			$joinSection = "JOIN res_partner ON ai_rated.partner_id=res_partner.id";
+			if($status){
+				$whereSection = "WHERE ai_rated.status = 'Canceled'";
+			}
+		}
+		$sql = <<< SQL
+			SELECT
+				{$selectSection}
+			FROM
+				(SELECT
+					ai.*,
+					(CASE WHEN state = 'cancel' THEN 'Canceled' ELSE (CASE WHEN state='paid' THEN 'Paid' ELSE 'Waiting For Payment' END) END) AS status,
+					(
+						CASE WHEN rcr.rating IS NULL THEN( 
+							( CASE WHEN (
+								CASE WHEN rcr.rating IS NULL AND rc.id=13 THEN 1 ELSE CASE WHEN rcr.rating IS NULL THEN 0 END END
+							) = 0 THEN (
+								SELECT rating FROM res_currency_rate WHERE ai.currency_id=rc.id AND NAME < ai.date_invoice ORDER BY NAME DESC LIMIT 1
+							) * ai.amount_total ELSE (1*ai.amount_total) END ) 
+						) 
+						ELSE (rcr.rating*amount_total) END
+					) AS total_rated
+				FROM "account_invoice" "ai"
+				JOIN res_currency AS rc ON ai.currency_id=rc.id 
+				LEFT OUTER JOIN res_currency_rate AS rcr ON rcr.currency_id=rc.id AND rcr.name = ai.date_invoice 
+				WHERE 
+					type in ('out_invoice')
+					{$andUserIds}
+					{$andDateRange}
+				) AS ai_rated
+			{$joinSection}
+			{$whereSection}
+			GROUP BY
+				{$groupSection}
+			ORDER BY
+				{$orderSection}
+SQL;
+		return $conn->createCommand($sql)->queryAll();
+
+	}
+
 	/**
 	 * Creates data provider instance with search query applied
 	 *
@@ -56,24 +139,50 @@ class AccountInvoiceSearch extends AccountInvoice
 	 *
 	 * @return ActiveDataProvider
 	 */
-	public function search($params,$type=null)
+	public function search($params=null,$type=null,$dateRange=null,$groupBy=null)
 	{
+
 		$query = AccountInvoice::find();
 
-		if($type) $query->where('type=:type')->addParams([':type'=>$type]);
+		/*->select(
+				[
+					'account_invoice.*',
+					'(CASE WHEN rcr.rating IS NULL THEN( 
+							( CASE WHEN (
+								CASE WHEN rcr.rating IS NULL AND rc.id=13 THEN 1 ELSE CASE WHEN rcr.rating IS NULL THEN 0 END END
+							) = 0 THEN (
+								SELECT rating FROM res_currency_rate WHERE account_invoice.currency_id=rc.id AND NAME < account_invoice.date_invoice ORDER BY name DESC LIMIT 1
+							) * account_invoice.amount_total ELSE (1*account_invoice.amount_total) END ) 
+						) 
+						ELSE (rcr.rating*amount_total) END
+					) AS total_rated'
+				]
+			)
+			->join('LEFT JOIN',ResCurrency::tableName().' rc','account_invoice.currency_id=rc.id ')
+			->leftJoin(ResCurrencyRate::tableName().' rcr','rcr.currency_id=rc.id AND rcr.name = account_invoice.date_invoice')*/
 
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,
 			'sort'  => [
 				'defaultOrder'=>[
-					'create_date'=>SORT_DESC,
+					'date_invoice'=>SORT_DESC,
 				]
 			]
 		]);
 
-		if (!($this->load($params) && $this->validate())) {
+		/*if (!($this->load($params) && $this->validate())) {
 			return $dataProvider;
+		}*/
+
+		$dateInvoiceFilter = $this->date_invoice;
+		if(preg_match('/To/', $this->date_invoice))
+		{
+			// if date range
+			$dateInvoiceFilter = 'BETWEEN :date_from AND :date_to';
+			$expl = explode('To', $this->date_invoice);
+			$query->where(['between','date_invoice',$expl[0],$expl[1]]);
 		}
+
 
 		$query->andFilterWhere([
 			'id' => $this->id,
@@ -95,7 +204,7 @@ class AccountInvoiceSearch extends AccountInvoice
 			'amount_tax' => $this->amount_tax,
 			'reconciled' => $this->reconciled,
 			'residual' => $this->residual,
-			'date_invoice' => $this->date_invoice,
+			// 'date_invoice' => $dateInvoiceFilter,
 			'period_id' => $this->period_id,
 			'amount_untaxed' => $this->amount_untaxed,
 			'move_id' => $this->move_id,
@@ -252,5 +361,52 @@ SQL;
 		$cmd = $conn->createCommand($sql);
 		$res = $cmd->queryAll();
 		return $res;
+	}
+
+
+
+	private function qInvoiceState(){
+		$sql = <<<SQL
+			SELECT
+				inv_state_sum.partner_id,
+				res_partner.name,
+				SUM(CASE WHEN inv_state_sum.status='Canceled' THEN inv_state_sum.subtotal ELSE 0 END) AS sub_cancel,
+				SUM(CASE WHEN inv_state_sum.status='Paid' THEN inv_state_sum.subtotal ELSE 0 END) AS sub_paid,
+				SUM(CASE WHEN inv_state_sum.status='Waiting For Payment' THEN inv_state_sum.subtotal ELSE 0 END) AS sub_waiting
+				
+			FROM(
+
+				SELECT
+					ai_rated.partner_id,
+					ai_rated.status,
+					SUM(ai_rated.total_rated) AS subtotal
+				FROM
+					(SELECT
+						ai.*,
+						(CASE WHEN state = 'cancel' THEN 'Canceled' ELSE (CASE WHEN state='paid' THEN 'Paid' ELSE 'Waiting For Payment' END) END) AS status,
+						(
+							CASE WHEN rcr.rating IS NULL THEN( 
+								( CASE WHEN (
+									CASE WHEN rcr.rating IS NULL AND rc.id=13 THEN 1 ELSE CASE WHEN rcr.rating IS NULL THEN 0 END END
+								) = 0 THEN (
+									SELECT rating FROM res_currency_rate WHERE ai.currency_id=rc.id AND NAME < ai.date_invoice ORDER BY NAME DESC LIMIT 1
+								) * ai.amount_total ELSE (1*ai.amount_total) END ) 
+							) 
+							ELSE (rcr.rating*amount_total) END
+						) AS total_rated
+					FROM "account_invoice" "ai"
+					JOIN res_currency AS rc ON ai.currency_id=rc.id 
+					LEFT OUTER JOIN res_currency_rate AS rcr ON rcr.currency_id=rc.id AND rcr.name = ai.date_invoice 
+					WHERE 
+						type in ('out_invoice')
+						
+					) AS ai_rated
+				GROUP BY
+					ai_rated.partner_id,ai_rated.status
+				) as inv_state_sum
+			JOIN res_partner ON inv_state_sum.partner_id=res_partner.id
+			GROUP BY inv_state_sum.partner_id,res_partner.name
+			ORDER BY res_partner.name ASC
+SQL;
 	}
 }
