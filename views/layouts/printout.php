@@ -46,6 +46,9 @@ use app\assets\AppAsset;
             }
 
         }
+        .hidden{
+            display: none;
+        }
         @media print{
             .hideOnPrint{
                 display: none;
