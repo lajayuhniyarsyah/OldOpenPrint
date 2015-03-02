@@ -20,7 +20,7 @@ $form = ActiveForm::begin([
 	'method'=>'get',
 ]);
 ?>
-<?='<label class="control-label">Provinces</label>'?>
+<?='<label class="control-label">Search Form</label>'?>
 <?=Select2::widget([
 	'name' => 'sales',
 	'data' => \yii\helpers\ArrayHelper::merge(
