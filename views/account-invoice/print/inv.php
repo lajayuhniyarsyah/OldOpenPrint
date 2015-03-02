@@ -212,9 +212,9 @@ use yii\helpers\Url;
 	<?php
 
 	
-	if($printer=='sri'):
+	if($printer=='sri'){
 		echo '.headers{padding-top:56mm;height: 32mm;}.kwNo{line-height: 2mm;}.terb{padding-top: 11mm;line-height: 35px;}';
-	endif;
+	}
 	?>
 </style>
 <?php
@@ -409,6 +409,65 @@ jQuery.each(lines,function(key,line){
 	currRow=currRow+1;
 });
 // end loop
+var currIndex = 0;
+function refreshActButton(currIndex){
+	jQuery('.btnActLine').remove();
+	jQuery('.td5').each(function(ro,v){
+		jQuery(this).append('<div class="btnActLine hideOnPrint" style="margin-left: 150px;position: absolute;"><a href="#" class="btnCutRow" data="'+ro+'">Cut</a><a href="#" data="'+ro+'" class="btnPaste btnPasteBefore hidden"> | Paste Before</a><a href="#" class="btnPaste btnPasteAfter hidden" data="'+ro+'"> | Paste After</a></div>');
+		currIndex = currIndex+1;
+		return currIndex;
+	});
+}
+
+currIndex = refreshActButton();
+
+var trCopy = "";
+var trCopyIdx;
+/*jQuery('.btnCutRow').click(function(){
+	trCopy = jQuery(this).parents("tr").html();
+	trCopyIdx = jQuery(this).attr('data');
+	console.log(trCopy);
+	jQuery('.btnPaste').show();
+	return false;
+});
+
+jQuery('.btnPasteAfter').click(function(){
+	var roNo = jQuery(this).attr('data');
+	jQuery("<tr>"+trCopy+"</tr>").insertAfter('tr:eq('+roNo+')');
+	jQuery("tr:eq("+trCopyIdx+")").remove();
+	trCopy = "";
+	trCopyIdx = "";
+	jQuery('.btnPaste').hide();
+	return false;
+});*/
+
+jQuery('#container').on('click','.btnCutRow',function(e){
+	e.preventDefault();
+	var target = jQuery(this).parents("tr");
+	jQuery(this).parent().remove();
+	trCopy = target.html();
+	trCopyIdx = jQuery(this).attr('data');
+	console.log("THtml = "+trCopy+". Index = "+trCopyIdx);
+	jQuery('.btnPaste').show();
+	console.log("Removing TR "+trCopyIdx);
+	jQuery("tr.rows"+trCopyIdx).remove();
+	return false;
+});
+
+jQuery('#container').on('click','.btnPasteAfter',function(e){
+	e.preventDefault();
+	var roNo = jQuery(this).attr('data');
+	
+	
+	console.log("inserting after "+roNo);
+	currIndex = currIndex+1;
+	jQuery('<tr class="cRows rows'+currIndex+'"></tr>'+trCopy+"</tr>").insertAfter('tr.rows'+roNo);
+	console.log(jQuery('tr.rows'+currIndex+' .btnCutRow').attr('class'));
+	trCopy = "";
+	trCopyIdx = "";
+	jQuery('.btnPaste').hide();
+	return false;
+});
 EOD;
 unset($jsonLines);
 $this->registerJs($scr);
