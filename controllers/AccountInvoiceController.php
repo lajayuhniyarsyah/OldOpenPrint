@@ -120,7 +120,7 @@ class AccountInvoiceController extends Controller
             if($invLine->account_id<>192){
                 $nameLine = $invLine->product->name_template;
 
-                if(!empty(trim($invLine->name))):
+                if(trim($invLine->name)):
                     $nameLine .= '<br/>'.nl2br($invLine->name);
                 endif;
 
