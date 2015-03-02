@@ -108,34 +108,103 @@ class AccountInvoiceController extends Controller
 		]);
 	}
 
+	// action print
+	public function actionPrint($id,$uid=null,$printer="refa"){
+        $this->layout = 'printout';
+        $discount = ['desc'=>'','curr'=>'','amount'=>''];
+        $model = $this->findModel($id);
 
+        $lines = [];
+        $total = 0;
+        foreach($model->accountInvoiceLines as $invLine):
+            if($invLine->account_id<>192){
+                $nameLine = $invLine->product->name_template;
+
+                if(!empty(trim($invLine->name))):
+                    $nameLine .= '<br/>'.nl2br($invLine->name);
+                endif;
+
+                $nameLine .= '<br/>P/N : '.$invLine->product->default_code;
+                $lines[] = [
+                    'no'=>$invLine->sequence,
+                    'name'=>$nameLine,
+                    'price_subtotal'=>Yii::$app->numericLib->westStyle($invLine->price_subtotal),
+                ];
+                $total+=floatval($invLine->price_unit)*floatval($invLine->quantity);
+                /*echo 'price unit '.$invLine->price_unit;
+                echo 'qty '.floatval($invLine->quantity).'<br/>';*/
+            }
+            else
+            {
+                $discount = [
+                    'desc'=>$invLine->name,
+                    'curr'=>$model->currency->name,
+                    'amount'=>$invLine->price_unit,
+                ];
+            }
+
+        endforeach;
+        // echo $total;
+        // print_r($lines);
+        if($uid==100){
+            $printer='sri';
+        }
+        if($model->currency->name=='IDR' and $model->currency->id==13)
+        {
+            // if Rupiah
+            return $this->render('print/fp_rp',['model'=>$model,'lines'=>$lines,'uid'=>$uid,'printer'=>$printer]);
+        }else{
+            return $this->render('print/fp_valas',['model'=>$model,'lines'=>$lines,'uid'=>$uid,'printer'=>$printer,'discount'=>$discount,'total'=>$total]);
+        }        
+    }
 
 	public function actionPrintInvoice($id,$uid=null,$printer="refa"){
-		$this->layout = 'printout';
-		$model=$this->findModel($id);
-		$lines = [];
-		$ar = 0;
-		foreach($model->accountInvoiceLines as $k=>$line):
-			$ar = $k;
-			$lines[$k]['no'] = $line->sequence;
-			$lines[$k]['qty'] = $line->quantity.(isset($line->uos->name) ? ' '.$line->uos->name:null);
-			$lines[$k]['desc'] = (isset($line->product->name_template) ? $line->product->name_template.'<br/>'.$line->name.'<br/>P/N : '.$line->product->default_code:nl2br($line->name));
-			$lines[$k]['unit_price'] = '<div style="float:left;">'.$model->currency->name.'</div><div style="float:right;padding-right:8px;">'.$line->price_unit.'</div>';
-			$lines[$k]['ext_price'] = '<div style="float:left;">'.$model->currency->name.'</div><div style="float:right;">'.$line->price_subtotal.'</div>';
+        $this->layout = 'printout';
+        $model=$this->findModel($id);
+        $lines = [];
+        $discountLine=['desc'=>'','amount'=>'','currCode'=>''];
+        $ar = 0;
+        $total = 0;
+        $formated = function($value) use ($model){
+            if($model->currency_id==13){
+                return Yii::$app->numericLib->indoStyle(floatval($value));
+            }else{
+                return Yii::$app->numericLib->westStyle(floatval($value));
+            }
+        };
+        foreach($model->accountInvoiceLines as $k=>$line):
+            if($line->account_id<>192){
+                $ar = $k;
+                $lines[$k]['no'] = $line->sequence;
+                $lines[$k]['qty'] = $line->quantity.(isset($line->uos->name) ? ' '.$line->uos->name:null);
+                $lines[$k]['desc'] = (isset($line->product->name_template) ? $line->product->name_template.'<br/>'.$line->name.'<br/>P/N : '.$line->product->default_code:nl2br($line->name));
+                $lines[$k]['unit_price'] = '<div style="float:left;">'.$model->currency->name.'</div><div style="float:right;padding-right:8px;">'.$formated($line->price_unit).'</div>';
+                $lines[$k]['ext_price'] = '<div style="float:left;">'.$model->currency->name.'</div><div style="float:right;">'.$formated($line->price_subtotal).'</div>';
+                $total+=floatval($line->price_unit)*floatval($line->quantity);
+            }else{
+                $discountLine = [
+                    'desc'=>$line->name,
+                    'amount'=>$line->price_unit,
+                    'currCode'=>$model->currency->name
+                ];
+            }
 
-		endforeach;
-		$ar+=1;
-		$lines[$ar]['no'] = '';
-		$lines[$ar]['qty'] = '';
-		$lines[$ar]['desc'] = 'PO No : '.$model->name;
-		if($model->comment){
-			$lines[$ar]['desc'] .= '<br/>'.$model->comment;
-		}
-		$lines[$ar]['unit_price'] = '';
-		$lines[$ar]['ext_price'] = '';
+        endforeach;
+        $ar+=1;
+        $lines[$ar]['no'] = '';
+        $lines[$ar]['qty'] = '';
+        $lines[$ar]['desc'] = 'PO No : '.$model->name;
+        if($model->comment){
+            $lines[$ar]['desc'] .= '<br/>'.$model->comment;
+        }
+        $lines[$ar]['unit_price'] = '';
+        $lines[$ar]['ext_price'] = '';
+        if($uid==100){
+            $printer='sri';
+        }
 
-		return $this->render('print/inv',['model'=>$model,'lines'=>$lines,'printer'=>$printer]);
-	}
+        return $this->render('print/inv',['model'=>$model,'lines'=>$lines,'printer'=>$printer,'discountLine'=>$discountLine,'total'=>$total]);
+    }
 
 	/**
 	 * Displays a single AccountInvoice model.
@@ -213,39 +282,6 @@ class AccountInvoiceController extends Controller
 		} else {
 			throw new NotFoundHttpException('The requested page does not exist.');
 		}
-	}
-
-
-	// action print
-	public function actionssPrint($id,$uid=null,$printer="refa"){
-		$this->layout = 'printout';
-		
-		$model = $this->findModel($id);
-
-		$lines = [];
-		foreach($model->accountInvoiceLines as $invLine):
-			$nameLine = $invLine->product->name_template;
-
-			if(trim($invLine->name)):
-				$nameLine .= '<br/>'.nl2br($invLine->name);
-			endif;
-
-			$nameLine .= '<br/>P/N : '.$invLine->product->default_code;
-			$lines[] = [
-				'no'=>$invLine->sequence,
-				'name'=>$nameLine,
-				'price_subtotal'=>$invLine->price_subtotal,
-			];
-		endforeach;
-		// print_r($lines);
-		if($model->currency->name=='IDR' and $model->currency->id==13)
-		{
-			// if Rupiah
-			return $this->render('print/fp_rp',['model'=>$model,'lines'=>$lines,'uid'=>$uid,'printer'=>$printer]);
-		}else{
-			return $this->render('print/fp_valas',['model'=>$model,'lines'=>$lines,'uid'=>$uid,'printer'=>$printer]);
-		}
-		
 	}
 
 
