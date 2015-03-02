@@ -348,7 +348,7 @@ class MovesController extends Controller
 				
 				$no = $line->no;
 				$qty = $line->qty.' '.$line->uom->name;
-				$desc = $line->product->name_template;
+				$desc = $line->product->name_template.'<br/>'.$line->desc;
 				$code = $line->product->default_code;
 
 
