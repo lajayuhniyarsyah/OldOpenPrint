@@ -13,9 +13,29 @@ if($charts && $charts['pie']):
 					'events'=>[
 						'drilldown'=>new \yii\web\JsExpression('function(e){
 							chart.setTitle({text: "'.$pie['drillDownTitle'].'"});
-							console.log(e.points);
-						}')
-					]
+							console.log("'.$pie['drillDownTitle'].'");
+							console.log(e.point.condition);
+							chart.showLoading(\'Please Wait...\');
+							jQuery.get("'.\yii\helpers\Url::to(['sales-activity/get-drill-down']).'",jQuery.parseJSON(e.point.condition),function(data){
+								chart.addSeriesAsDrilldown(e.point,jQuery.parseJSON(data));
+								chart.hideLoading();
+							});
+							/*chart.addSeriesAsDrilldown(e.point,{
+								name:"Drilled Drill",
+								type:"pie",
+								data:[
+									["Point 1",100],
+									["Point 2",80],
+									["Point 3",10],
+								]
+							});*/
+							
+						}'),
+						'drillup'=>new \yii\web\JsExpression('function(e){
+							chart.setTitle({text: "'.$pie['title'].'"});
+						}'),
+					],
+
 				],
 				'plotOptions'=>[
 					'pie'=>[

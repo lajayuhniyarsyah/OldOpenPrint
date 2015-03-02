@@ -6,6 +6,8 @@ use Yii;
 use app\models\SalesActivity;
 use app\models\SalesActivitySearch;
 use app\models\SalesActivityPlan;
+use app\models\ResUsers;
+use app\models\ResPartner;
 
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -71,11 +73,13 @@ class SalesActivityController extends Controller
 
 		$plan = SalesActivityPlan::find();
 		$pieType = 'customer';
+		$salesName = "All Sales Man";
 		if ($salesActivityForm->load(Yii::$app->request->get()) && $salesActivityForm->validate())
 		{
 
 			$uid=$salesActivityForm->sales;
 			if($uid){
+				$salesName = ResUsers::findOne($uid)->partner->name;
 				$plan->where('sales_activity_plan.user_id = :uid')
 					->addParams([':uid'=>$uid]);
 				$pieType = 'customer';
@@ -85,7 +89,7 @@ class SalesActivityController extends Controller
 			if($salesActivityForm->customer){
 				$plan->andWhere('(sales_activity_plan.partner_id = :partner OR sales_activity_plan.actual_partner_id = :partner)')->addParams([':partner'=>$salesActivityForm->customer]);
 				$pieType='sales';
-				
+				$custName = ResPartner::findOne($salesActivityForm->customer)->name;
 			}
 			$start=$salesActivityForm->date_begin;
 		}
@@ -108,9 +112,10 @@ class SalesActivityController extends Controller
 		if($pieType && $pieType=='customer')
 		{
 			$chartData = $this->getCustomerActivityCompositionByUser($uid);
+			// var_dump($chartData);
 			$series = $chartData['series'];
 			$pies[] = [
-				'title'=>'User Visit Activity',
+				'title'=>'Customer Visit Activity By '.$salesName,
 				'series'=>$chartData['series'],
 				'drillDown'=>$chartData['drillDown'],
 				'drillDownTitle'=>'Customer Visit Activity',
@@ -119,11 +124,13 @@ class SalesActivityController extends Controller
 		elseif($pieType && $pieType='sales')
 		{
 			$series = $this->getCustomerActivityCompositionByCustomer($salesActivityForm->customer);
-			
 			$pies[] = [
-				'title'=>'Customer Visit Activity',
+				'title'=>'Relationship Activities On '.$custName,
 				'series'=>$series,
+				'drillDownTitle'=>'User Visit Activity On '.ResPartner::findOne($salesActivityForm->customer)->name,
+				'drillDown'=>[],
 			];
+			// var_dump($series);
 		}
 		else
 		{
@@ -148,24 +155,29 @@ class SalesActivityController extends Controller
 		$plan = SalesActivityPlan::find();
 		$plan->select('sales_activity_plan.actual_partner_id, res_partner.name, count(actual_partner_id) as cout')
 			->groupBy(['sales_activity_plan.actual_partner_id','res_partner.name'])
-			->leftJoin(\app\models\ResPartner::tableName(),'res_partner.id=actual_partner_id')
-			->where('sales_activity_plan.user_id = :uid')
+			->leftJoin(ResPartner::tableName(),'res_partner.id=actual_partner_id');
+		if($uid){
+			$plan->where('sales_activity_plan.user_id = :uid')
 			->addParams([':uid'=>$uid]);
+		}
 		$series = [];
 		$drillDownData = [];
+		$drillDown = [];
 		foreach($plan->createCommand()->queryAll() as $idx=>$act){
 			$series[$idx] = [
+				'id'=>$act['actual_partner_id'],
 				'name'=>$act['name'],
+				'condition'=>\yii\Helpers\Json::encode(['pid'=>floatval($act['actual_partner_id']),'uid'=>floatval($uid),'custName'=>$act['name']]),
 				'y'=>floatval($act['cout']),
-				'drilldown'=>'drill'.$idx,
+				'drilldown'=>true,
 			];
 			
-			$drillDownData = $this->getCustomerActivityCompositionByCustomer($act['actual_partner_id']);
+			/*$drillDownData = $this->getCustomerActivityCompositionByCustomer($act['actual_partner_id']);
 			$drillDown[] = [
 				'id'=>'drill'.$idx,
 				'type'=>'pie',
 				'data'=>$drillDownData
-			];
+			];*/
 
 
 		}
@@ -174,6 +186,29 @@ class SalesActivityController extends Controller
 			'drillDown'=>$drillDown
 		];
 		return $chartData;
+	}
+
+	public function actionGetDrillDown($uid,$pid=null,$custName=null){
+		\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+		if($pid){
+			
+			$res = [
+				'name'=>"Sales Man Activity in ".$custName,
+				'type'=>'pie',
+				'data'=>$this->getCustomerActivityCompositionByCustomer($pid)
+			];
+		}else{
+			// if pid is null
+			// get by user
+			
+			$res = [
+				'name'=>"Customer Activity Composition For ",
+				'type'=>'pie',
+				'data'=>$this->getCustomerActivityCompositionByUser($uid)
+			];
+		}
+		return \yii\helpers\Json::encode($res);
+
 	}
 
 	/**
@@ -186,8 +221,8 @@ class SalesActivityController extends Controller
 	{
 		$plan = SalesActivityPlan::find();
 		$plan->select('res_partner.name, count(sales_activity_plan.user_id) as cout')
-			->leftJoin(\app\models\ResUsers::tableName(),'res_users.id=sales_activity_plan.user_id')
-			->leftJoin(\app\models\ResPartner::tableName(),'res_partner.id=res_users.partner_id')
+			->leftJoin(ResUsers::tableName(),'res_users.id=sales_activity_plan.user_id')
+			->leftJoin(ResPartner::tableName(),'res_partner.id=res_users.partner_id')
 			->where('sales_activity_plan.actual_partner_id = :actual_partner_id')
 			->addParams([':actual_partner_id'=>$partner_id])
 			->groupBy(['res_partner.name']);
