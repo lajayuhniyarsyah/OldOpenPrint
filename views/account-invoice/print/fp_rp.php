@@ -138,7 +138,9 @@ use yii\helpers\Url;
 								<div style="margin-bottom:2mm;" contenteditable="true">
 									
 									<?php
-										$expPartnerName = explode(',',$model->partner->name );
+										$prtName = (isset($model->partner->parent) ? $model->partner->parent->name:$model->partner->name);
+                                        $expPartnerName = explode(',',$prtName );
+										// $expPartnerName = explode(',',$model->partner->name );
 										if(is_array($expPartnerName) && isset($expPartnerName[1])){
 											$partnerName = $expPartnerName[1].'.'.$expPartnerName[0];
 										}else{

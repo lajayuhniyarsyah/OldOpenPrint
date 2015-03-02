@@ -64,7 +64,9 @@ use yii\helpers\Url;
 
 	.containerLines{
 		min-height: 117mm;
-		max-height: 117mm;
+		overflow: hidden;
+		/*max-height: 117mm;*/
+		/*height: 117mm;*/
 		background: lime;
 		font-size: 11pt;
 		/*border-bottom: 1px solid black;*/
@@ -155,14 +157,15 @@ use yii\helpers\Url;
 		width: 24mm;
 	}
 	.td3{
-		width: 85mm;
+		width: 82mm;
 	}
 	.td4{
 		/*width:36mm;*/
-		width: 31mm;
+		width: 120px;
 	}
 	.td5{
 		width: 120px;
+		padding-left: 11px;
 	}
 
 	.invFootNotes{
@@ -207,11 +210,24 @@ use yii\helpers\Url;
 	}
 
 	<?php
+
+	
 	if($printer=='sri'):
 		echo '.headers{padding-top:56mm;height: 32mm;}.kwNo{line-height: 2mm;}.terb{padding-top: 11mm;line-height: 35px;}';
 	endif;
 	?>
 </style>
+<?php
+
+$formated = function($value) use ($model){
+		if($model->currency_id==13){
+			return Yii::$app->numericLib->indoStyle(floatval($value));
+		}else{
+			return Yii::$app->numericLib->westStyle(floatval($value));
+		}
+	};
+
+?>
 <div class="choosePrinter">
 	<form method="get" id="formSelectPrinter">
 			<input type="hidden" value="<?=Url::to('account-invoice/print-invoice')?>" name="r" />
@@ -229,7 +245,8 @@ use yii\helpers\Url;
 			<div class="leftInfo">
 				<div class="partnerName" contenteditable="true">
 					<?php
-						$expPartnerName = explode(',',$model->partner->name );
+						$prtName = (isset($model->partner->parent) ? $model->partner->parent->name:$model->partner->name);
+						$expPartnerName = explode(',',$prtName );
 						if(is_array($expPartnerName) && isset($expPartnerName[1])){
 							$partnerName = $expPartnerName[1].'.'.$expPartnerName[0];
 						}else{
@@ -250,22 +267,24 @@ use yii\helpers\Url;
 			</div>
 			<div class="clear">&nbsp;</div>
 		</div>
-		<div class="containerLines">
-			<table class="contentLines">
-				<!-- <tr></tr> -->
-			</table>
+		<div class="superContain" style="max-height:117mm;">
+			<div class="containerLines">
+				<table class="contentLines">
+					<!-- <tr></tr> -->
+				</table>
+			</div>
 		</div>
 		<div class="footers">
 			<div class="amounts">
-				<div class="amLine1 am"><?='<div class="currSymbol">'.$model->currency->name.'</div><div class="amountNumber">'.Yii::$app->numericLib->indoStyle($model->amount_untaxed).'</div><div class="clear"></div>'?></div>
+				<div class="amLine1 am"><?='<div class="currSymbol">'.$model->currency->name.'</div><div class="amountNumber">'.$formated($total).'</div><div class="clear"></div>'?></div>
 				<div class="amLine2 am">
-					<div class="am2Words" contenteditable="true">&nbsp;</div>
-					<div class="kursAm2" contenteditable="true">&nbsp;</div>
-					<div class="valAm2" contenteditable="true">&nbsp;</div>
+					<div class="am2Words" contenteditable="true"><?=$discountLine['desc']?></div>
+					<div class="kursAm2" contenteditable="true"><?=$discountLine['currCode']?></div>
+					<div class="valAm2" contenteditable="true"><?=($discountLine['amount'] !='' ? $formated(-$discountLine['amount']):null)?></div>
 				</div>
-				<div class="amLine3 am"><?='<div class="currSymbol">'.$model->currency->name.'</div><div class="amountNumber">'.Yii::$app->numericLib->indoStyle($model->amount_untaxed).'</div><div class="clear"></div>'?></div>
-				<div class="amLine4 am"><?='<div class="currSymbol">'.$model->currency->name.'</div><div class="amountNumber">'.Yii::$app->numericLib->indoStyle($model->amount_tax).'</div><div class="clear"></div>'?></div>
-				<div class="amLine5 am"><?='<div class="currSymbol">'.$model->currency->name.'</div><div class="amountNumber">'.Yii::$app->numericLib->indoStyle($model->amount_total).'</div><div class="clear"></div>'?></div>
+				<div class="amLine3 am"><?='<div class="currSymbol">'.$model->currency->name.'</div><div class="amountNumber">'.$formated($model->amount_untaxed).'</div><div class="clear"></div>'?></div>
+				<div class="amLine4 am"><?='<div class="currSymbol">'.$model->currency->name.'</div><div class="amountNumber">'.$formated($model->amount_tax).'</div><div class="clear"></div>'?></div>
+				<div class="amLine5 am"><?='<div class="currSymbol">'.$model->currency->name.'</div><div class="amountNumber">'.$formated($model->amount_total).'</div><div class="clear"></div>'?></div>
 			</div>
 			<div class="notes">
 				<div class="terb" contenteditable="true">
@@ -275,21 +294,30 @@ use yii\helpers\Url;
 						case 'USD':
 							# code...
 							$preCur = '# United State Dollar ';
+							$subCur = "#";
 							break;
 						case 'SGD':
 							$preCur = '# Singapore Dollar ';
+							$subCur = "#";
 							break;
 						case 'EUR':
 							$preCur = '# EURO';
+							$subCur = "#";
+							break;
+						case 'IDR':
+							$preCur = '#';
+							$subCur = " Rupiah#";
 							break;
 						default:
 							# code...
 							$preCur='#';
+							$subCur = "#";
 							break;
 					}
 					echo $preCur;
 					?>
 					<?=ucwords(Yii::$app->numericLib->convertToWords($model->amount_total,$model->currency->name))?>
+					<?=$subCur?>
 
 				</div>
 				<div class="dueDate"><?=(isset($model->paymentTerm->name) ? $model->paymentTerm->name:"")?></div>
