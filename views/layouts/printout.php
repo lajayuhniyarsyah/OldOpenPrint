@@ -44,10 +44,10 @@ use app\assets\AppAsset;
                 width: 100%;
                 height: 100%;
             }
+            .hidden{
+                display: none;
+            }
 
-        }
-        .hidden{
-            display: none;
         }
         @media print{
             .hideOnPrint{
