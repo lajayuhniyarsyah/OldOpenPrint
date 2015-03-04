@@ -172,8 +172,11 @@ class AccountInvoiceController extends Controller
                 return Yii::$app->numericLib->westStyle(floatval($value));
             }
         };
+
+        $tes = 1;
         foreach($model->accountInvoiceLines as $k=>$line):
             if($line->account_id<>192){
+            	
                 $ar = $k;
                 $lines[$k]['no'] = $line->sequence;
                 $lines[$k]['qty'] = $line->quantity.(isset($line->uos->name) ? ' '.$line->uos->name:null);
