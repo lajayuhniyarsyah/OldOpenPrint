@@ -162,7 +162,12 @@ use yii\helpers\Url;
                         </td>
                     </tr>
                     <tr>
-                        <?php $maxHeight = '105mm'; ?>
+                        <?php
+                            $maxHeight = '103mm'; 
+                            if($printer=='sri'){
+                                $maxHeight = '105mm';
+                            }
+                        ?>
                         <td class="tdLines" style="height:<?=$maxHeight?>;vertical-align:top;">
                             <div class="contentArea">
                                 <table class="contentLines" style="width:100%;margin-top:18mm;">
@@ -294,7 +299,7 @@ $this->registerJs('
 
     function prepareRow(rowNo,data)
     {
-        return "<tr class=\'cRows rows"+rowNo+"\'><td style=\"width:6%;\">"+data.no+"</td><td contenteditable=\"true\" style=\"width:56%;padding-right:10px;\">"+data.name+"</td><td><div style=\"float:left;width:13mm;\">"+rateSymbol+"</div><div>"+data.price_subtotal+"</div><div style=\"clear:both;\"></div></td><td>&nbsp;</td></tr>";
+        return "<tr class=\'cRows rows"+rowNo+"\'><td style=\"width:6%;\">"+data.no+"</td><td contenteditable=\"true\" style=\"width:56%;padding-right:10px;\">"+data.name+"</td><td><div style=\"float:left;width:13mm;\">"+rateSymbol+"</div><div style=\"width:106px;text-align:right;\">"+data.price_subtotal+"</div><div style=\"clear:both;\"></div></td><td>&nbsp;</td></tr>";
     }
 
     function prepareNoteRow(rowNo,data)

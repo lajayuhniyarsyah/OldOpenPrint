@@ -214,6 +214,37 @@ use yii\helpers\Url;
 	
 	if($printer=='sri'){
 		echo '.headers{padding-top:56mm;height: 32mm;}.kwNo{line-height: 2mm;}.terb{padding-top: 11mm;line-height: 35px;}';
+	}elseif($printer=='refa'){
+		?>
+		.td1{
+			width: 6mm;
+		}
+		.td2{
+			width: 24mm;
+		}
+		.td3{
+			width: 315px;
+		}
+		.td4{
+			/*width:36mm;*/
+			width: 120px;
+		}
+		.td5{
+			width: 120px;
+			padding-left: 11px;
+		}
+		.dateInv{
+			height: 10mm;
+			line-height: 32px;
+		}
+		.footers{
+			padding-top: 9px;
+		}
+		.terb {
+		    padding-top: 11mm;
+		    line-height: 35px;
+		}
+		<?php
 	}
 	?>
 </style>
@@ -462,6 +493,19 @@ jQuery('#container').on('click','.btnPasteAfter',function(e){
 	console.log("inserting after "+roNo);
 	currIndex = currIndex+1;
 	jQuery('<tr class="cRows rows'+currIndex+'"></tr>'+trCopy+"</tr>").insertAfter('tr.rows'+roNo);
+	console.log(jQuery('tr.rows'+currIndex+' .btnCutRow').attr('class'));
+	trCopy = "";
+	trCopyIdx = "";
+	jQuery('.btnPaste').hide();
+	return false;
+});
+
+jQuery('#container').on('click','.btnPasteBefore',function(e){
+	e.preventDefault();
+	var roNo = jQuery(this).attr('data');
+	console.log("inserting before "+roNo);
+	currIndex = currIndex+1;
+	jQuery('<tr class="cRows rows'+currIndex+'"></tr>'+trCopy+"</tr>").insertBefore('tr.rows'+roNo);
 	console.log(jQuery('tr.rows'+currIndex+' .btnCutRow').attr('class'));
 	trCopy = "";
 	trCopyIdx = "";
