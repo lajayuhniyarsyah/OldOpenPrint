@@ -19,6 +19,7 @@ AppAsset::register($this);
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <?= Html::csrfMetaTags() ?>
     <title>Open ERP Report</title>
+    <link rel="shortcut icon" href="<?php echo Yii::$app->request->baseUrl; ?>/favicon.ico" type="image/x-icon" />
     <?php $this->head() ?>
 </head>
 <body>
@@ -47,7 +48,18 @@ AppAsset::register($this);
                                 ]
                         ],
                         ['label' => 'Admin', 'url' => ['/site/contact']],
-                        ['label' => 'Accounting', 'url' => ['/site/contact']],
+                        ['label' => 'Accounting', 'url' => ['#'],
+                            'items' => [
+                                  ['label' => 'Report Transaksi Per Account', 'url' =>['/report-accounting/reportaccount']],
+                                  ['label' => 'Report Jurnal AR', 'url' => ['/report-accounting/jurnalar']],
+                                  ['label' => 'Report Aging AR Summary', 'url' => ['/report-accounting/arsummary']],
+                                  ['label' => 'Report Aging AR Detail', 'url' =>['/report-accounting/ardetail']],
+                                  ['label' => 'Report Jurnal AP', 'url' => ['/report-accounting/jurnalap']],
+                                  ['label' => 'Report Aging AP summary', 'url' => ['/report-accounting/apsummary']],
+                                  ['label' => 'Report Aging AP Detail', 'url' => ['/report-accounting/apdetail']],
+                                  ['label' => 'Report Jurnal pengeluaran', 'url' => ['/report-accounting/jurnalpengeluaran']],
+                                ]
+                        ],
                         ['label' => 'Purchases', 'url' => ['/site/contact']],
                         ['label' => 'Warehouse', 'url' => ['/site/contact']],
                         ['label' => 'Manufacturing', 'url' => ['/site/contact']],

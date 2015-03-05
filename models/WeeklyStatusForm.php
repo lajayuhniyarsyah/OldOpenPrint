@@ -8,14 +8,12 @@ use yii\base\Model;
 /**
  * ContactForm is the model behind the contact form.
  */
-class SalesActivityForm extends Model
+class WeeklyStatusForm extends Model
 {
     public $sales;
     public $customer;
-    public $from;
-    public $to;
-    public $type;
-
+    public $status;
+    public $productgroup;
     /**
      * @return array the validation rules.
      */
@@ -24,7 +22,7 @@ class SalesActivityForm extends Model
         return [
             // name, email, subject and body are required
             // [['sales', 'customer'], 'required'],
-            [['sales', 'customer','from','to'], 'safe'],
+            [['sales', 'customer','status','productgroup'], 'safe'],
             // email has to be a valid email address
             // ['email', 'email'],
             
@@ -39,8 +37,8 @@ class SalesActivityForm extends Model
         return [
             'sales' => 'Sales',
             'customer'=>'Customer',
-            'from'=>'Date',
-            'to'=>'to'
+            'status'=>'Status',
+            'productgroup'=>'Product Group'
         ];
     }
 

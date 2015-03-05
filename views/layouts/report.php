@@ -19,6 +19,7 @@ use app\assets\AppAsset;
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <?= Html::csrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
+    <link rel="shortcut icon" href="<?php echo Yii::$app->request->baseUrl; ?>/favicon.ico" type="image/x-icon" />
     <?php $this->head() ?>
 </head>
 <style type="text/css">
@@ -155,6 +156,22 @@ use app\assets\AppAsset;
         filter:progid:DXImageTransform.Microsoft.gradient(startColorstr="#cccccc", endColorstr="#b2b2b2");  background: -o-linear-gradient(top,#cccccc,b2b2b2);
 
         background-color:#cccccc;
+    }
+    .grandtotal{
+        -moz-border-bottom-colors: none;
+        -moz-border-left-colors: none;
+        -moz-border-right-colors: none;
+        -moz-border-top-colors: none;
+        background: -moz-linear-gradient(center top , #cccccc 5%, #b2b2b2 100%) repeat scroll 0 0 #cccccc;
+        border-color: #666464;
+        border-image: none;
+        border-style: solid;
+        border-width: 0 0 1px 1px;
+        color: #000000;
+        font-family: Arial;
+        font-size: 14px;
+        font-weight: bold;
+        line-height: 35px;
     }
 </style>
 <body>
