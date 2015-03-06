@@ -161,20 +161,20 @@ class NumericLib extends Component{
 	public function indoStyle($numeric,$decimalDigit=2,$thousandSep='.',$decimalSep=','){
 		$formatted = number_format(floatval($numeric),$decimalDigit,$decimalSep,$thousandSep);
 		$exp = explode($decimalSep, $formatted);
-		if($exp[1]=='00'){
-			$formatted = trim($exp[0]).',-&nbsp;';
+		if(isset($exp[1] && $exp[1]=='00'){
+			$formatted = trim($exp[0]);
 		}
 		return $formatted;
 	}
 
 	public function westStyle($numeric,$decimalDigit=2,$thousandSep=',',$decimalSep='.',$showPointZero=false){
 		$formatted = number_format(floatval($numeric),$decimalDigit,$decimalSep,$thousandSep);
-		if(!$showPointZero){
+		/*if(!$showPointZero){
 			$exp = explode($decimalSep, $formatted);
 			if($exp[1]=='00'){
 				$formatted = trim($exp[0]).'.-&nbsp;&nbsp;';
 			}
-		}
+		}*/
 		
 		return $formatted;
 	}
