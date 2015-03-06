@@ -161,7 +161,7 @@ class NumericLib extends Component{
 	public function indoStyle($numeric,$decimalDigit=2,$thousandSep='.',$decimalSep=','){
 		$formatted = number_format(floatval($numeric),$decimalDigit,$decimalSep,$thousandSep);
 		$exp = explode($decimalSep, $formatted);
-		if(isset($exp[1] && $exp[1]=='00'){
+		if(isset($exp[1]) && $exp[1]=='00'){
 			$formatted = trim($exp[0]);
 		}
 		return $formatted;
