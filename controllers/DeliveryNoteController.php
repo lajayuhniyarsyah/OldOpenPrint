@@ -132,7 +132,7 @@ class DeliveryNoteController extends Controller
         $sets = [];
         
         $prepLines = $this->prepareLineData($model->deliveryNoteLines);
-        
+        // var_dump($prepLines);
         $linesData = $this->renderLinesPrint($prepLines);
         if(!$test):
             return $this->render('print/dn_batch',['model'=>$model,'linesData'=>$linesData]);
@@ -189,7 +189,8 @@ class DeliveryNoteController extends Controller
         // var_dump($preparedLines);
         foreach($preparedLines as $k=>$l):
             $res[$k]=[
-                'qty'=>'<div style="float:left;width:10mm;">'.($l['no'] ? $l['no']:'&nbsp;').'</div><div>'.floatval($l['qty']).' '.$l['uom'].'</div><div style="clear:both;"></div>',
+                'qty'=>'<div style="float:left;width:10mm;">'.($l['no'] ? $l['no']:'&nbsp;').'</div>
+                    <div>'.floatval($l['qty']).' '.$l['uom'].'</div><div style="clear:both;"></div>',
                 
                 'part_no'=>$l['part_no']
             ];
@@ -256,10 +257,11 @@ class DeliveryNoteController extends Controller
                 else
                 {
                     // init to be printed
-                    
+                    // TOP LEVEL PRINTED
                     $res[$moveDest->id] = [
                         'no'=>$line->no,
                         'qty'=>$moveDest->product_qty,
+                        // 'qty'=>$line->product_qty,
                         'uom'=>$moveDest->productUom->name,
                         'name'=>($moveDest->desc ? nl2br($moveDest->desc):nl2br($moveDest->name)),
                         'name2'=>$moveDest->name,
@@ -269,6 +271,13 @@ class DeliveryNoteController extends Controller
                         ],
                         'part_no'=>$moveDest->product->default_code,
                     ];
+                    // CHECK SET QTY
+                    if($moveDest->product->mrpBoms){
+                        $bomId = $moveDest->product->mrpBoms[0]->id;
+                        $bomObj = \app\models\MrpBom::find()->where('product_id=:prodId AND bom_id = :bomId')
+                            ->addParams([':prodId'=>$line->product_id,':bomId'=>$bomId])->one();
+                            $res[$moveDest->id]['qty'] = $line->product_qty/$bomObj->product_qty;
+                    }
 
                    
 
