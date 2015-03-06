@@ -64,7 +64,9 @@ use yii\helpers\Url;
 
 	.containerLines{
 		min-height: 117mm;
-		max-height: 117mm;
+		overflow: hidden;
+		/*max-height: 117mm;*/
+		/*height: 117mm;*/
 		background: lime;
 		font-size: 11pt;
 		/*border-bottom: 1px solid black;*/
@@ -155,14 +157,15 @@ use yii\helpers\Url;
 		width: 24mm;
 	}
 	.td3{
-		width: 85mm;
+		width: 82mm;
 	}
 	.td4{
 		/*width:36mm;*/
-		width: 31mm;
+		width: 120px;
 	}
 	.td5{
 		width: 120px;
+		padding-left: 11px;
 	}
 
 	.invFootNotes{
@@ -207,11 +210,55 @@ use yii\helpers\Url;
 	}
 
 	<?php
-	if($printer=='sri'):
+
+	
+	if($printer=='sri'){
 		echo '.headers{padding-top:56mm;height: 32mm;}.kwNo{line-height: 2mm;}.terb{padding-top: 11mm;line-height: 35px;}';
-	endif;
+	}elseif($printer=='refa'){
+		?>
+		.td1{
+			width: 6mm;
+		}
+		.td2{
+			width: 24mm;
+		}
+		.td3{
+			width: 315px;
+		}
+		.td4{
+			/*width:36mm;*/
+			width: 120px;
+		}
+		.td5{
+			width: 120px;
+			padding-left: 11px;
+		}
+		.dateInv{
+			height: 10mm;
+			line-height: 32px;
+		}
+		.footers{
+			padding-top: 9px;
+		}
+		.terb {
+		    padding-top: 11mm;
+		    line-height: 35px;
+		}
+		<?php
+	}
 	?>
 </style>
+<?php
+
+$formated = function($value) use ($model){
+		if($model->currency_id==13){
+			return Yii::$app->numericLib->indoStyle(floatval($value));
+		}else{
+			return Yii::$app->numericLib->westStyle(floatval($value));
+		}
+	};
+
+?>
 <div class="choosePrinter">
 	<form method="get" id="formSelectPrinter">
 			<input type="hidden" value="<?=Url::to('account-invoice/print-invoice')?>" name="r" />
@@ -229,7 +276,8 @@ use yii\helpers\Url;
 			<div class="leftInfo">
 				<div class="partnerName" contenteditable="true">
 					<?php
-						$expPartnerName = explode(',',$model->partner->name );
+						$prtName = (isset($model->partner->parent) ? $model->partner->parent->name:$model->partner->name);
+						$expPartnerName = explode(',',$prtName );
 						if(is_array($expPartnerName) && isset($expPartnerName[1])){
 							$partnerName = $expPartnerName[1].'.'.$expPartnerName[0];
 						}else{
@@ -250,22 +298,24 @@ use yii\helpers\Url;
 			</div>
 			<div class="clear">&nbsp;</div>
 		</div>
-		<div class="containerLines">
-			<table class="contentLines">
-				<!-- <tr></tr> -->
-			</table>
+		<div class="superContain" style="max-height:117mm;">
+			<div class="containerLines">
+				<table class="contentLines">
+					<!-- <tr></tr> -->
+				</table>
+			</div>
 		</div>
 		<div class="footers">
 			<div class="amounts">
-				<div class="amLine1 am"><?='<div class="currSymbol">'.$model->currency->name.'</div><div class="amountNumber">'.Yii::$app->numericLib->indoStyle($model->amount_untaxed).'</div><div class="clear"></div>'?></div>
+				<div class="amLine1 am"><?='<div class="currSymbol">'.$model->currency->name.'</div><div class="amountNumber">'.$formated($total).'</div><div class="clear"></div>'?></div>
 				<div class="amLine2 am">
-					<div class="am2Words" contenteditable="true">&nbsp;</div>
-					<div class="kursAm2" contenteditable="true">&nbsp;</div>
-					<div class="valAm2" contenteditable="true">&nbsp;</div>
+					<div class="am2Words" contenteditable="true"><?=$discountLine['desc']?></div>
+					<div class="kursAm2" contenteditable="true"><?=$discountLine['currCode']?></div>
+					<div class="valAm2" contenteditable="true"><?=($discountLine['amount'] !='' ? $formated(-$discountLine['amount']):null)?></div>
 				</div>
-				<div class="amLine3 am"><?='<div class="currSymbol">'.$model->currency->name.'</div><div class="amountNumber">'.Yii::$app->numericLib->indoStyle($model->amount_untaxed).'</div><div class="clear"></div>'?></div>
-				<div class="amLine4 am"><?='<div class="currSymbol">'.$model->currency->name.'</div><div class="amountNumber">'.Yii::$app->numericLib->indoStyle($model->amount_tax).'</div><div class="clear"></div>'?></div>
-				<div class="amLine5 am"><?='<div class="currSymbol">'.$model->currency->name.'</div><div class="amountNumber">'.Yii::$app->numericLib->indoStyle($model->amount_total).'</div><div class="clear"></div>'?></div>
+				<div class="amLine3 am"><?='<div class="currSymbol">'.$model->currency->name.'</div><div class="amountNumber">'.$formated($model->amount_untaxed).'</div><div class="clear"></div>'?></div>
+				<div class="amLine4 am"><?='<div class="currSymbol">'.$model->currency->name.'</div><div class="amountNumber">'.$formated($model->amount_tax).'</div><div class="clear"></div>'?></div>
+				<div class="amLine5 am"><?='<div class="currSymbol">'.$model->currency->name.'</div><div class="amountNumber">'.$formated($model->amount_total).'</div><div class="clear"></div>'?></div>
 			</div>
 			<div class="notes">
 				<div class="terb" contenteditable="true">
@@ -275,21 +325,30 @@ use yii\helpers\Url;
 						case 'USD':
 							# code...
 							$preCur = '# United State Dollar ';
+							$subCur = "#";
 							break;
 						case 'SGD':
 							$preCur = '# Singapore Dollar ';
+							$subCur = "#";
 							break;
 						case 'EUR':
 							$preCur = '# EURO';
+							$subCur = "#";
+							break;
+						case 'IDR':
+							$preCur = '#';
+							$subCur = " Rupiah#";
 							break;
 						default:
 							# code...
 							$preCur='#';
+							$subCur = "#";
 							break;
 					}
 					echo $preCur;
 					?>
 					<?=ucwords(Yii::$app->numericLib->convertToWords($model->amount_total,$model->currency->name))?>
+					<?=$subCur?>
 
 				</div>
 				<div class="dueDate"><?=(isset($model->paymentTerm->name) ? $model->paymentTerm->name:"")?></div>
@@ -381,6 +440,78 @@ jQuery.each(lines,function(key,line){
 	currRow=currRow+1;
 });
 // end loop
+var currIndex = 0;
+function refreshActButton(currIndex){
+	jQuery('.btnActLine').remove();
+	jQuery('.td5').each(function(ro,v){
+		jQuery(this).append('<div class="btnActLine hideOnPrint" style="margin-left: 150px;position: absolute;"><a href="#" class="btnCutRow" data="'+ro+'">Cut</a><a href="#" data="'+ro+'" class="btnPaste btnPasteBefore hidden"> | Paste Before</a><a href="#" class="btnPaste btnPasteAfter hidden" data="'+ro+'"> | Paste After</a></div>');
+		currIndex = currIndex+1;
+		return currIndex;
+	});
+}
+
+currIndex = refreshActButton();
+
+var trCopy = "";
+var trCopyIdx;
+/*jQuery('.btnCutRow').click(function(){
+	trCopy = jQuery(this).parents("tr").html();
+	trCopyIdx = jQuery(this).attr('data');
+	console.log(trCopy);
+	jQuery('.btnPaste').show();
+	return false;
+});
+
+jQuery('.btnPasteAfter').click(function(){
+	var roNo = jQuery(this).attr('data');
+	jQuery("<tr>"+trCopy+"</tr>").insertAfter('tr:eq('+roNo+')');
+	jQuery("tr:eq("+trCopyIdx+")").remove();
+	trCopy = "";
+	trCopyIdx = "";
+	jQuery('.btnPaste').hide();
+	return false;
+});*/
+
+jQuery('#container').on('click','.btnCutRow',function(e){
+	e.preventDefault();
+	var target = jQuery(this).parents("tr");
+	jQuery(this).parent().remove();
+	trCopy = target.html();
+	trCopyIdx = jQuery(this).attr('data');
+	console.log("THtml = "+trCopy+". Index = "+trCopyIdx);
+	jQuery('.btnPaste').show();
+	console.log("Removing TR "+trCopyIdx);
+	jQuery("tr.rows"+trCopyIdx).remove();
+	return false;
+});
+
+jQuery('#container').on('click','.btnPasteAfter',function(e){
+	e.preventDefault();
+	var roNo = jQuery(this).attr('data');
+	
+	
+	console.log("inserting after "+roNo);
+	currIndex = currIndex+1;
+	jQuery('<tr class="cRows rows'+currIndex+'"></tr>'+trCopy+"</tr>").insertAfter('tr.rows'+roNo);
+	console.log(jQuery('tr.rows'+currIndex+' .btnCutRow').attr('class'));
+	trCopy = "";
+	trCopyIdx = "";
+	jQuery('.btnPaste').hide();
+	return false;
+});
+
+jQuery('#container').on('click','.btnPasteBefore',function(e){
+	e.preventDefault();
+	var roNo = jQuery(this).attr('data');
+	console.log("inserting before "+roNo);
+	currIndex = currIndex+1;
+	jQuery('<tr class="cRows rows'+currIndex+'"></tr>'+trCopy+"</tr>").insertBefore('tr.rows'+roNo);
+	console.log(jQuery('tr.rows'+currIndex+' .btnCutRow').attr('class'));
+	trCopy = "";
+	trCopyIdx = "";
+	jQuery('.btnPaste').hide();
+	return false;
+});
 EOD;
 unset($jsonLines);
 $this->registerJs($scr);

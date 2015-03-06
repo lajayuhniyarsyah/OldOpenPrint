@@ -49,6 +49,13 @@ $this->params['breadcrumbs'][] = $this->title;
 	<?=GridView::widget([
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
+		'tableOptions'=>[
+			'style'=>'width:1500px;max-width:1500px;'
+		],
+		'pager' => [
+			'firstPageLabel' => 'First',
+			'lastPageLabel' => 'Last',
+		],
 		'rowOptions'=>function($model,$key,$index,$grid){
 			if($model->state=='cancel'){
 				$style = 'color:red';
@@ -150,12 +157,26 @@ $this->params['breadcrumbs'][] = $this->title;
 			// 'invoice_quantity',
 			// 'picking_policy',
 			// 'incoterm',
-			[
+			/*[
 				'attribute'=>'shipped',
 				'format'=>'boolean',
 				'filter'=>[
 					'No','Yes'
 				]
+			],*/
+			[
+				'attribute'=>'amount_total',
+				'value'=>function($model,$key,$index,$column){
+					return Yii::$app->numericLib->indoStyle($model->amount_total);
+				}
+			],
+			[
+				'attribute'=>'pricelist_id',
+				'label'=>'SO Currency',
+				'value'=>function($model,$key,$index,$column){
+					return $model->pricelist->name;
+				},
+				'filter'=>\yii\helpers\ArrayHelper::map(app\models\ProductPricelist::find()->all(),'id','name')
 			],
 			[
 				'label'=>'OP',
@@ -183,19 +204,47 @@ $this->params['breadcrumbs'][] = $this->title;
 				'format'=>'html',
 				'options'=>['width'=>'300']
 			],
-
 			[
 				'label'=>'Invoices',
+				'format'=>'',
 				'value'=>function($model,$key,$index,$column){
-					$res = '';
+					$res = '<ul class="list-group">';
 					foreach($model->invoices as $inv){
-						if($res) $res.='<br/>';
-						$res .= Html::a(Html::encode($inv->name),'http://192.168.9.26:10001/?db=LIVE_2014&id='.$inv->id.'&view_type=form&model=account.invoice&menu_id=220&action=241').' ('.$inv->state.')';
+						// if($res) $res.='<br/>';
+						$val = $inv->currency->name.' '.Yii::$app->formatter->asDecimal($inv->amount_total);
+						$validCurrency = ($model->pricelist->currency_id == $inv->currency_id ? true:false);
+						switch ($validCurrency) {
+							case false:
+								$res .= '<li class="list-group-item">'.
+									Html::a(
+										Html::decode(
+											'<span class="bg-danger">'.$inv->name.' - '.$val.' ('.$inv->state.')</span>'
+										),
+										'http://192.168.9.26:10001/?db=LIVE_2014&id='.
+										$inv->id.
+										'&view_type=form&model=account.invoice&menu_id=220&action=241').
+									'</li>';
+								break;
+							
+							default:
+								$res .= '<li class="list-group-item">'.
+									Html::a(
+										Html::decode(
+											$inv->name.' - '.$val.' ('.$inv->state.')'
+										),
+										'http://192.168.9.26:10001/?db=LIVE_2014&id='.
+										$inv->id.
+										'&view_type=form&model=account.invoice&menu_id=220&action=241').
+									'</li>';
+								break;
+						}
+						
 					}
+					$res .= '<ul>';
 					return $res;
 				},
 				'format'=>'html',
-				'options'=>['width'=>'300']
+				'options'=>['width'=>'400px']
 			],
 			// 'carrier_id',
 			// 'worktype',

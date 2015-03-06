@@ -73,6 +73,7 @@ use Yii;
  */
 class AccountInvoice extends \yii\db\ActiveRecord
 {
+    public $total_rated,$currency_rate;
     /**
      * @inheritdoc
      */
@@ -149,17 +150,45 @@ class AccountInvoice extends \yii\db\ActiveRecord
             'pajak' => 'Kurs Pajak',
             'kurs' => 'Kurs BI',
             'approver' => 'Approved by',
+            'currency_rate'=>'Currency Rate',
+            'total_rated'=>'Subtotal In IDR',
         ];
     }
 
-   /* public function afterFind(){
+   public function afterFind(){
         
-        $this->amount_tax = $this->numberFormat($this->amount_tax);
+        /*$this->amount_tax = $this->numberFormat($this->amount_tax);
         $this->amount_untaxed = $this->numberFormat($this->amount_untaxed);
-        $this->amount_total = $this->numberFormat($this->amount_total);
+        $this->amount_total = $this->numberFormat($this->amount_total);*/
+        $this->setCurrencyRate();
+        $this->setTotalRated();
         return true;
-    }*/
+    }
 
+    private function getCurrencyRate(){
+        $res = 1;
+        if($this->currency_id!=13){
+            // if not RP
+            $q = ResCurrencyRate::find()
+                ->where('currency_id=:currencyId AND name = :dateRate')
+                ->addParams(
+                    [
+                        ':currencyId'=>$this->currency_id,
+                        ':dateRate'=>($this->date_invoice ? $this->date_invoice:$this->create_date)
+                    ]
+                )
+                ->asArray()
+                ->one();
+            $res = $q['rating'];
+        }
+        return $res;
+    }
+    private function setCurrencyRate(){
+        $this->currency_rate=$this->getCurrencyRate();
+    }
+    private function setTotalRated(){
+        $this->total_rated=($this->currency_rate*$this->amount_total);
+    }
     private function numberFormat($val){
         return number_format($val,2,',','.');
     }

@@ -5,12 +5,13 @@ use kartik\widgets\ActiveForm;
 use kartik\widgets\DatePicker;
 use kartik\widgets\Select2;
 use kartik\grid\GridView;
+use yii\web\JsExpression;
 
 use miloschuman\highcharts\Highcharts;
 
 ?>
 <?php
-$this->title = 'Invoice Summary Dashboard';
+$this->title = 'Invoice Released Summary';
 $this->params['breadcrumbs'][] = ['label'=>'Customer Invoice','url'=>['out']];
 $this->params['breadcrumbs'][] = $this->title;
 $form = ActiveForm::begin([
@@ -19,8 +20,7 @@ $form = ActiveForm::begin([
 	'method'=>'get',
 ]);
 ?>
-<?='<label class="control-label">Provinces</label>'?>
-
+<?='<label class="control-label">Search Form</label>'?>
 <?=Select2::widget([
 	'name' => 'sales',
 	'data' => \yii\helpers\ArrayHelper::merge(
@@ -39,11 +39,12 @@ $form = ActiveForm::begin([
 			"group:sls"=>"Group: Sulawesi",
 		]
 	),
+	
 	'value'=>Yii::$app->request->get('sales'),
 	'options' => [
 		'placeholder' => 'Select Sales ...',
 		'multiple' => true,
-	],
+	]
 ]);?>
 <?=DatePicker::widget([
 	'model' => $model,
@@ -76,38 +77,38 @@ if(isset($resGrid) && $resGrid){
 	?>
 	<div class="panel panel-default">
 		<div class="panel-heading">
-			<h3 class="panel-title">Order Received Composition By Sales Man</h3>
+			<h3 class="panel-title">Invoice Released Composition By Sales Man</h3>
 		</div>
 		<div class="panel-body">
 			<?=HighCharts::widget([
-					'options'=>[
-						'title'=>['text'=>'Invoice Released Composition'],
-						
-						'plotOptions'=>[
-							'pie'=>[
-								'allowPointSelect'=>true,
-								'cursor'=>'pointer',
-								'dataLabels'=>[
-									'enabled'=>true,
-									'format'=>'<b>{point.name}</b>: {point.percentage:.1f} %'
-								]
-							]
-						],
-						'series'=>[
-							[
-								'type'=>'pie',
-								'name'=>"Order Receive Composition",
-								"data"=>$pie['series'],
+				'options'=>[
+					'title'=>['text'=>'Invoice Released Composition'],
+					
+					'plotOptions'=>[
+						'pie'=>[
+							'allowPointSelect'=>true,
+							'cursor'=>'pointer',
+							'dataLabels'=>[
+								'enabled'=>true,
+								'format'=>'<b>{point.name}</b>: {point.percentage:.1f} %'
 							]
 						]
+					],
+					'series'=>[
+						[
+							'type'=>'pie',
+							'name'=>"Order Receive Composition",
+							"data"=>$pie['series'],
+						]
 					]
-				])?>
+				]
+			])?>
 		</div>
 	</div>
 
 	<div class="panel panel-default">
 		<div class="panel-heading">
-			<h3 class="panel-title">Summary Invoice Released</h3>
+			<h3 class="panel-title">Summary Invoice Released<?=$title['between']?></h3>
 		</div>
 		<div class="panel-body">
 			<?=GridView::widget([

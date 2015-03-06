@@ -14,7 +14,7 @@ use yii\helpers\Url;
         page-break-after: always;
     }
     .amount{
-        margin-left:62%;
+        margin-left:61%;
     }
     .lineFoot{
         padding-left: 74%;
@@ -52,7 +52,7 @@ use yii\helpers\Url;
         right: 0;
     }
     .wid1{
-        width: 110px;
+        width: 111px;
         padding-right: 10px;
         text-align: right;
     }
@@ -75,6 +75,9 @@ use yii\helpers\Url;
     }
     .partnerName{
         margin-bottom:2mm;padding-top:4px;
+    }
+    .productDescTd{
+        padding-right: 10px;
     }
     <?php
     if($printer=='sri'):
@@ -136,7 +139,8 @@ use yii\helpers\Url;
                             <div class="pbkp">
                                 <div class="partnerName" contenteditable="true">
                                     <?php
-                                        $expPartnerName = explode(',',$model->partner->name );
+                                        $prtName = (isset($model->partner->parent) ? $model->partner->parent->name:$model->partner->name);
+                                        $expPartnerName = explode(',',$prtName );
                                         if(is_array($expPartnerName) && isset($expPartnerName[1])){
                                             $partnerName = $expPartnerName[1].'.'.$expPartnerName[0];
                                         }else{
@@ -158,7 +162,12 @@ use yii\helpers\Url;
                         </td>
                     </tr>
                     <tr>
-                        <?php $maxHeight = '105mm'; ?>
+                        <?php
+                            $maxHeight = '103mm'; 
+                            if($printer=='sri'){
+                                $maxHeight = '105mm';
+                            }
+                        ?>
                         <td class="tdLines" style="height:<?=$maxHeight?>;vertical-align:top;">
                             <div class="contentArea">
                                 <table class="contentLines" style="width:100%;margin-top:18mm;">
@@ -180,9 +189,40 @@ use yii\helpers\Url;
                                         </tr>
                                     </table>
                                 </div>
-                                    <?='<div style="float:left;width:13mm;">'.$model->currency->name.'</div><div class="wid1">'.Yii::$app->numericLib->indoStyle($model->amount_untaxed).'</div><div style="clear:both;"></div>';?>
+                                    <?='<div style="float:left;width:auto;">'.$model->currency->name.'</div><div class="wid1">'.Yii::$app->numericLib->westStyle($total).'</div><div style="clear:both;"></div>';?>
                             </div>
-                            <div style="height:11mm;">&nbsp;</div>
+                            <!-- <div style="height:11mm;">
+                                <div>
+                                    <?=$discount['desc']?>
+                                </div>
+                            </div> -->
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <td>
+                            <div class="amount">
+                                <table style="width:100%;" cellpadding="0" cellspacing="0">
+                                    <tr>
+                                        <td style="width:61%;"><?='<div style="position:absolute;margin-left:-131px;">'.$discount['desc'].'</div><div style="width:auto;float:left;">'.($discount['amount'] != '' ? $model->currency->name:null).'</div><div class="wid1">'.($discount['amount'] != '' ? Yii::$app->numericLib->westStyle(-$discount['amount']):null).'</div>'?></td>
+                                        <td style="text-align:right;">&nbsp;</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- EMPTY -->
+                    <tr>
+                        <td>
+                            <div class="amount">
+                                <table style="width:100%;" cellpadding="0" cellspacing="0">
+                                    <tr>
+                                        <td style="width:61%;height:12px;"></td>
+                                        <td style="text-align:right;"></td>
+                                    </tr>
+                                </table>
+                            </div>
                         </td>
                     </tr>
                     <tr>
@@ -190,8 +230,8 @@ use yii\helpers\Url;
                             <div class="amount">
                                 <table style="width:100%;" cellpadding="0" cellspacing="0">
                                     <tr>
-                                        <td style="width:61%;"><?='<div style="width:13mm;float:left;">'.  $model->currency->name.'</div><div class="wid1">'.Yii::$app->numericLib->indoStyle($model->amount_untaxed).'</div>'?></td>
-                                        <td style="text-align:right;"><?=Yii::$app->numericLib->indoStyle((round($model->amount_untaxed*$model->pajak)))?></td>
+                                        <td style="width:61%;"><?='<div style="width:auto;float:left;">'.  $model->currency->name.'</div><div class="wid1">'.Yii::$app->numericLib->westStyle($model->amount_untaxed).'</div>'?></td>
+                                        <td style="text-align:right;"><?=Yii::$app->numericLib->westStyle((round($model->amount_untaxed*$model->pajak)))?></td>
                                     </tr>
                                 </table>
                             </div>
@@ -200,8 +240,8 @@ use yii\helpers\Url;
                     <tr>
                         <td>
                             <div class="amount" style="margin-top:-3px;">
-                                <div style="width:43mm;float:left;"><?= (isset($model->amount_tax) ? '<div style="float:left;width:13mm;">'.$model->currency->name.'</div><div class="wid1">'.Yii::$app->numericLib->indoStyle($model->amount_tax).'</div><div style="clear:both;"></div>':''); ?></div>
-                                <div style="text-align:right;"><?=Yii::$app->numericLib->indoStyle((round(($model->amount_untaxed*$model->pajak)*0.10)))?></div>
+                                <div style="width:auto;float:left;"><?= (isset($model->amount_tax) ? '<div style="float:left;width:auto;">'.$model->currency->name.'</div><div class="wid1">'.Yii::$app->numericLib->westStyle($model->amount_tax).'</div><div style="clear:both;"></div>':''); ?></div>
+                                <div style="text-align:right;"><?=Yii::$app->numericLib->westStyle((round(($model->amount_untaxed*$model->pajak)*0.10)))?></div>
                                 <div class="clear:both;"></div>
                             </div>
                         </td>
@@ -219,9 +259,9 @@ use yii\helpers\Url;
         </tr>
         <tr>
             <td>
-                <div class="rateInfo" style="margin-top:3mm;">
+                <div class="rateInfo" style="margin-top:8px;">
                     <div>
-                        <div style="width:37mm;float:left;margin-left:29mm;"><?=Yii::$app->numericLib->indoStyle(floatval($model->pajak))?></div><div><?='1 '.$model->currency->name?></div>
+                        <div style="width:37mm;float:left;margin-left:29mm;"><?=Yii::$app->numericLib->westStyle(floatval($model->pajak))?></div><div><?='1 '.$model->currency->name?></div>
                         <div style="clear:both;"></div>
                     </div>
                     <div>
@@ -259,7 +299,7 @@ $this->registerJs('
 
     function prepareRow(rowNo,data)
     {
-        return "<tr class=\'cRows rows"+rowNo+"\'><td style=\"width:6%;\">"+data.no+"</td><td contenteditable=\"true\" style=\"width:56%\">"+data.name+"</td><td><div style=\"float:left;width:13mm;\">"+rateSymbol+"</div><div>"+data.price_subtotal+"</div><div style=\"clear:both;\"></div></td><td>&nbsp;</td></tr>";
+        return "<tr class=\'cRows rows"+rowNo+"\'><td style=\"width:6%;\">"+data.no+"</td><td contenteditable=\"true\" style=\"width:56%;padding-right:10px;\">"+data.name+"</td><td><div style=\"float:left;width:13mm;\">"+rateSymbol+"</div><div style=\"width:106px;text-align:right;\">"+data.price_subtotal+"</div><div style=\"clear:both;\"></div></td><td>&nbsp;</td></tr>";
     }
 
     function prepareNoteRow(rowNo,data)

@@ -119,5 +119,10 @@ class ServiceController extends Controller{
 		}
 		echo \yii\helpers\Json::encode($out);
 	}
+
+
+	public function actionGetPartnerImage($id){
+		$model = \app\models\ResPartner::find($id)->asArray()->one();
+	}
 }
 ?>
