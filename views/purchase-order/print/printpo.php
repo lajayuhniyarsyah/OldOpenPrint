@@ -293,11 +293,15 @@ use yii\helpers\Url;
 				}else{
 					$diskon=$diskon+$value->discount_nominal;
 				}
-
+				if($value->variants==false){
+					$desc=nl2br($value->name);
+				}else{
+					$desc=$value->variants0->name;
+				}
 				$subtotal=$subtotal+($value->price_unit*$value->product_qty);
 				$data2[]=array(
 								$no,
-								nl2br($value->name),
+								$desc,
 								$pn,
 								$value->product_qty,
 								$value->productUom->name,
