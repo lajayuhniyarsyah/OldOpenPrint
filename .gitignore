@@ -11,3 +11,5 @@ config/*
 config/db.php
 /web/js/ckeditor/*
 *.lock
+config/web.php
+composer.lock
