@@ -5,8 +5,10 @@ namespace app\models;
 use Yii;
 
 /**
- * This is the model class for table "executive_summary_sales".
+ * This is the model class for table "executive_summary_group".
  *
+ * @property integer $gid
+ * @property string $group_name
  * @property integer $year_invoice
  * @property integer $user_id
  * @property double $amount_target
@@ -15,14 +17,14 @@ use Yii;
  * @property string $ytd_sales_achievement
  * @property string $achievement
  */
-class ExecutiveSummarySales extends \yii\db\ActiveRecord
+class ExecutiveSummaryGroup extends \yii\db\ActiveRecord
 {
     /**
      * @inheritdoc
      */
     public static function tableName()
     {
-        return 'executive_summary_sales';
+        return 'executive_summary_group';
     }
 
     /**
@@ -31,9 +33,11 @@ class ExecutiveSummarySales extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['year_invoice', 'user_id'], 'integer'],
+            [['gid', 'year_invoice', 'user_id'], 'integer'],
+            [['group_name'], 'string'],
             [['amount_target', 'ytd_target', 'ytd_sales_achievement', 'achievement'], 'number'],
-            [['name'], 'string', 'max' => 128]
+            [['name'], 'string', 'max' => 128],
+            [['gid','year_invoice','user_id','group_name','user_id'],'safe'],
         ];
     }
 
@@ -43,6 +47,8 @@ class ExecutiveSummarySales extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
+            'gid' => 'Gid',
+            'group_name' => 'Group Name',
             'year_invoice' => 'Year Invoice',
             'user_id' => 'User ID',
             'amount_target' => 'Amount Target',

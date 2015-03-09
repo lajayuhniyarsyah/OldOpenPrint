@@ -5,9 +5,11 @@ namespace app\controllers;
 use Yii;
 use app\models\SalesActivity;
 use app\models\SalesActivitySearch;
+use \app\models\SalesActivityForm;
 use app\models\SalesActivityPlan;
 use app\models\ResUsers;
 use app\models\ResPartner;
+use app\models\WeekStatus;
 
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -65,7 +67,7 @@ class SalesActivityController extends Controller
 	 */
 	public function actionViewTimeLine($uid=null,$customer=null,$start=null)
 	{
-		$salesActivityForm = new \app\models\SalesActivityForm;
+		$salesActivityForm = new SalesActivityForm;
 
 		$charts = ['pie'=>[],'line'=>[]]; #prepared for all chart
 
@@ -74,18 +76,22 @@ class SalesActivityController extends Controller
 		$plan = SalesActivityPlan::find();
 		$pieType = 'customer';
 		$salesName = "All Sales Man";
+		$salesActivityForm->sales = $uid;
+		$salesActivityForm->customer = $customer;
+		$salesActivityForm->date_begin = $start;
 		if ($salesActivityForm->load(Yii::$app->request->get()) && $salesActivityForm->validate())
 		{
-
+			// die();
 			$uid=$salesActivityForm->sales;
 			if($uid){
+				// die();
 				$salesName = ResUsers::findOne($uid)->partner->name;
 				$plan->where('sales_activity_plan.user_id = :uid')
 					->addParams([':uid'=>$uid]);
 				$pieType = 'customer';
 
 			}
-			// var_dump($salesActivityForm->customer);
+			
 			if($salesActivityForm->customer){
 				$plan->andWhere('(sales_activity_plan.partner_id = :partner OR sales_activity_plan.actual_partner_id = :partner)')->addParams([':partner'=>$salesActivityForm->customer]);
 				$pieType='sales';
@@ -142,6 +148,15 @@ class SalesActivityController extends Controller
 		return $this->render('viewTimeLine',['dataProvider'=>$dataProvider,'salesActivityForm'=>$salesActivityForm,'series'=>$series,'charts'=>$charts]);
 	}
 
+	public function actionProspect(){
+		$dataToRender = [];
+		$dataToRender['model'] = WeekStatusLine::find()->select(['state','COUNT(id) as total'])->groupBy('state')->asArray()->all();
+
+
+		$dataToRender['salesActivityForm'] = new SalesActivityForm();
+		return $this->render('prospect',$dataToRender);
+	}
+
 
 	/**
 	 * [getCustomerActivityCompositionByUser description]
@@ -188,6 +203,14 @@ class SalesActivityController extends Controller
 		return $chartData;
 	}
 
+
+	/**
+	 * ACTION FOR AJAX HIGHCHART DRILL DOWN
+	 * @param  [type] $uid      [description]
+	 * @param  [type] $pid      [description]
+	 * @param  [type] $custName [description]
+	 * @return [type]           [description]
+	 */
 	public function actionGetDrillDown($uid,$pid=null,$custName=null){
 		\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 		if($pid){

@@ -19,7 +19,7 @@ $form = ActiveForm::begin([
 	'method'=>'get',
 ]);
 ?>
-<?='<label class="control-label">Provinces</label>'?>
+<?='<label class="control-label">Sales Man/Group/Site</label>'?>
 
 <?=Select2::widget([
 	'name' => 'sales',

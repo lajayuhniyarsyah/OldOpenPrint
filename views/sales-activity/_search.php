@@ -21,8 +21,21 @@ use yii\web\JsExpression;
         'action' => [''],
         'method' => 'get',
     ]);
-    $saleGroup = \app\models\ResGroups::findOne(['name'=>'All Sales User']);
-    $saleUsers = \yii\helpers\ArrayHelper::map($saleGroup->users,'id','name');
+    $saleGroup = \app\models\ResGroups::find()
+        ->select('id')
+        ->with(
+            [
+                'users',
+                'users.partner'=>function($query){
+                    $query->orderBy('name ASC');
+                },
+
+            ]
+        )
+        ->where(['name'=>'All Sales User'])->asArray()->one();
+    
+    $saleUsers = \yii\helpers\ArrayHelper::map($saleGroup['users'],'id','partner.name');
+    var_dump($saleGroup);
     ?>
     <div class="form-group">
         <label class="controll-label" for="sales">Sales</label>

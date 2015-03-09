@@ -61,6 +61,12 @@ AppAsset::register($this);
             <?= Breadcrumbs::widget([
                 'links' => isset($this->params['breadcrumbs']) ? $this->params['breadcrumbs'] : [],
             ]) ?>
+            <?php
+            // var_dump(Yii::$app->session->getAllFlashes());
+            foreach(Yii::$app->session->getAllFlashes() as $key=>$flash){
+                echo '<div class="alert alert-'.$key.'"><b>Error In Read Data</b> '.\yii\helpers\Html::encode($flash).'</div>';
+            }
+            ?>
             <?= $content ?>
         </div>
     </div>

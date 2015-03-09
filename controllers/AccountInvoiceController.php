@@ -12,13 +12,16 @@ use app\models\ResGroups;
 use app\models\ResGroupsUsersRel;
 use app\models\GroupSales;
 use app\models\GroupSalesLine;
-
-
+use app\models\ExecutiveSummarySales;
+use app\models\ExecutiveSummaryGroup;
+use app\models\ExecutiveSummaryGroupSearch;
 use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
+
+use yii\data\ActiveDataProvider;
 /**
  * AccountInvoiceController implements the CRUD actions for AccountInvoice model.
  */
@@ -176,7 +179,7 @@ class AccountInvoiceController extends Controller
         $tes = 1;
         foreach($model->accountInvoiceLines as $k=>$line):
             if($line->account_id<>192){
-            	
+
                 $ar = $k;
                 $lines[$k]['no'] = $line->sequence;
                 $lines[$k]['qty'] = $line->quantity.(isset($line->uos->name) ? ' '.$line->uos->name:null);
@@ -431,5 +434,160 @@ class AccountInvoiceController extends Controller
 		}
 		$title['between'] = ' Between '.\DateTime::createFromFormat('Y-m-d',$aiSearch->start_date)->format('d-F-Y').' and '.\DateTime::createFromFormat('Y-m-d',$aiSearch->end_date)->format('d-F-Y');
 		return $this->render('order_invoice_dashboard',['title'=>$title,'model'=>$model,'saleUsers'=>$saleUsers,'resGrid'=>$resGrid,'pie'=>$pie]);
+	}
+
+	/**
+	 * ESS EXECUTIVE SUMMARY SALES REPORT BY SALES MAN
+	 * @param  [type] $year [description]
+	 * @return [type]       [description]
+	 */
+	public function actionExecutiveSummaryBySalesMan($year=null,$gid=null){
+		$modelSearch = new ExecutiveSummaryGroupSearch;
+		$dataToRender = [];
+		if(!$year) $year = date('Y'); #GET CURRENT YEAR
+		
+		$modelSearch->year_invoice = $year;
+		$modelSearch->gid = $gid;
+		// $modelSearch->user_id = 'aaaa';
+		$query = $modelSearch->getQuery();
+
+		$query->orderBy('name ASC');
+		
+
+		
+		$dataArr = $query->asArray()->all();
+		$ytdSales = array_map(function($v){
+			return ['name'=>$v['name'],'y'=>floatval($v['ytd_target'])];
+		},$dataArr);
+
+		$ytdAchievement = array_map(function($v){
+			return ['name'=>$v['name'],'y'=>floatval($v['ytd_sales_achievement'])];
+		},$dataArr);
+		
+		
+		$dataToRender['chart']['series'] = [
+			[
+				'name'=>'Ytd Target',
+				'data'=>$ytdSales,
+				'pointPadding'=>0.3,
+				'pointPlacement'=>-0.1,
+			],
+			[
+				'name'=>'Ytd Achievement',
+				'data'=>$ytdAchievement,
+				'pointPadding'=>0.4,
+				'pointPlacement'=>-0.1,
+			],
+		];
+		// \yii\helpers\VarDumper::dump($dataArr);
+		$dataToRender['provider'] = new \yii\data\ArrayDataProvider([
+		    'allModels' => $dataArr,
+		    'pagination' => false
+		]);
+
+
+		$dataToRender['year'] = $modelSearch->year_invoice;
+
+		$dataToRender['salesTitle'] = ($gid && isset($dataArr[0]) ? strtoupper($dataArr[0]['group_name']):'All Sales');
+		// var_dump($dataToRender['salesTitle']);
+		// var_dump($modelSearch->errors);
+		foreach($modelSearch->errors as $error){
+			Yii::$app->session->setFlash('danger',$error[0]);
+		}
+		
+		return $this->render('executive_summary_by_sales_man',$dataToRender);
+	}
+
+
+
+	/**
+	 * ESS EXECUTIVE SALES ACHIEVEMEN DASHBOARD REPORT BY SALES GROUP
+	 * @param  [type] $year [description]
+	 * @return [type]       [description]
+	 */
+	public function actionExecutiveSummaryByGroup($year=null){
+		$dataToRender = [];
+		$model = new ExecutiveSummaryGroup;
+		if(!$year) $year = date('Y'); #GET CURRENT YEAR
+		$query = ExecutiveSummaryGroup::find()
+			->where('year_invoice = :year')
+			->addParams([':year'=>$year])
+			->groupBy('gid, group_name, year_invoice')
+			->orderBy('group_name ASC');
+
+		$dataArr = $query->select('year_invoice, gid, group_name, 
+				SUM(amount_target) AS amount_target, SUM(ytd_target) as ytd_target, SUM(ytd_sales_achievement) as ytd_sales_achievement, 
+				SUM(achievement) AS achievement')->asArray()->all();
+		$ytdSales = array_map(function($v){
+			return ['name'=>$v['group_name'],'y'=>floatval($v['ytd_target'])];
+		},$dataArr);
+
+		$ytdAchievement = array_map(function($v){
+			return ['id'=>$v['gid'],'name'=>$v['group_name'],'y'=>floatval($v['ytd_sales_achievement'])];
+		},$dataArr);
+		
+		
+		$dataToRender['chart']['series'] = [
+			[
+				'name'=>'Ytd Target',
+				'data'=>$ytdSales,
+				'pointPadding'=>0.3,
+				'pointPlacement'=>-0.1,
+			],
+			[
+				'name'=>'Ytd Achievement',
+				'data'=>$ytdAchievement,
+				'pointPadding'=>0.4,
+				'pointPlacement'=>-0.1,
+			],
+		];
+
+		// \yii\helpers\VarDumper::dump($dataToRender['chart']['series']);
+
+		$dataToRender['provider'] = new ActiveDataProvider([
+		    'query' => $query->select('year_invoice, gid, group_name, 
+				SUM(amount_target) AS amount_target, SUM(ytd_target) as ytd_target, SUM(ytd_sales_achievement) as ytd_sales_achievement, 
+				SUM(achievement) AS achievement'),
+		    'pagination' => [
+		        'pageSize' => -1,
+		    ],
+		]);
+
+		$dataToRender['year'] = $year;
+
+		return $this->render('executive_summary_by_group',$dataToRender);
+	}
+
+	public function actionGetEssGroupDetail($group,$series=null,$year=null){
+		\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+		$data = [];
+		
+		if(!$year) $year = date('Y');
+		$groupObj = GroupSales::find()->where('name like :search')->addParams([':search'=>strtolower($group)])->one();
+		
+		if($groupObj){
+			$dataArr = ExecutiveSummaryGroup::find()
+				->where('year_invoice = :year AND gid = :gid')->addParams([':year'=>$year,':gid'=>$groupObj->id])
+				->orderBy('name ASC')->asArray()->all();
+			
+
+			$ytdSales = array_map(function($v){
+				return ['name'=>$v['name'],'y'=>floatval($v['ytd_target'])];
+			},$dataArr);
+
+			$ytdAchievement = array_map(function($v){
+				return ['name'=>$v['name'],'y'=>floatval($v['ytd_sales_achievement'])];
+			},$dataArr);
+
+			$series = [
+				'name'=>'Ytd Achievement',
+				// 'data'=>$ytdAchievement,
+				'data'=>(preg_replace('/W+/','',strtolower($series)) == 'ytdtarget' ? $ytdTarget:$ytdAchievement)
+			];
+		}
+		
+		
+		return \yii\helpers\Json::encode($series);
+
 	}
 }
