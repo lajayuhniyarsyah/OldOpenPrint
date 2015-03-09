@@ -19,6 +19,7 @@ use app\assets\AppAsset;
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <?= Html::csrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
+    <link rel="shortcut icon" href="<?php echo Yii::$app->request->baseUrl; ?>/favicon.ico" type="image/x-icon" />
     <?php $this->head() ?>
 </head>
 <style type="text/css">
@@ -26,7 +27,7 @@ use app\assets\AppAsset;
         width: 1000px;
         margin-left: auto;
         margin-right: auto;
-        border:1px solid black;
+        /*border:1px solid black;*/
     }
     .ReportTable {
         margin:0px;padding:0px;
@@ -77,7 +78,7 @@ use app\assets\AppAsset;
     .ReportTable td{
         vertical-align:middle;
         
-        background-color:#e5e5e5;
+        /*background-color:#e5e5e5;*/
 
         border:1px solid #666464;
         border-width:0px 1px 1px 0px;
@@ -94,12 +95,13 @@ use app\assets\AppAsset;
     }.ReportTable tr:last-child td:last-child{
         border-width:0px 0px 0px 0px;
     }
-    .ReportTable tr:first-child td{
-            background:-o-linear-gradient(bottom, #cccccc 5%, #b2b2b2 100%);    background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #cccccc), color-stop(1, #b2b2b2) );
+    .ReportTable .head{
+       /* background:-o-linear-gradient(bottom, #cccccc 5%, #b2b2b2 100%);    background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #cccccc), color-stop(1, #b2b2b2) );
         background:-moz-linear-gradient( center top, #cccccc 5%, #b2b2b2 100% );
-        filter:progid:DXImageTransform.Microsoft.gradient(startColorstr="#cccccc", endColorstr="#b2b2b2");  background: -o-linear-gradient(top,#cccccc,b2b2b2);
-
-        background-color:#cccccc;
+        filter:progid:DXImageTransform.Microsoft.gradient(startColorstr="#cccccc", endColorstr="#b2b2b2");  background: -o-linear-gradient(top,#cccccc,b2b2b2);*/
+        background-color: #ededed;
+        background-image: linear-gradient(to bottom, #fcfcfc, #dedede);
+        /*background-color:#cccccc;*/
         border:0px solid #666464;
         text-align:center;
         border-width:0px 0px 1px 1px;
@@ -108,19 +110,7 @@ use app\assets\AppAsset;
         font-weight:bold;
         color:#000000;
     }
-    .ReportTable tr:first-child:hover td{
-        background:-o-linear-gradient(bottom, #cccccc 5%, #b2b2b2 100%);    background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #cccccc), color-stop(1, #b2b2b2) );
-        background:-moz-linear-gradient( center top, #cccccc 5%, #b2b2b2 100% );
-        filter:progid:DXImageTransform.Microsoft.gradient(startColorstr="#cccccc", endColorstr="#b2b2b2");  background: -o-linear-gradient(top,#cccccc,b2b2b2);
-
-        background-color:#cccccc;
-    }
-    .ReportTable tr:first-child td:first-child{
-        border-width:0px 0px 1px 0px;
-    }
-    .ReportTable tr:first-child td:last-child{
-        border-width:0px 0px 1px 1px;
-    }
+   
     .judul{
         color: black;
         font-family: Tahoma Bold,sans-serif;
@@ -150,11 +140,32 @@ use app\assets\AppAsset;
         text-align: right;
     }
     .bgdark{
-        background:-o-linear-gradient(bottom, #cccccc 5%, #b2b2b2 100%);    background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #cccccc), color-stop(1, #b2b2b2) );
+        /*background:-o-linear-gradient(bottom, #cccccc 5%, #b2b2b2 100%);    background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #cccccc), color-stop(1, #b2b2b2) );
         background:-moz-linear-gradient( center top, #cccccc 5%, #b2b2b2 100% );
-        filter:progid:DXImageTransform.Microsoft.gradient(startColorstr="#cccccc", endColorstr="#b2b2b2");  background: -o-linear-gradient(top,#cccccc,b2b2b2);
-
+        filter:progid:DXImageTransform.Microsoft.gradient(startColorstr="#cccccc", endColorstr="#b2b2b2");  background: -o-linear-gradient(top,#cccccc,b2b2b2);*/
+        background-color: #ededed;
+        background-image: linear-gradient(to bottom, #f6f6f6, #d0d0d0);
         background-color:#cccccc;
+    }
+    .grandtotal{
+       /* -moz-border-bottom-colors: none;
+        -moz-border-left-colors: none;
+        -moz-border-right-colors: none;
+        -moz-border-top-colors: none;
+        background: -moz-linear-gradient(center top , #cccccc 5%, #b2b2b2 100%) repeat scroll 0 0 #cccccc;*/
+        background-color: #ededed;
+        background-image: linear-gradient(to bottom, #fcfcfc, #dedede);
+        border-color: #666464;
+        border-image: none;
+        border-style: solid;
+        border-width: 0 0 1px 1px;
+        color: #000000;
+        text-align: right !important;
+        padding-right: 4px;
+        font-family: Arial;
+        font-size: 14px;
+        font-weight: bold;
+        line-height: 35px;
     }
 </style>
 <body>

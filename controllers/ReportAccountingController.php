@@ -8,10 +8,15 @@ use app\models\StockMove;
 use app\models\StockMoveSearch;
 use app\models\MrpBom;
 use app\models\MrpBomSearch;
+use app\models\AccountAccount;
+use app\models\ResPartner;
+use app\models\AccountingReportForm;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 use yii\db\Query;
+use yii\helpers\Json;
+use yii\helpers\ArrayHelper;
 class ReportAccountingController extends Controller
 {
     public function behaviors()
@@ -114,29 +119,921 @@ class ReportAccountingController extends Controller
     	return $this->render('stockmove',['data'=>$query->all(), 'jenis'=>$jenisreport, 'from'=>$from , 'to'=>$to]);
     }
 
-     public function actionTransaksiAccount($account,$from,$to)
+
+    public function actionAccountlist($search = null, $id = null) 
+    {
+        $out = ['more' => false];
+        if (!is_null($search)) {
+            $query = new Query;
+            $lowerchr=strtolower($search);
+            $command = Yii::$app->db->createCommand("SELECT DISTINCT id, code, name as text FROM account_account WHERE lower(name) LIKE '%".$lowerchr."%' OR code LIKE '%".$lowerchr."%' LIMIT 20");
+            $data = $command->queryAll();
+            $out['results'] = array_values($data);
+        }
+        elseif ($id > 0) {
+            $out['results'] = ['id' => $id, 'text' => AccountAccount::find($id)->code.' '.AccountAccount::find($id)->name];
+        }
+        else {
+            $out['results'] = ['id' => 0, 'text' => 'No matching records found'];
+        }
+        echo Json::encode($out);
+    }
+
+
+    public function actionCustomerlist($search = null, $id = null) 
+    {
+        $out = ['more' => false];
+        if (!is_null($search)) {
+            $query = new Query;
+            $lowerchr=strtolower($search);
+            $command = Yii::$app->db->createCommand("SELECT DISTINCT id, name as text FROM res_partner WHERE lower(name) LIKE '%".$lowerchr."%' AND customer=true AND is_company=true LIMIT 20");
+            $data = $command->queryAll();
+            $out['results'] = array_values($data);
+        }
+        elseif ($id > 0) {
+            $out['results'] = ['id' => $id, 'text' => ResPartner::find($id)->name];
+        }
+        else {
+            $out['results'] = ['id' => 0, 'text' => 'No matching records found'];
+        }
+        echo Json::encode($out);
+    }
+
+    public function actionSupplierlist($search = null, $id = null) 
+    {
+        $out = ['more' => false];
+        if (!is_null($search)) {
+            $query = new Query;
+            $lowerchr=strtolower($search);
+            $command = Yii::$app->db->createCommand("SELECT DISTINCT id, name as text FROM res_partner WHERE lower(name) LIKE '%".$lowerchr."%' AND supplier=true AND is_company=true LIMIT 20");
+            $data = $command->queryAll();
+            $out['results'] = array_values($data);
+        }
+        elseif ($id > 0) {
+            $out['results'] = ['id' => $id, 'text' => ResPartner::find($id)->name];
+        }
+        else {
+            $out['results'] = ['id' => 0, 'text' => 'No matching records found'];
+        }
+        echo Json::encode($out);
+    }
+
+
+
+     public function actionReportaccount()
      {
-     	$this->layout = 'report';
-     	$query = new Query;
+     	$this->layout ='dashboard';
+     	$model = new AccountingReportForm();
+        $account = AccountAccount::find()->where(['type' => ['view', 'other', 'receivable','payable','liquidity','consolidation','closed']])->all();
+        $SelectAccount = ArrayHelper::map($account,'id','name');
 
-     	if ($account == "False"){
-     		$query
-     		->select ('aml.account_id as account_id')
-     		->distinct('aml.account_id')
-     		->from('account_move_line as aml')
-     		->where(['>=','aml.date',$from])
-     		->andWhere(['<=','aml.date',$to])
-			->addOrderBy(['aml.account_id' => SORT_ASC]);
-		
-			return $this->render('transaksiaccount',['data'=>$query->all(), 'from' =>$from, 'to'=>$to, 'account'=>$account]);
+		$model->load(Yii::$app->request->get());
+        if ($model->load(Yii::$app->request->get())) { 
+        	$this->layout = 'report';
+        	$query = new Query;       	
+        	
+     		if($model->account==null){ 
+	     		$query
+		     		->select ('
+	     					aml.account_id as account_id, 
+	     					aa.code as code, 
+	     					aa.name as account_name')
+		     		->distinct('aml.account_id')
+		     		->from('account_move_line as aml')
+		     		->join('LEFT JOIN','account_account as aa','aa.id=aml.account_id')
+		     		->where(['>=','aml.date',$model->date_from])
+		     		->andWhere(['<=','aml.date',$model->date_to])
+					->addOrderBy(['aml.account_id' => SORT_ASC]);
+			}else{
+				$query
+		     		->select ('
+		     				aml.account_id as account_id, 
+		     				aa.code as code, 
+		     				aa.name as account_name')
+		     		->distinct('aml.account_id')
+		     		->from('account_move_line as aml')
+		     		->join('LEFT JOIN','account_account as aa','aa.id=aml.account_id')
+		     		->where(['>=','aml.date',$model->date_from])
+		     		->andWhere(['<=','aml.date',$model->date_to])
+		     		->andWhere(['aml.account_id' =>explode(',',$model->account)])
+					->addOrderBy(['aml.account_id' => SORT_ASC]);
+			}
 
-     	}else{
-			return $this->render('transaksiaccount',['account'=>$account, 'from' =>$from, 'to'=>$to]);
-     	}
+        	$queryline = new Query;
+	     		$queryline
+		     		->select ('
+	     					aml.account_id as account_id,
+	     					aa.name as account_name,
+		     				aml.ref as ref, 
+		     				aml.name as name,
+		     				aml.date as date, 
+		     				aml.debit as debit, 
+		     				aml.credit as credit')
+		     		->from('account_move_line aml')
+		     		->join('LEFT JOIN','account_move as am','am.id=aml.move_id')
+		     		->join('LEFT JOIN','account_account as aa','aa.id=aml.account_id')
+		     		->where(['>=','aml.date',$model->date_from])
+		     		->andWhere(['<=','aml.date',$model->date_to])
+					->addOrderBy(['aml.account_id' => SORT_ASC])
+					->addOrderBy(['aml.date' => SORT_ASC]);
 
-     	
+			 return $this->render('report\transaksiaccount',['data'=>$queryline->all(),'array'=>$query->all(),'from' =>$model->date_from, 'to'=>$model->date_to]);		
+			     	
+        }
+     	return $this->render('reportaccount',['model' => $model,'SelectAccount'=>$SelectAccount]);
+
      }
 
+     public function actionJurnalar(){
+     	$this->layout ='dashboard';
+     	$model = new AccountingReportForm();
+     	
+     	$model->load(Yii::$app->request->get());
+        if ($model->load(Yii::$app->request->get())) { 
+        		$this->layout = 'report';
+        		$query = new Query;
+        		if($model->partner==false)
+        		{
+        			$query
+			 			->select ('
+			 					am.id as move_id,
+			 					am.date as date,
+			 					rp.name as partner_name
+			 					')
+				 		->from('account_move as am')
+				 		->join('LEFT JOIN','res_partner as rp','rp.id=am.partner_id')
+				 		->where(['>=','am.date',$model->date_from])
+				 		->andWhere(['<=','am.date',$model->date_to])
+				 		->andWhere(['am.journal_id' =>1])
+						->addOrderBy(['am.date' => SORT_DESC]);
+
+					$queryline = new Query;
+		     		$queryline
+						->select ('
+								aml.move_id as move_id,
+								ai.kwitansi as kwitansi,
+								aml.ref as ref, 
+								aa.code as code, 
+								aa.name as account, 
+								aml.name as name,
+								aml.date as date, 
+								aml.debit as debit, 
+								aml.credit as credit
+								')
+			     		->from('account_move_line aml')
+			     		->join('LEFT JOIN','account_account as aa','aa.id=aml.account_id')
+			     		->join('LEFT JOIN','account_move as am','am.id=aml.move_id')
+			     		->join('LEFT JOIN','account_invoice as ai','ai.move_id=am.id')
+						->where(['>=','am.date',$model->date_from])
+			 			->andWhere(['<=','am.date',$model->date_to])
+						->addOrderBy(['aml.id' => SORT_ASC])
+						->addOrderBy(['am.date' => SORT_ASC]);
+        		}else{
+        			$query
+		 			->select ('
+		 					am.id as move_id,
+		 					am.date as date,
+		 					rp.name as partner_name
+		 					')
+			 		->from('account_move as am')
+			 		->join('LEFT JOIN','res_partner as rp','rp.id=am.partner_id')
+			 		->where(['>=','am.date',$model->date_from])
+			 		->andWhere(['<=','am.date',$model->date_to])
+			 		->andWhere(['am.journal_id' =>1])
+			 		->andWhere(['am.partner_id' =>explode(',',$model->partner)])
+					->addOrderBy(['am.date' => SORT_DESC]);
+
+					$queryline = new Query;
+		     		$queryline
+						->select ('
+								aml.move_id as move_id,
+								ai.kwitansi as kwitansi,
+								aml.ref as ref, 
+								aa.code as code, 
+								aa.name as account, 
+								aml.name as name,
+								aml.date as date, 
+								aml.debit as debit, 
+								aml.credit as credit
+								')
+			     		->from('account_move_line aml')
+			     		->join('LEFT JOIN','account_account as aa','aa.id=aml.account_id')
+			     		->join('LEFT JOIN','account_move as am','am.id=aml.move_id')
+			     		->join('LEFT JOIN','account_invoice as ai','ai.move_id=am.id')
+						->where(['>=','am.date',$model->date_from])
+			 			->andWhere(['<=','am.date',$model->date_to])
+			 			->andWhere(['aml.partner_id' =>explode(',',$model->partner)])
+						->addOrderBy(['aml.id' => SORT_ASC])
+						->addOrderBy(['am.date' => SORT_ASC]);
+        		}
+				return $this->render('report\transaksiar',['data'=>$queryline->all(), 'array'=>$query->all(), 'from' =>$model->date_from, 'to'=>$model->date_to]);	
+        	}
+
+     	return $this->render('jurnalar',['model' => $model]);
+     }
+
+
+     public function actionArsummary()
+     {
+     	$this->layout ='dashboard';
+     	$model = new AccountingReportForm();
+     	$model->load(Yii::$app->request->get());
+        if ($model->load(Yii::$app->request->get())) { 
+  
+        	$this->layout = 'report';
+        	$query = new Query;
+
+        	$bulan1=date('Y-m-d',strtotime('-30 day',strtotime($model->date_from)));
+			$bulan2=date('Y-m-d',strtotime('-30 day',strtotime($bulan1)));
+			$bulan3=date('Y-m-d',strtotime('-30 day',strtotime($bulan2)));
+			$bulan4=date('Y-m-d',strtotime('-30 day',strtotime($bulan3)));
+
+    	    if($model->partner==false){ // All Partner
+    	    	$command = 
+    	    		Yii::$app->db->createCommand(
+    	    			"SELECT 
+							datalines.partner as id_partner, 
+							datalines.pname as partner, 
+							datalines.total as total,
+							(SELECT sum(a.debit) as debit30 
+								FROM account_move_line as a
+								LEFT JOIN account_move as am_line ON am_line.id=a.move_id
+								LEFT JOIN account_invoice as ai_line ON ai_line.move_id=am_line.id
+								WHERE 
+									a.partner_id=datalines.partner 
+									AND 
+									a.date >= '$bulan1'
+									AND 
+									a.date <= '$model->date_from'
+									AND
+									a.account_id=56
+									AND
+									ai_line.state='open'
+							),
+							(SELECT sum(a.debit) as debit60 
+								FROM account_move_line as a
+								LEFT JOIN account_move as am_line ON am_line.id=a.move_id
+								LEFT JOIN account_invoice as ai_line ON ai_line.move_id=am_line.id
+								WHERE 
+									a.partner_id=datalines.partner 
+									AND 
+									a.date >= '$bulan2'
+									AND 
+									a.date <= '$bulan1'
+									AND
+									a.account_id=56
+									AND
+									ai_line.state='open'
+							),
+							(SELECT sum(a9.debit) as debit90 
+								FROM account_move_line as a9
+								LEFT JOIN account_move as am_line9 ON am_line9.id=a9.move_id
+								LEFT JOIN account_invoice as ai_line9 ON ai_line9.move_id=am_line9.id
+								WHERE 
+									a9.partner_id=datalines.partner 
+									AND 
+									a9.date >= '$bulan3'
+									AND 
+									a9.date <= '$bulan2'
+									AND
+									a9.account_id=56
+									AND
+									ai_line9.state='open'
+							),
+							(SELECT sum(a90.debit) as debit90lebih 
+								FROM account_move_line as a90
+								LEFT JOIN account_move as am_line90 ON am_line90.id=a90.move_id
+								LEFT JOIN account_invoice as ai_line90 ON ai_line90.move_id=am_line90.id
+								WHERE 
+									a90.partner_id=datalines.partner 
+									AND 
+									a90.date <= '$bulan3'
+									AND
+									a90.account_id=56
+									AND
+									ai_line90.state='open'
+							)
+						FROM
+						(SELECT DISTINCT 
+							aml.partner_id as partner, 
+							rp.name as pname,
+						(sum(aml.debit)-sum(aml.credit)) as total
+						FROM account_invoice as p
+							LEFT JOIN account_move as am ON am.id=p.move_id
+							LEFT JOIN res_partner as rp ON rp.id=am.partner_id
+							LEFT JOIN account_move_line as aml ON aml.move_id=am.id
+						WHERE aml.account_id=56 AND p.state='open' GROUP BY aml.partner_id,rp.name ORDER BY rp.name ASC) as datalines
+						");
+			}else{
+				$command = 
+    	    		Yii::$app->db->createCommand(
+    	    			"SELECT 
+							datalines.partner as id_partner, 
+							datalines.pname as partner, 
+							datalines.total as total,
+							(SELECT sum(a.debit) as debit30 
+								FROM account_move_line as a
+								LEFT JOIN account_move as am_line ON am_line.id=a.move_id
+								LEFT JOIN account_invoice as ai_line ON ai_line.move_id=am_line.id
+								WHERE 
+									a.partner_id=datalines.partner 
+									AND 
+									a.date >= '$bulan1'
+									AND 
+									a.date <= '$model->date_from'
+									AND
+									a.account_id=56
+									AND
+									ai_line.state='open'
+							),
+							(SELECT sum(a.debit) as debit60 
+								FROM account_move_line as a
+								LEFT JOIN account_move as am_line ON am_line.id=a.move_id
+								LEFT JOIN account_invoice as ai_line ON ai_line.move_id=am_line.id
+								WHERE 
+									a.partner_id=datalines.partner 
+									AND 
+									a.date >= '$bulan2'
+									AND 
+									a.date <= '$bulan1'
+									AND
+									a.account_id=56
+									AND
+									ai_line.state='open'
+							),
+							(SELECT sum(a9.debit) as debit90 
+								FROM account_move_line as a9
+								LEFT JOIN account_move as am_line9 ON am_line9.id=a9.move_id
+								LEFT JOIN account_invoice as ai_line9 ON ai_line9.move_id=am_line9.id
+								WHERE 
+									a9.partner_id=datalines.partner 
+									AND 
+									a9.date >= '$bulan3'
+									AND 
+									a9.date <= '$bulan2'
+									AND
+									a9.account_id=56
+									AND
+									ai_line9.state='open'
+							),
+							(SELECT sum(a90.debit) as debit90lebih 
+								FROM account_move_line as a90
+								LEFT JOIN account_move as am_line90 ON am_line90.id=a90.move_id
+								LEFT JOIN account_invoice as ai_line90 ON ai_line90.move_id=am_line90.id
+								WHERE 
+									a90.partner_id=datalines.partner 
+									AND 
+									a90.date <= '$bulan3'
+									AND
+									a90.account_id=56
+									AND
+									ai_line90.state='open'
+							)
+						FROM
+						(SELECT DISTINCT 
+							aml.partner_id as partner, 
+							rp.name as pname,
+						(sum(aml.debit)-sum(aml.credit)) as total
+						FROM account_invoice as p
+							LEFT JOIN account_move as am ON am.id=p.move_id
+							LEFT JOIN res_partner as rp ON rp.id=am.partner_id
+							LEFT JOIN account_move_line as aml ON aml.move_id=am.id
+						WHERE aml.account_id=56 AND p.state='open' AND aml.partner_id IN ($model->partner) GROUP BY aml.partner_id,rp.name ORDER BY rp.name ASC) as datalines
+						");
+			}
+
+			return $this->render('report\arsummary',['data'=>$command->queryAll(),'date'=>$model->date_from]);	
+        }
+     	return $this->render('arsummary',['model' => $model]);
+     }
+
+     public function actionArdetail()
+     {
+     	$this->layout ='dashboard';
+     	$model = new AccountingReportForm();
+     	$model->load(Yii::$app->request->get());
+        if ($model->load(Yii::$app->request->get())) { 
+  
+        	$this->layout = 'report';
+        	$query = new Query;
+    	    if($model->partner==false){ 
+    	    	$array = 
+    	    		Yii::$app->db->createCommand("SELECT 
+													aml.partner_id as partner_id, 
+													rp.name as partner_name,
+													rp.street as street
+												FROM account_invoice as p
+													LEFT JOIN account_move as am ON am.id=p.move_id
+													LEFT JOIN account_move_line as aml ON aml.move_id=am.id
+													LEFT JOIN res_partner as rp ON rp.id=aml.partner_id
+												WHERE 
+													p.state='open' 
+												AND
+													aml.account_id=56
+												GROUP BY 
+													aml.partner_id,
+													rp.name,
+													rp.street");
+
+	        	$command = 
+	    		Yii::$app->db->createCommand("SELECT  
+	    										p.partner_id as partner_id,
+												rp.name as parner_name,
+												rp.street as street,
+												p.kwitansi AS kwitansi, 
+												p.date_invoice AS date_invoice,
+												aml.debit AS total 
+											FROM account_invoice AS p 
+												LEFT JOIN account_move AS am ON am.id=p.move_id 
+												LEFT JOIN account_move_line AS aml ON aml.move_id=am.id 
+												LEFT JOIN res_partner as rp ON rp.id=p.partner_id
+											WHERE 
+												aml.account_id=56 
+											AND
+												p.state='open'
+											ORDER BY 
+												p.partner_id,
+												p.date_invoice DESC");
+			}else{
+
+				$array = 
+    	    		Yii::$app->db->createCommand("SELECT 
+													aml.partner_id as partner_id, 
+													rp.name as partner_name,
+													rp.street as street
+												FROM account_invoice as p
+													LEFT JOIN account_move as am ON am.id=p.move_id
+													LEFT JOIN account_move_line as aml ON aml.move_id=am.id
+													LEFT JOIN res_partner as rp ON rp.id=aml.partner_id
+												WHERE 
+													p.state='open' 
+												AND
+													aml.account_id=56
+												AND 
+													p.partner_id IN ($model->partner)
+												GROUP BY 
+													aml.partner_id,
+													rp.name,
+													rp.street");
+				$command = 
+	    		Yii::$app->db->createCommand("SELECT  
+	    										p.partner_id as partner_id,
+												rp.name as parner_name,
+												rp.street as street,
+												p.kwitansi AS kwitansi, 
+												p.date_invoice AS date_invoice,
+												aml.debit AS total 
+											FROM account_invoice AS p 
+												LEFT JOIN account_move AS am ON am.id=p.move_id 
+												LEFT JOIN account_move_line AS aml ON aml.move_id=am.id 
+												LEFT JOIN res_partner as rp ON rp.id=p.partner_id
+											WHERE 
+												aml.account_id=56 
+											AND
+												p.state='open'
+											AND 
+												p.partner_id IN ($model->partner)
+											ORDER BY 
+												p.partner_id,
+												p.date_invoice DESC");
+			}
+    	  
+			return $this->render('report\ardetail',['data'=>$command->queryAll(),'array'=>$array->queryAll(),'date'=>$model->date_from,'partner'=>'all']);	
+        }
+     	return $this->render('ardetail',['model' => $model]);
+     }
+
+     public function actionApsummary()
+     {
+     	$this->layout ='dashboard';
+     	$model = new AccountingReportForm();
+     	$model->load(Yii::$app->request->get());
+
+     	        if ($model->load(Yii::$app->request->get())) { 
+  
+        	$this->layout = 'report';
+        	$query = new Query;
+
+        	$bulan1=date('Y-m-d',strtotime('-30 day',strtotime($model->date_from)));
+			$bulan2=date('Y-m-d',strtotime('-30 day',strtotime($bulan1)));
+			$bulan3=date('Y-m-d',strtotime('-30 day',strtotime($bulan2)));
+			$bulan4=date('Y-m-d',strtotime('-30 day',strtotime($bulan3)));
+
+    	    if($model->partner==false){ // All Partner
+    	    	$command = 
+    	    		Yii::$app->db->createCommand(
+    	    			"SELECT 
+							datalines.partner as id_partner, 
+							datalines.pname as partner, 
+							datalines.total as total,
+							(SELECT sum(a.credit) as debit30 
+								FROM account_move_line as a
+								LEFT JOIN account_move as am_line ON am_line.id=a.move_id
+								LEFT JOIN account_invoice as ai_line ON ai_line.move_id=am_line.id
+								WHERE 
+									a.partner_id=datalines.partner 
+									AND 
+									a.date >= '$bulan1'
+									AND 
+									a.date <= '$model->date_from'
+									AND
+									a.account_id=119
+									AND
+									ai_line.state='open'
+							),
+							(SELECT sum(a.credit) as debit60 
+								FROM account_move_line as a
+								LEFT JOIN account_move as am_line ON am_line.id=a.move_id
+								LEFT JOIN account_invoice as ai_line ON ai_line.move_id=am_line.id
+								WHERE 
+									a.partner_id=datalines.partner 
+									AND 
+									a.date >= '$bulan2'
+									AND 
+									a.date <= '$bulan1'
+									AND
+									a.account_id=119
+									AND
+									ai_line.state='open'
+							),
+							(SELECT sum(a9.credit) as debit90 
+								FROM account_move_line as a9
+								LEFT JOIN account_move as am_line9 ON am_line9.id=a9.move_id
+								LEFT JOIN account_invoice as ai_line9 ON ai_line9.move_id=am_line9.id
+								WHERE 
+									a9.partner_id=datalines.partner 
+									AND 
+									a9.date >= '$bulan3'
+									AND 
+									a9.date <= '$bulan2'
+									AND
+									a9.account_id=119
+									AND
+									ai_line9.state='open'
+							),
+							(SELECT sum(a90.credit) as debit90lebih 
+								FROM account_move_line as a90
+								LEFT JOIN account_move as am_line90 ON am_line90.id=a90.move_id
+								LEFT JOIN account_invoice as ai_line90 ON ai_line90.move_id=am_line90.id
+								WHERE 
+									a90.partner_id=datalines.partner 
+									AND 
+									a90.date <= '$bulan3'
+									AND
+									a90.account_id=119
+									AND
+									ai_line90.state='open'
+							)
+						FROM
+						(SELECT DISTINCT 
+							aml.partner_id as partner, 
+							rp.name as pname,
+						(sum(aml.credit)-sum(aml.debit)) as total
+						FROM account_invoice as p
+							LEFT JOIN account_move as am ON am.id=p.move_id
+							LEFT JOIN res_partner as rp ON rp.id=am.partner_id
+							LEFT JOIN account_move_line as aml ON aml.move_id=am.id
+						WHERE aml.account_id=119 AND p.state='open' GROUP BY aml.partner_id,rp.name ORDER BY rp.name ASC) as datalines
+						");
+			}else{
+				$command = 
+    	    		Yii::$app->db->createCommand(
+    	    			"SELECT 
+							datalines.partner as id_partner, 
+							datalines.pname as partner, 
+							datalines.total as total,
+							(SELECT sum(a.credit) as debit30 
+								FROM account_move_line as a
+								LEFT JOIN account_move as am_line ON am_line.id=a.move_id
+								LEFT JOIN account_invoice as ai_line ON ai_line.move_id=am_line.id
+								WHERE 
+									a.partner_id=datalines.partner 
+									AND 
+									a.date >= '$bulan1'
+									AND 
+									a.date <= '$model->date_from'
+									AND
+									a.account_id=119
+									AND
+									ai_line.state='open'
+							),
+							(SELECT sum(a.credit) as debit60 
+								FROM account_move_line as a
+								LEFT JOIN account_move as am_line ON am_line.id=a.move_id
+								LEFT JOIN account_invoice as ai_line ON ai_line.move_id=am_line.id
+								WHERE 
+									a.partner_id=datalines.partner 
+									AND 
+									a.date >= '$bulan2'
+									AND 
+									a.date <= '$bulan1'
+									AND
+									a.account_id=119
+									AND
+									ai_line.state='open'
+							),
+							(SELECT sum(a9.credit) as debit90 
+								FROM account_move_line as a9
+								LEFT JOIN account_move as am_line9 ON am_line9.id=a9.move_id
+								LEFT JOIN account_invoice as ai_line9 ON ai_line9.move_id=am_line9.id
+								WHERE 
+									a9.partner_id=datalines.partner 
+									AND 
+									a9.date >= '$bulan3'
+									AND 
+									a9.date <= '$bulan2'
+									AND
+									a9.account_id=119
+									AND
+									ai_line9.state='open'
+							),
+							(SELECT sum(a90.credit) as debit90lebih 
+								FROM account_move_line as a90
+								LEFT JOIN account_move as am_line90 ON am_line90.id=a90.move_id
+								LEFT JOIN account_invoice as ai_line90 ON ai_line90.move_id=am_line90.id
+								WHERE 
+									a90.partner_id=datalines.partner 
+									AND 
+									a90.date <= '$bulan3'
+									AND
+									a90.account_id=119
+									AND
+									ai_line90.state='open'
+							)
+						FROM
+						(SELECT DISTINCT 
+							aml.partner_id as partner, 
+							rp.name as pname,
+						(sum(aml.credit)-sum(aml.debit)) as total
+						FROM account_invoice as p
+							LEFT JOIN account_move as am ON am.id=p.move_id
+							LEFT JOIN res_partner as rp ON rp.id=am.partner_id
+							LEFT JOIN account_move_line as aml ON aml.move_id=am.id
+						WHERE aml.account_id=119 AND p.state='open' AND aml.partner_id IN ($model->partner) GROUP BY aml.partner_id,rp.name ORDER BY rp.name ASC) as datalines
+						");
+			}
+
+			return $this->render('report\apsummary',['data'=>$command->queryAll(),'date'=>$model->date_from]);	
+        }
+     	return $this->render('apsummary',['model' => $model]);	
+     }
+
+     public function actionApdetail()
+     {
+     	$this->layout ='dashboard';
+     	$model = new AccountingReportForm();
+     	$model->load(Yii::$app->request->get());
+
+     	        if ($model->load(Yii::$app->request->get())) { 
+  
+        	$this->layout = 'report';
+        	$query = new Query;
+    	    if($model->partner==false){ 
+    	    	$array = 
+    	    		Yii::$app->db->createCommand("SELECT 
+													aml.partner_id as partner_id, 
+													rp.name as partner_name,
+													rp.street as street
+												FROM account_invoice as p
+													LEFT JOIN account_move as am ON am.id=p.move_id
+													LEFT JOIN account_move_line as aml ON aml.move_id=am.id
+													LEFT JOIN res_partner as rp ON rp.id=aml.partner_id
+												WHERE 
+													p.state='open' 
+												AND
+													aml.account_id=119
+												GROUP BY 
+													aml.partner_id,
+													rp.name,
+													rp.street");
+
+	        	$command = 
+	    		Yii::$app->db->createCommand("SELECT  
+	    										p.partner_id as partner_id,
+												rp.name as parner_name,
+												rp.street as street,
+												p.kwitansi AS kwitansi, 
+												p.date_invoice AS date_invoice,
+												aml.credit AS total 
+											FROM account_invoice AS p 
+												LEFT JOIN account_move AS am ON am.id=p.move_id 
+												LEFT JOIN account_move_line AS aml ON aml.move_id=am.id 
+												LEFT JOIN res_partner as rp ON rp.id=p.partner_id
+											WHERE 
+												aml.account_id=119 
+											AND
+												p.state='open'
+											ORDER BY 
+												p.partner_id,
+												p.date_invoice DESC");
+			}else{
+
+				$array = 
+    	    		Yii::$app->db->createCommand("SELECT 
+													aml.partner_id as partner_id, 
+													rp.name as partner_name,
+													rp.street as street
+												FROM account_invoice as p
+													LEFT JOIN account_move as am ON am.id=p.move_id
+													LEFT JOIN account_move_line as aml ON aml.move_id=am.id
+													LEFT JOIN res_partner as rp ON rp.id=aml.partner_id
+												WHERE 
+													p.state='open' 
+												AND
+													aml.account_id=119
+												AND 
+													p.partner_id IN ($model->partner)
+												GROUP BY 
+													aml.partner_id,
+													rp.name,
+													rp.street");
+				$command = 
+	    		Yii::$app->db->createCommand("SELECT  
+	    										p.partner_id as partner_id,
+												rp.name as parner_name,
+												rp.street as street,
+												p.kwitansi AS kwitansi, 
+												p.date_invoice AS date_invoice,
+												aml.credit AS total 
+											FROM account_invoice AS p 
+												LEFT JOIN account_move AS am ON am.id=p.move_id 
+												LEFT JOIN account_move_line AS aml ON aml.move_id=am.id 
+												LEFT JOIN res_partner as rp ON rp.id=p.partner_id
+											WHERE 
+												aml.account_id=119 
+											AND
+												p.state='open'
+											AND 
+												p.partner_id IN ($model->partner)
+											ORDER BY 
+												p.partner_id,
+												p.date_invoice DESC");
+			}
+    	  
+			return $this->render('report\apdetail',['data'=>$command->queryAll(),'array'=>$array->queryAll(),'date'=>$model->date_from,'partner'=>'all']);	
+        }
+        
+   //      if ($model->load(Yii::$app->request->get())) { 
+  
+   //      	$this->layout = 'report';
+   //      	$query = new Query;
+   //  	    if($model->partner==false){ // All Partner
+   //  	    	$command = 
+   //  	    		Yii::$app->db->createCommand("SELECT DISTINCT aml.partner_id as partner 
+			// 										FROM account_invoice as p
+			// 										LEFT JOIN account_move as am ON am.id=p.move_id
+			// 										LEFT JOIN account_move_line as aml ON aml.move_id=am.id
+			// 										WHERE p.state='open' AND aml.account_id=119");
+			// }else{
+			// 	$command = 
+			// 		Yii::$app->db->createCommand("SELECT DISTINCT p.partner_id as partner 
+			// 									FROM account_invoice as p
+			// 									LEFT JOIN account_move as am ON am.id=p.move_id
+			// 									LEFT JOIN account_move_line as aml ON aml.move_id=am.id
+			// 									WHERE p.state='open' AND aml.account_id=119 AND p.partner_id IN ($model->partner)");
+			// }
+    	  
+			// return $this->render('report\apdetail',['data'=>$command->queryAll(),'date'=>$model->date_from,'partner'=>'all']);	
+   //      }
+     	return $this->render('apdetail',['model' => $model]);
+     }
+
+     public function actionJurnalap()
+     {
+     	$this->layout ='dashboard';
+     	$model = new AccountingReportForm();
+
+
+
+     	$model->load(Yii::$app->request->get());
+        if ($model->load(Yii::$app->request->get())) { 
+        		$this->layout = 'report';
+        		$query = new Query;
+        		if($model->partner==false)
+        		{
+        			$query
+		 			->select ('
+		 					am.id as move_id,
+		 					am.date as date,
+		 					rp.name as partner_name
+		 					')
+			 		->from('account_move as am')
+			 		->join('LEFT JOIN','res_partner as rp','rp.id=am.partner_id')
+			 		->where(['>=','am.date',$model->date_from])
+			 		->andWhere(['<=','am.date',$model->date_to])
+			 		->andWhere(['am.journal_id' =>2])
+					->addOrderBy(['am.date' => SORT_DESC]);
+
+					$queryline = new Query;
+		     		$queryline
+						->select ('
+								aml.move_id as move_id,
+								ai.kwitansi as kwitansi,
+								aml.ref as ref, 
+								aa.code as code, 
+								aa.name as account, 
+								aml.name as name,
+								aml.date as date, 
+								aml.debit as debit, 
+								aml.credit as credit
+								')
+			     		->from('account_move_line aml')
+			     		->join('LEFT JOIN','account_account as aa','aa.id=aml.account_id')
+			     		->join('LEFT JOIN','account_move as am','am.id=aml.move_id')
+			     		->join('LEFT JOIN','account_invoice as ai','ai.move_id=am.id')
+						->where(['>=','am.date',$model->date_from])
+			 			->andWhere(['<=','am.date',$model->date_to])
+						->addOrderBy(['aml.id' => SORT_ASC])
+						->addOrderBy(['am.date' => SORT_ASC]);
+        		}else{
+        			$query
+		 			->select ('
+		 					am.id as move_id,
+		 					am.date as date,
+		 					rp.name as partner_name
+		 					')
+			 		->from('account_move as am')
+			 		->join('LEFT JOIN','res_partner as rp','rp.id=am.partner_id')
+			 		->where(['>=','am.date',$model->date_from])
+			 		->andWhere(['<=','am.date',$model->date_to])
+			 		->andWhere(['am.journal_id' =>2])
+			 		->andWhere(['am.partner_id' =>explode(',',$model->partner)])
+					->addOrderBy(['am.date' => SORT_DESC]);
+
+					$queryline = new Query;
+		     		$queryline
+						->select ('
+								aml.move_id as move_id,
+								ai.kwitansi as kwitansi,
+								aml.ref as ref, 
+								aa.code as code, 
+								aa.name as account, 
+								aml.name as name,
+								aml.date as date, 
+								aml.debit as debit, 
+								aml.credit as credit
+								')
+			     		->from('account_move_line aml')
+			     		->join('LEFT JOIN','account_account as aa','aa.id=aml.account_id')
+			     		->join('LEFT JOIN','account_move as am','am.id=aml.move_id')
+			     		->join('LEFT JOIN','account_invoice as ai','ai.move_id=am.id')
+						->where(['>=','am.date',$model->date_from])
+			 			->andWhere(['<=','am.date',$model->date_to])
+			 			->andWhere(['aml.partner_id' =>explode(',',$model->partner)])
+						->addOrderBy(['aml.id' => SORT_ASC])
+						->addOrderBy(['am.date' => SORT_ASC]);
+        		}
+				return $this->render('report\transaksiap',['data'=>$queryline->all(), 'array'=>$query->all(), 'from' =>$model->date_from, 'to'=>$model->date_to]);	
+        	}
+
+     	return $this->render('jurnalap',['model' => $model]);	
+     }
+
+     public function actionJurnalpengeluaran()
+     {
+     	$this->layout ='dashboard';
+     	$model = new AccountingReportForm();
+
+     	$model->load(Yii::$app->request->get());
+        if ($model->load(Yii::$app->request->get())) {
+        	$this->layout = 'report';
+        	$query = new Query;
+        	$query
+	 			->select ('
+	 					am.id as move_id, 
+	 					am.date as date, 
+	 					am.ref as ref
+	 					')
+		 		->from('account_move as am')
+		 		->where(['>=','am.date',$model->date_from])
+		 		->andWhere(['<=','am.date',$model->date_to])
+		 		->andWhere(['not',['am.journal_id' =>[1,2]]])
+				->addOrderBy(['am.date' => SORT_DESC]);
+
+			$queryline = new Query;
+     		$queryline
+					->select ('
+						aml.move_id as move_id,
+						aml.ref as ref, 
+						aa.code as code, 
+						aa.name as account, 
+						aml.name as name,
+						aml.date as date, 
+						aml.debit as debit, 
+						aml.credit as credit
+						')
+		     		->from('account_move_line aml')
+		     		->join('LEFT JOIN','account_account as aa','aa.id=aml.account_id')
+		     		->join('LEFT JOIN','account_move as am','am.id=aml.move_id')
+		     		->where(['>=','aml.date',$model->date_from])
+		 			->andWhere(['<=','aml.date',$model->date_to])
+		 			->andWhere(['not',['am.journal_id' =>[1,2]]])
+					->addOrderBy(['aml.id' => SORT_ASC]);
+
+			return $this->render('report\jurnalpengeluaran',['data'=>$queryline->all(),'array'=>$query->all(), 'from' =>$model->date_from, 'to'=>$model->date_to, 'account'=>'all']);	
+        }
+     	return $this->render('jurnalpengeluaran',['model' => $model]);	
+     }
      public function actionAgingArSummary()
      {
      	$this->layout = 'report';
@@ -201,9 +1098,7 @@ class ReportAccountingController extends Controller
 			    ->addOrderBy(['m.date' => SORT_DESC]);
 
 			$data = $query->all();
-			// echo '<pre>';
-			// print_r($query->all()[0]['product_name']);
-			// echo '</pre>';
+	
      	return $this->render('turnover',['data'=>$data,'nameproduct'=>$data[0]['product_name']]);	
      }
 }

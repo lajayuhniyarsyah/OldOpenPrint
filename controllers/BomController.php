@@ -35,7 +35,6 @@ class BomController extends Controller
     {
         $searchModel = new MrpBomSearch();
         $dataProvider = $searchModel->searchPhantom(Yii::$app->request->queryParams);
-
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
@@ -127,6 +126,18 @@ class BomController extends Controller
             return $model;
         } else {
             throw new NotFoundHttpException('The requested page does not exist.');
+        }
+    }
+
+    public function actionbomDetail() {
+        if (isset($_POST['bom'])) 
+        {
+            $model = \frontend\models\Book::findOne($_POST['expandRowKey']);
+                return $this->renderPartial('_book-details', ['model'=>$model]);
+            }
+        else 
+        {
+            return '<div class="alert alert-danger">No data found</div>';
         }
     }
 }
