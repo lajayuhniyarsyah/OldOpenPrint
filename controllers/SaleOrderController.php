@@ -288,7 +288,8 @@ EOQ;
 					'pageSize'=>100,
 				]
 			]);
-
+			$groups = ArrayHelper::map(GroupSales::find()->select('id,desc')->where(['is_main_group'=>true])->asArray()->all(),'id','desc');
+			
 			$salesManSearchGrid['columns']=[
 				/*[
 					'class'=>\yii\grid\SerialColumn::className()
@@ -296,6 +297,13 @@ EOQ;
 				[
 					'attribute'=>'sales_name',
 					'header'=>'User(s)',
+				],
+				[
+					'attribute'=>'group_id',
+					'header'=>'Group',
+					'value'=>function($model,$key,$col,$grid) use ($groups){
+						return $groups[$model['group_id']];
+					}
 				]
 			];
 			$countCurrColumn = 0;
@@ -321,6 +329,9 @@ EOQ;
 							# dont render
 							break;
 						case 'sales_name':
+							# dont render
+							break;
+						case 'group_id':
 							# dont render
 							break;
 						default:
@@ -417,7 +428,7 @@ EOQ;
 		// @link http://www.php.net/manual/en/class.dateinterval.php
 		$interval = $d2->diff($d1);
 
-		$interval->format('%m months');
+		$monthDiff = ceil($interval->format('%m.%d'));
 		// var_dump($interval);
 		// echo $y1.'-'.$m1.'/'.$y2.'-'.$m2;
 		if($date_from == $date_to)
@@ -443,7 +454,7 @@ EOQ;
 		$periods = [];
 		$currM = $m1;
 		$currY = $y1;
-		for($m=1;$m<=$interval->m;$m++):
+		for($m=1;$m<=$monthDiff;$m++):
 			if($currM>12){
 				$currY++; #next year
 				$currM = 1; #reset to jan
@@ -467,6 +478,7 @@ EOQ;
 		$query = <<<EOQ
 	
 	SELECT 
+	annual.group_id,
 	annual.user_id,
 	p.name as sales_name,
 	{$qSelectMonthly}
@@ -475,6 +487,7 @@ FROM
 		CAST(EXTRACT(YEAR FROM "date_order") AS INTEGER) AS period_year,
 		CAST(EXTRACT(MONTH FROM "date_order") AS INTEGER) AS period_month,
 		CONCAT(TO_CHAR(TO_TIMESTAMP (CAST(EXTRACT(MONTH FROM "date_order") AS TEXT), 'MM'), 'TMmon'), '-',CAST(EXTRACT(YEAR FROM "date_order") AS TEXT)) as month_name,
+		group_id,
 		user_id,
 		SUM(so_rates.rates) AS subtotal
 		FROM(
@@ -505,17 +518,18 @@ FROM
 		and
 		so.state not in ('draft','cancel'){$andWhereUserIds}
 		order by so.date_order asc) AS so_rates
-	GROUP BY period_year, period_month, month_name, user_id
-	ORDER BY period_year ASC, period_month ASC, user_id ASC) AS annual
+	GROUP BY period_year, period_month, month_name, group_id, user_id
+	ORDER BY period_year ASC, period_month ASC, group_id ASC, user_id ASC) AS annual
 JOIN res_users AS rusr ON annual.user_id = rusr.id
 JOIN res_partner as p ON p.id = rusr.partner_id
 GROUP BY
+	annual.group_id,
 	annual.user_id,
 	p.name
 ORDER BY
 	p.name
 EOQ;
-		echo '<text>'.$query.'</text>';
+		// echo '<text>'.$query.'</text>';
 		$connection=Yii::$app->db;
 		return $connection->createCommand($query)->queryAll();
 	}
@@ -591,5 +605,21 @@ EOQ;
 			$out['results'] = ['id' => 0, 'text' => 'No matching records found'];
 		}
 		echo \yii\helpers\Json::encode($out);
+	}
+
+
+	public function actionToDone($id){
+		\Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+		$res = [];
+		if(Yii::$app->request->isAjax){
+			$model = SaleOrder::findOne($id);
+			$model->state = 'done';
+
+			$res = [
+				'status'=>$model->update(),
+			];
+		}
+
+		return $res;
 	}
 }

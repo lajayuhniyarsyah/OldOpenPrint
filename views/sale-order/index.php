@@ -3,7 +3,7 @@
 use yii\helpers\Html;
 use yii\helpers\Url;
 use kartik\grid\GridView;
-
+use yii\widgets\Pjax;
 use app\models\ResUsers;
 use app\models\ResPartner;
 use yii\web\JsExpression;
@@ -46,9 +46,11 @@ $this->params['breadcrumbs'][] = $this->title;
 		}';
 	}
 	?>
+	<?php Pjax::begin(['id'=>'pjax-so-grid']); ?>
 	<?=GridView::widget([
 		'dataProvider' => $dataProvider,
 		'filterModel' => $searchModel,
+		'pjax'=>true,
 		'tableOptions'=>[
 			'style'=>'width:1500px;max-width:1500px;'
 		],
@@ -184,7 +186,7 @@ $this->params['breadcrumbs'][] = $this->title;
 					$res = '';
 					foreach($model->orderPreparations as $op){
 						if($res) $res.='<br/>';
-						$res .= Html::a(Html::encode($op->name),'http://192.168.9.26:10001/?db=LIVE_2014&id='.$op->id.'&view_type=form&model=order.preparation&menu_id=546&action=498#id=14&view_type=form&model=order.preparation&menu_id=529&action=498',['class'=>'_blank']).' ('.$op->state.')';
+						$res .= Html::a(Html::encode($op->name),'http://192.168.9.26:10001/?db=LIVE_2014#id='.$op->id.'&view_type=form&model=order.preparation&menu_id=529&action=498',['class'=>'_blank']).' ('.$op->state.')';
 					}
 					return $res;
 				},
@@ -197,7 +199,7 @@ $this->params['breadcrumbs'][] = $this->title;
 					$res = '';
 					foreach($model->deliveryNotes as $dn){
 						if($res) $res.='<br/>';
-						$res .= Html::a(Html::encode($dn->name),'http://192.168.9.26:10001/?db=LIVE_2014&id='.$dn->id.'&view_type=form&model=delivery.note&menu_id=527&action=502#id=1853&view_type=form&model=delivery.note&menu_id=527&action=502').' ('.$dn->state.')';
+						$res .= Html::a(Html::encode($dn->name),'http://192.168.9.26:10001/?db=LIVE_2014#id='.$dn->id.'&view_type=form&model=delivery.note&menu_id=527&action=502').' ('.$dn->state.')';
 					}
 					return $res;
 				},
@@ -220,9 +222,7 @@ $this->params['breadcrumbs'][] = $this->title;
 										Html::decode(
 											'<span class="bg-danger">'.$inv->name.' - '.$val.' ('.$inv->state.')</span>'
 										),
-										'http://192.168.9.26:10001/?db=LIVE_2014&id='.
-										$inv->id.
-										'&view_type=form&model=account.invoice&menu_id=220&action=241').
+										'http://192.168.9.26:10001/?db=LIVE_2014#id='.$inv->id.'&view_type=form&model=account.invoice&menu_id=220&action=241').
 									'</li>';
 								break;
 							
@@ -232,9 +232,7 @@ $this->params['breadcrumbs'][] = $this->title;
 										Html::decode(
 											$inv->name.' - '.$val.' ('.$inv->state.')'
 										),
-										'http://192.168.9.26:10001/?db=LIVE_2014&id='.
-										$inv->id.
-										'&view_type=form&model=account.invoice&menu_id=220&action=241').
+										'http://192.168.9.26:10001/?db=LIVE_2014#id='.$inv->id.'&view_type=form&model=account.invoice&menu_id=220&action=241').
 									'</li>';
 								break;
 						}
@@ -257,7 +255,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
 			[
 				'class' => 'yii\grid\ActionColumn',
-				'template'=>'{view}',
+				'template'=>'{view}{done}',
 				'buttons'=>[
 					'view'=>function($url,$model,$key){
 						if($model->state=='draft' || $model->state=='cancel'){
@@ -266,11 +264,40 @@ $this->params['breadcrumbs'][] = $this->title;
 							return Html::a('<span class="glyphicon glyphicon-eye-open"></span>','http://192.168.9.26:10001/?db=LIVE_2014&debug=#id='.$model->id.'&view_type=form&model=sale.order&menu_id=254&action=302');
 						}
 						
+					},
+					'done'=>function($url,$model,$key){
+						if(!Yii::$app->user->isGuest){
+							if($model->state != 'done' && $model->state != 'cancel' && $model->state != 'draft'){
+								return Html::a(
+									'<span class="glyphicon glyphicon-check"></span>',
+									[
+										'sale-order/to-done',
+										'id'=>$model->id
+									],
+									[
+										'onclick'=>new JsExpression('
+											jQuery.ajax({
+												url:jQuery(this).attr(\'href\')
+											}).success(function(res){
+												$.pjax.reload({container:\'#pjax-so-grid\'});
+											}).error(function(res){
+												alert(\'Error\');
+											});
+											return false;
+										'),
+									]
+								);
+							}
+							
+						}else{
+							return null;
+						}
 					}
 				]
 
 			],
 		],
 	]); ?>
+	<?php Pjax::end(); ?>
 
 </div>
