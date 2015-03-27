@@ -263,7 +263,37 @@ $this->params['breadcrumbs'][] = $this->title;
 						],
 				],
 			],
-			
+			[
+				'attribute'=>'currency_id',
+				'value'=>function($model,$key,$index,$grid){
+					return $model->currency->name;
+				},
+				'filterType'=>GridView::FILTER_SELECT2,
+				'filterWidgetOptions'=>[
+					'pluginOptions' => [
+						'allowClear' => true,
+						'minimumInputLength'=>2,
+						'ajax'=>[
+							'url'=>Url::to(['service/search-currency']),
+							'dataType'=>'json',
+							'data'=>new JsExpression('function(term,page){return {search:term}; }'),
+							'results'=>new JsExpression('function(data,page){ return {results:data.results}; }'),
+						],
+						'initSelection' => new JsExpression(
+								'function (element, callback) {
+								var id=$(element).val();
+								if (id !== "") {
+									$.ajax("'.Url::to(['service/search-currency']).'&id=" + id, {
+										dataType: "json"
+										}).done(function(data) {
+											callback(data.results);
+										}
+									);
+								}
+							}')
+						],
+				],
+			],
 			// 'fiscal_position',
 			// 'user_id',
 			// 'partner_bank_id',

@@ -93,7 +93,7 @@ class AccountInvoice extends \yii\db\ActiveRecord
             [['check_total', 'amount_tax', 'residual', 'amount_untaxed', 'amount_total', 'pajak', 'kurs'], 'number'],
             [['account_id', 'company_id', 'currency_id', 'partner_id', 'reference_type', 'journal_id'], 'required'],
             [['reference_type', 'state', 'type', 'comment'], 'string'],
-            [['reconciled', 'sent'], 'boolean'],
+            [['reconciled', 'sent','print_all_taxes_line'], 'boolean'],
             [['origin', 'reference', 'supplier_invoice_number', 'number', 'move_name', 'name', 'kmk', 'kwitansi'], 'string', 'max' => 64],
             [['internal_number'], 'string', 'max' => 32],
             [['faktur_pajak_no'], 'string', 'max' => 20],
@@ -293,6 +293,14 @@ class AccountInvoice extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
+    public function getFakturAddress()
+    {
+        return $this->hasOne(ResPartner::className(), ['id' => 'faktur_address']);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
     public function getMove()
     {
         return $this->hasOne(AccountMove::className(), ['id' => 'move_id']);
@@ -328,6 +336,10 @@ class AccountInvoice extends \yii\db\ActiveRecord
     public function getSaleOrderInvoiceRels()
     {
         return $this->hasMany(SaleOrderInvoiceRel::className(), ['invoice_id' => 'id']);
+    }
+
+    public function getOrders(){
+        return $this->hasMany(SaleOrder::className(),['id'=>'order_id'])->via('saleOrderInvoiceRels');
     }
 
     /**

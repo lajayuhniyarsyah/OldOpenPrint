@@ -12,7 +12,7 @@ use app\models\AccountInvoice;
  */
 class AccountInvoiceSearch extends AccountInvoice
 {
-	public $start_date,$end_date,$sales_ids;
+	public $start_date,$end_date,$sales_ids,$group_ids;
 	/**
 	 * @inheritdoc
 	 */
@@ -21,9 +21,10 @@ class AccountInvoiceSearch extends AccountInvoice
 		return [
 			[['id', 'create_uid', 'write_uid', 'account_id', 'company_id', 'currency_id', 'partner_id', 'fiscal_position', 'user_id', 'partner_bank_id', 'payment_term', 'journal_id', 'period_id', 'move_id', 'commercial_partner_id', 'approver'], 'integer'],
 			[['create_date', 'write_date', 'origin', 'date_due', 'reference', 'supplier_invoice_number', 'number', 'reference_type', 'state', 'type', 'internal_number', 'move_name', 'date_invoice', 'name', 'comment', 'kmk', 'faktur_pajak_no', 'kwitansi','start_date','end_date'], 'safe'],
-			[['check_total', 'amount_tax', 'residual', 'amount_untaxed', 'amount_total', 'pajak', 'kurs'], 'number'],
+			[['check_total', 'amount_tax', 'residual', 'amount_untaxed', 'amount_untaxed', 'pajak', 'kurs'], 'number'],
 			[['reconciled', 'sent'], 'boolean'],
-			[['sales_ids'],'checkSales']
+			[['sales_ids'],'checkSales'],
+			[['group_ids'],'checkGroup']
 		];
 	}
 
@@ -36,6 +37,18 @@ class AccountInvoiceSearch extends AccountInvoice
 				->addParams([':salesIds'=>$salesId]);
 			if(!$query->exists()){
 				$this->addError($attribute,'Sales Man did you search is not exist for sales man id '.$salesId);
+			}
+		}
+	}
+	public function checkGroup($attribute,$params){
+		foreach($this->$attribute as $gid){
+			$query = new \yii\db\Query;
+			$query->select('id')
+				->from(GroupSales::tableName())
+				->where('id = :gid')
+				->addParams([':gid'=>$gid]);
+			if(!$query->exists()){
+				$this->addError($attribute,'Sales Man did you search is not exist for group id '.$gid);
 			}
 		}
 	}
@@ -109,9 +122,9 @@ class AccountInvoiceSearch extends AccountInvoice
 								CASE WHEN rcr.rating IS NULL AND rc.id=13 THEN 1 ELSE CASE WHEN rcr.rating IS NULL THEN 0 END END
 							) = 0 THEN (
 								SELECT rating FROM res_currency_rate WHERE ai.currency_id=rc.id AND NAME < ai.date_invoice ORDER BY NAME DESC LIMIT 1
-							) * ai.amount_total ELSE (1*ai.amount_total) END ) 
+							) * ai.amount_untaxed ELSE (1*ai.amount_untaxed) END ) 
 						) 
-						ELSE (rcr.rating*amount_total) END
+						ELSE (rcr.rating*amount_untaxed) END
 					) AS total_rated
 				FROM "account_invoice" "ai"
 				JOIN res_currency AS rc ON ai.currency_id=rc.id 
@@ -143,24 +156,7 @@ SQL;
 	{
 
 		$query = AccountInvoice::find();
-
-		/*->select(
-				[
-					'account_invoice.*',
-					'(CASE WHEN rcr.rating IS NULL THEN( 
-							( CASE WHEN (
-								CASE WHEN rcr.rating IS NULL AND rc.id=13 THEN 1 ELSE CASE WHEN rcr.rating IS NULL THEN 0 END END
-							) = 0 THEN (
-								SELECT rating FROM res_currency_rate WHERE account_invoice.currency_id=rc.id AND NAME < account_invoice.date_invoice ORDER BY name DESC LIMIT 1
-							) * account_invoice.amount_total ELSE (1*account_invoice.amount_total) END ) 
-						) 
-						ELSE (rcr.rating*amount_total) END
-					) AS total_rated'
-				]
-			)
-			->join('LEFT JOIN',ResCurrency::tableName().' rc','account_invoice.currency_id=rc.id ')
-			->leftJoin(ResCurrencyRate::tableName().' rcr','rcr.currency_id=rc.id AND rcr.name = account_invoice.date_invoice')*/
-
+		
 		$dataProvider = new ActiveDataProvider([
 			'query' => $query,
 			'sort'  => [
@@ -208,7 +204,7 @@ SQL;
 			'period_id' => $this->period_id,
 			'amount_untaxed' => $this->amount_untaxed,
 			'move_id' => $this->move_id,
-			'amount_total' => $this->amount_total,
+			'amount_untaxed' => $this->amount_untaxed,
 			'sent' => $this->sent,
 			'commercial_partner_id' => $this->commercial_partner_id,
 			'pajak' => $this->pajak,
@@ -245,6 +241,15 @@ SQL;
 		$userIdsWhere=""; # append 'AND ai.user_id in ()' default to empty string it means not append user id condition
 		if(count($this->sales_ids)){
 			$userIdsWhere = 'AND ai.user_id in ('.implode(',', $this->sales_ids).')';
+		}
+
+		$groupIdsWhere="";
+		if(count($this->group_ids)){
+			if($userIdsWhere){
+				$userIdsWhere = 'AND ('.str_replace('AND ', '', $userIdsWhere).' OR ai.group_id in ('.implode(',', $this->group_ids).'))';
+			}else{
+				$groupIdsWhere = 'AND ai.group_id in ('.implode(',', $this->group_ids).')';
+			}
 		}
 		$d1 = new \DateTime($this->start_date);
 		$y1 = $d1->format('Y');
@@ -300,6 +305,7 @@ SQL;
 		$conn = \Yii::$app->db;
 		$sql = <<<SQL
 SELECT 
+	grouped_ai.group_name,
 	grouped_ai.user_id, 
 	p.name as sales_name, 
 	{$qSelectMonthly}
@@ -308,6 +314,7 @@ FROM (
 		
 		ai_rated.year_invoice,
 		ai_rated.month_invoice,
+		(select "desc" from group_sales as gs where gs.id = ai_rated.group_id) as group_name,
 		ai_rated.user_id,
 		SUM(ai_rated.total_rated) as summary
 		
@@ -315,8 +322,9 @@ FROM (
 		(SELECT
 			ai.id,
 			ai.user_id,
-			ai.amount_total,
+			ai.amount_untaxed,
 			ai.date_invoice,
+			ai.group_id,
 			CAST(EXTRACT(MONTH FROM "date_invoice") AS INTEGER) AS month_invoice,
 			CAST(EXTRACT(YEAR FROM "date_invoice") AS INTEGER) AS year_invoice,
 			rcr.rating,
@@ -327,9 +335,9 @@ FROM (
 						CASE WHEN rcr.rating IS NULL AND rc.id=13 THEN 1 ELSE CASE WHEN rcr.rating IS NULL THEN 0 END END
 					) = 0 THEN (
 						SELECT rating FROM res_currency_rate WHERE ai.currency_id=rc.id AND NAME < ai.date_invoice ORDER BY NAME DESC LIMIT 1
-					) * ai.amount_total ELSE (1*ai.amount_total) END ) 
+					) * ai.amount_untaxed ELSE (1*ai.amount_untaxed) END ) 
 				) 
-				ELSE (rcr.rating*amount_total) END
+				ELSE (rcr.rating*amount_untaxed) END
 			) AS total_rated
 		FROM
 			account_invoice AS ai
@@ -338,12 +346,14 @@ FROM (
 		WHERE
 			ai.date_invoice BETWEEN '{$this->start_date}' AND '{$this->end_date}'
 			AND ai.type='out_invoice'
-			AND ai.state not in ('cancel')
+			AND ai.state not in ('cancel','draft')
 			{$userIdsWhere}
+			{$groupIdsWhere}
 		) AS ai_rated
 	GROUP BY
 		ai_rated.year_invoice,
 		ai_rated.month_invoice,
+		group_name,
 		ai_rated.user_id
 	ORDER BY 
 		ai_rated.year_invoice ASC,
@@ -352,12 +362,145 @@ FROM (
 LEFT OUTER JOIN res_users AS rusr ON grouped_ai.user_id = rusr.id 
 LEFT OUTER JOIN res_partner as p ON p.id = rusr.partner_id 
 GROUP BY
+	grouped_ai.group_name,
 	grouped_ai.user_id
 	,p.name
 ORDER BY
+	grouped_ai.group_name,
 	p.name ASC
 SQL;
-		// var_dump($sql);
+		// echo '<text>'.$sql.'</text>';
+		$cmd = $conn->createCommand($sql);
+		$res = $cmd->queryAll();
+		return $res;
+	}
+
+	public function getSumGroup(){
+		$this->validate();
+		$userIdsWhere=""; # append 'AND ai.user_id in ()' default to empty string it means not append user id condition
+		if(count($this->sales_ids)){
+			$userIdsWhere = 'AND ai.user_id in ('.implode(',', $this->sales_ids).')';
+		}
+
+		$groupIdsWhere="";
+		if(count($this->group_ids)){
+			if($userIdsWhere){
+				$userIdsWhere = 'AND ('.str_replace('AND ', '', $userIdsWhere).' OR ai.group_id in ('.implode(',', $this->group_ids).'))';
+			}else{
+				$groupIdsWhere = 'AND ai.group_id in ('.implode(',', $this->group_ids).')';
+			}
+			
+		}
+		// var_dump($groupIdsWhere);
+		$d1 = new \DateTime($this->start_date);
+		$y1 = $d1->format('Y');
+		$m1 = $d1->format('n');
+		$d2 = new \DateTime($this->end_date);
+		$y2 = $d2->format('Y');
+		$m2 = $d2->format('n');
+
+		// @link http://www.php.net/manual/en/class.dateinterval.php
+		$interval = $d2->diff($d1);
+
+		$interval->format('%m months');
+		
+		
+		$periods = [];
+		$currM = $m1;
+		$currY = $y1;
+
+		// end year = $y2
+		// end month = $m2
+		$stop = false;
+		do {
+			if($currM>12)
+			{
+				$currY++; #next year
+				$currM = 1; #reset to jan
+			}
+			$periods[] = [
+				'period_year'=>$currY,
+				'period_month'=>$currM
+			];
+			
+
+			// if month and year is end
+			// stop
+			if($currY==$y2 and $currM == $m2){
+				$stop=true;
+			}else{
+				$currM++;
+			}
+
+		} while(!$stop);
+		
+		$qSelectMonthly = [];
+		foreach($periods as $period):
+			$period_year = $period['period_year'];
+			$period_month = $period['period_month'];
+
+			$qSelectMonthly[] = "SUM(CASE WHEN grouped_ai.year_invoice = '{$period_year}' AND grouped_ai.month_invoice = {$period_month} THEN summary ELSE 0 END) AS summary_{$period_year}_{$period_month}";
+		endforeach;
+		$qSelectMonthly = implode(',', $qSelectMonthly);
+		
+		$conn = \Yii::$app->db;
+		$sql = <<<SQL
+SELECT 
+	grouped_ai.group_name as sales_name,
+	{$qSelectMonthly}
+FROM (
+	SELECT 
+		
+		ai_rated.year_invoice,
+		ai_rated.month_invoice,
+		(select "desc" from group_sales as gs where gs.id = ai_rated.group_id) as group_name,
+		SUM(ai_rated.total_rated) as summary
+		
+	FROM
+		(SELECT
+			ai.id,
+			ai.amount_untaxed,
+			ai.date_invoice,
+			ai.group_id,
+			CAST(EXTRACT(MONTH FROM "date_invoice") AS INTEGER) AS month_invoice,
+			CAST(EXTRACT(YEAR FROM "date_invoice") AS INTEGER) AS year_invoice,
+			rcr.rating,
+			
+			(
+				CASE WHEN rcr.rating IS NULL THEN( 
+					( CASE WHEN (
+						CASE WHEN rcr.rating IS NULL AND rc.id=13 THEN 1 ELSE CASE WHEN rcr.rating IS NULL THEN 0 END END
+					) = 0 THEN (
+						SELECT rating FROM res_currency_rate WHERE ai.currency_id=rc.id AND NAME < ai.date_invoice ORDER BY NAME DESC LIMIT 1
+					) * ai.amount_untaxed ELSE (1*ai.amount_untaxed) END ) 
+				) 
+				ELSE (rcr.rating*amount_untaxed) END
+			) AS total_rated
+		FROM
+			account_invoice AS ai
+		JOIN res_currency AS rc ON ai.currency_id=rc.id 
+		LEFT OUTER JOIN res_currency_rate AS rcr ON rcr.currency_id=rc.id AND rcr.name = ai.date_invoice 
+		WHERE
+			ai.date_invoice BETWEEN '{$this->start_date}' AND '{$this->end_date}'
+			AND ai.type='out_invoice'
+			AND ai.state not in ('cancel','draft')
+			{$userIdsWhere}
+			{$groupIdsWhere}
+		) AS ai_rated
+	GROUP BY
+		ai_rated.year_invoice,
+		ai_rated.month_invoice,
+		group_name
+	ORDER BY 
+		ai_rated.year_invoice ASC,
+		ai_rated.month_invoice ASC
+	) as grouped_ai
+GROUP BY
+	grouped_ai.group_name
+ORDER BY
+	grouped_ai.group_name
+SQL;
+		// echo '<text>'.$sql.'</text>';
 		$cmd = $conn->createCommand($sql);
 		$res = $cmd->queryAll();
 		return $res;
@@ -390,9 +533,9 @@ SQL;
 									CASE WHEN rcr.rating IS NULL AND rc.id=13 THEN 1 ELSE CASE WHEN rcr.rating IS NULL THEN 0 END END
 								) = 0 THEN (
 									SELECT rating FROM res_currency_rate WHERE ai.currency_id=rc.id AND NAME < ai.date_invoice ORDER BY NAME DESC LIMIT 1
-								) * ai.amount_total ELSE (1*ai.amount_total) END ) 
+								) * ai.amount_untaxed ELSE (1*ai.amount_untaxed) END ) 
 							) 
-							ELSE (rcr.rating*amount_total) END
+							ELSE (rcr.rating*amount_untaxed) END
 						) AS total_rated
 					FROM "account_invoice" "ai"
 					JOIN res_currency AS rc ON ai.currency_id=rc.id 

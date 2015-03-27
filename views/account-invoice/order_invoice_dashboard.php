@@ -120,8 +120,5 @@ if(isset($resGrid) && $resGrid){
 			]);?>
 		</div>
 	</div>
-
-
-	
 	<?php
 }
