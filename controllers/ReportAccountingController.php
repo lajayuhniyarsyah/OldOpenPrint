@@ -1071,6 +1071,7 @@ class ReportAccountingController extends Controller
 	    				 r.name as partner,
 	    				 s.name as type,
 	    				 s.lbm_no as lbm,
+	    				 m.location_id as location_id,
 	    				 s.cust_doc_ref as ref_cus,
 	    				 dn.name as dn,
 	    				 op.name as op,

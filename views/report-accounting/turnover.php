@@ -40,7 +40,14 @@
 			}
 
 			if($value['jenis']==""){
-				$jenis=$value['product_name'];
+				if($value['location_id']==5){
+					$jenis='Adjutsment';
+				}else if($value['location_id']==53){
+					$jenis='IN / Konversi';
+				}else if($value['location_id']==52){
+					$jenis='Out / Konversi';
+				}
+				// $jenis=$value['product_name'];
 			}else{
 				$jenis=$value['jenis'];
 			}

@@ -1,6 +1,6 @@
 <?php
 use yii\helpers\Url;
-
+use yii\db\Query;
 
 ?>
 <style type="text/css">
