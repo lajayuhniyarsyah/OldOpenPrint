@@ -35,7 +35,7 @@ use yii\web\JsExpression;
         ->where(['name'=>'All Sales User'])->asArray()->one();
     
     $saleUsers = \yii\helpers\ArrayHelper::map($saleGroup['users'],'id','partner.name');
-    var_dump($saleGroup);
+    // var_dump($saleGroup);
     ?>
     <div class="form-group">
         <label class="controll-label" for="sales">Sales</label>

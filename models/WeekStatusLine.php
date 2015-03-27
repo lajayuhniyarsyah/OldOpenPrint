@@ -27,7 +27,7 @@ use Yii;
  * @property StatusSubline[] $statusSublines
  * @property WeekStatus $status0
  * @property ResCurrency $currency
- * @property ResPartner $name0
+ * @property ResPartner $customer
  * @property SaleOrder $order
  * @property ProductProduct $product
  * @property ResUsers $writeU
@@ -36,6 +36,7 @@ use Yii;
  */
 class WeekStatusLine extends \yii\db\ActiveRecord
 {
+    
     /**
      * @inheritdoc
      */
@@ -111,7 +112,7 @@ class WeekStatusLine extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getName0()
+    public function getCustomer()
     {
         return $this->hasOne(ResPartner::className(), ['id' => 'name']);
     }
@@ -154,5 +155,20 @@ class WeekStatusLine extends \yii\db\ActiveRecord
     public function getLogStatusCustomers()
     {
         return $this->hasMany(LogStatusCustomer::className(), ['week_id' => 'id']);
+    }
+
+
+    
+    private static $stateAliases = [
+        'nego'=>'Persentation',
+        'win'=>'Win',
+        'quo'=>'Quotation',
+        'budget'=>'Budgetary',
+        'lost'=>'Lost',
+        'post'=>'Postpone',
+    ];
+    public static function getStateAliases($state){
+         
+         return self::$stateAliases[$state];
     }
 }

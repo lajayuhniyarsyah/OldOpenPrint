@@ -20,16 +20,13 @@ class SalesActivityForm extends Model
     public function rules()
     {
         return [
-<<<<<<< HEAD
             // name, email, subject and body are required
             // [['sales', 'customer'], 'required'],
-            [['sales', 'customer','from','to'], 'safe'],
+            [['sales', 'customer','date_begin'], 'safe'],
+            [['sales', 'customer'],'number','integerOnly'=>true,]
             // email has to be a valid email address
             // ['email', 'email'],
             
-=======
-            [['sales','customer','date_begin'],'safe'],
->>>>>>> cd70eccde419de91f106903c16d09fd8718217e4
         ];
     }
 

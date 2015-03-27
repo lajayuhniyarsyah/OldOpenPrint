@@ -5,11 +5,14 @@ namespace app\controllers;
 use Yii;
 use app\models\SalesActivity;
 use app\models\SalesActivitySearch;
-use \app\models\SalesActivityForm;
+use app\models\SalesActivityForm;
 use app\models\SalesActivityPlan;
 use app\models\ResUsers;
 use app\models\ResPartner;
 use app\models\WeekStatus;
+use app\models\WeekStatusLine;
+
+use yii\data\ArrayDataProvider;
 
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -39,7 +42,7 @@ class SalesActivityController extends Controller
 	public function actionIndex()
 	{
 		$resGroupsModel = \app\models\ResGroups::find()->where('name like :name')->addParams([':name'=>'All Sales User'])->one();
-		$salesData = new \yii\data\ArrayDataProvider([
+		$salesData = new ArrayDataProvider([
 			'allModels'=>$resGroupsModel->users,
 			'sort'=>[
 				'attributes'=>[
@@ -65,7 +68,7 @@ class SalesActivityController extends Controller
 	 * @param integer $uid instead user_id
 	 * @return mixed
 	 */
-	public function actionViewTimeLine($uid=null,$customer=null,$start=null)
+	public function actionViewTimeLine(integer $uid=null,$customer=null,$start=null)
 	{
 		$salesActivityForm = new SalesActivityForm;
 
@@ -79,9 +82,12 @@ class SalesActivityController extends Controller
 		$salesActivityForm->sales = $uid;
 		$salesActivityForm->customer = $customer;
 		$salesActivityForm->date_begin = $start;
+
+
 		if ($salesActivityForm->load(Yii::$app->request->get()) && $salesActivityForm->validate())
 		{
-			// die();
+			/*var_dump($salesActivityForm->date_begin);
+			die();*/
 			$uid=$salesActivityForm->sales;
 			if($uid){
 				// die();
@@ -98,6 +104,17 @@ class SalesActivityController extends Controller
 				$custName = ResPartner::findOne($salesActivityForm->customer)->name;
 			}
 			$start=$salesActivityForm->date_begin;
+		}else{
+			$msg = [];
+			foreach($salesActivityForm->errors as $error){
+				foreach($error as $err){
+					$msg[] = $err;
+				}
+			}
+			if($msg){
+				Yii::$app->session->setFlash('danger',implode(' and ', $msg));
+			}
+			
 		}
 		// if defined start and end date
 		if($start){
@@ -108,13 +125,16 @@ class SalesActivityController extends Controller
 		}
 		
 		// echo $plan->createCommand()->sql;
-		$dataProvider = new \yii\data\ArrayDataProvider([
+		// var_dump($plan->with(['partner','user','user.partner','actualPartner'])->orderBy('year_p DESC, week_no DESC, dow DESC, user_id, daylight, not_planned_actual')->asArray()->all());
+		// die();
+		$dataProvider = new ArrayDataProvider([
 			'allModels'=>$plan->with(['partner','user','user.partner','actualPartner'])->orderBy('year_p DESC, week_no DESC, dow DESC, user_id, daylight, not_planned_actual')->asArray()->all(),
 		]);
 
 
 		$pies = [];
 		// var_dump($pieType);
+		
 		if($pieType && $pieType=='customer')
 		{
 			$chartData = $this->getCustomerActivityCompositionByUser($uid);
@@ -144,17 +164,135 @@ class SalesActivityController extends Controller
 		}
 		
 		$charts['pie'] = $pies;
-
+		// var_dump($charts);
 		return $this->render('viewTimeLine',['dataProvider'=>$dataProvider,'salesActivityForm'=>$salesActivityForm,'series'=>$series,'charts'=>$charts]);
 	}
 
 	public function actionProspect(){
 		$dataToRender = [];
-		$dataToRender['model'] = WeekStatusLine::find()->select(['state','COUNT(id) as total'])->groupBy('state')->asArray()->all();
+		$charts = [];
+		$model = WeekStatusLine::find()
+			->groupBy('year, state')
+			->where('EXTRACT(year FROM "quotation") = :year')
+			->addParams([':year'=>date('Y')])
+			->asArray();
 
+		$dataSeries = [];
+		/*$stateGrouped = $model->select(['state'])->column();
+		$countGrouped = array_map('floatval',$model->select(['COUNT(id) AS cout'])->column());
+		var_dump(array_merge($stateGrouped,$countGrouped));*/
 
+		$column = [];
+		$color = [
+			'lost'=>'#F15C80',
+			'win'=>'#90ED7D',
+			'quo'=>'#95CEFF',
+			'post'=>'#5C5C61',
+			'nego'=>'#F7A35C',
+		];
+
+		$dataArray = $model->select(['CONCAT(EXTRACT(YEAR FROM "quotation"),\'-\',"state") as "id"','EXTRACT(YEAR FROM "quotation") as "year"','state','COUNT(id) AS cout'])->all();
+		foreach($dataArray as $k=>$d):
+			$dataSeries[$k] = ['id'=>$d['state'].'-'.$d['year'],'name'=>$d['state'],'y'=>floatval($d['cout']),'color'=>$color[$d['state']],'drilldown'=>[]];
+			$column[] = [
+				'type'=>'column',
+				'name'=>$d['state'],
+				'data'=>[
+					[
+						'id'=>$d['state'].'-'.$d['year'],
+						'y'=>floatval($d['cout'])
+					]
+					
+				],
+				'color'=>$color[$d['state']],
+				// 'center'=>[150,0],
+			];
+		endforeach;
+		$series = [];
+		$pie = [
+
+			'type'=>'pie',
+			'name'=>'Prospect Summary',
+			'center'=>[950,80],
+			'size'=>200,
+			'showInLegend'=>false,
+			/*'dataLabels'=>[
+				'enabled'=>false,
+			],*/
+			/*'data'=>[
+				[
+					'name'=>'satu',
+					'y'=>1000,
+				],
+				[
+					'name'=>'dua',
+					'y'=>100,
+				],
+				[
+					'name'=>'tiga',
+					'y'=>400,
+				],
+			]*/
+			'data'=>$dataSeries
+		];
+		// $series = [$pie];
+		$series = array_merge([$pie],$column);
+		$dataToRender['charts'][] = [
+			'type'=>'pie',
+			'series'=>$series
+
+		];
+		// \yii\helpers\VarDumper::dump($series);
+		
+		$dataToRender['dataProvider'] = new ArrayDataProvider([
+			'allModels'=>$dataArray,
+			'key'=>'id',
+		]);
 		$dataToRender['salesActivityForm'] = new SalesActivityForm();
 		return $this->render('prospect',$dataToRender);
+	}
+
+
+	public function actionProspectGrid($expandRowKey=null) {
+		if(isset($_POST['expandRowKey'])) $expandRowKey = $_POST['expandRowKey'];
+
+		if ($expandRowKey) {
+			$exp = explode('-', $expandRowKey);
+			$year = (int)$exp[0];
+			$state = $exp[1];
+
+			$query = WeekStatusLine::find()->asArray()->with(['status0','status0.user','status0.user.partner'])->where('EXTRACT(YEAR FROM "quotation") = :year')->andWhere('state like :state')->addParams([':year'=>$year,':state'=>$state]);
+
+			$dataProvider = new ArrayDataProvider([
+				'allModels'=>$query->all(),
+				'key'=>'id',
+				'pagination'=>[
+					'params'=>array_merge($_GET,['expandRowKey'=>$expandRowKey,])
+				]
+			]);
+			return $this->renderAjax('_ajax_prospect_grid_detail',['dataProvider'=>$dataProvider,'state'=>WeekStatusLine::getStateAliases($state),'year'=>$year]);
+			// return $this->render('_ajax_prospect_grid_detail',['dataProvider'=>$dataProvider,'state'=>WeekStatusLine::getStateAliases($state),'year'=>$year]);
+		}
+		else
+		{
+			return '<div class="alert alert-danger">No data found</div>';
+		}
+	}
+
+	public function actionGetChartProspectByCustomer($param){
+		// \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+		$arrParam = explode('-', $param);
+		$data = [];
+		$model = WeekStatusLine::find()
+			->select(['CONCAT(EXTRACT(year FROM "quotation"),\'-\',res_partner.name,\'-\',\''.$arrParam[0].'\') AS id','EXTRACT(year FROM "quotation") AS year','res_partner.name AS name','COUNT(res_partner.name) as cout'])
+			->leftJoin(ResPartner::tableName(),'week_status_line.name = res_partner.id')
+			->groupBy('year, res_partner.name')
+			->where('EXTRACT(year FROM "quotation") = :year')
+			->andWhere('state like :state')
+			->addParams([':year'=>$arrParam[1],':state'=>$arrParam[0]])
+			->asArray();
+
+		return \yii\helpers\Json::encode($model->all());
 	}
 
 
@@ -182,7 +320,7 @@ class SalesActivityController extends Controller
 			$series[$idx] = [
 				'id'=>$act['actual_partner_id'],
 				'name'=>$act['name'],
-				'condition'=>\yii\Helpers\Json::encode(['pid'=>floatval($act['actual_partner_id']),'uid'=>floatval($uid),'custName'=>$act['name']]),
+				'condition'=>\yii\helpers\Json::encode(['pid'=>floatval($act['actual_partner_id']),'uid'=>floatval($uid),'custName'=>$act['name']]),
 				'y'=>floatval($act['cout']),
 				'drilldown'=>true,
 			];
