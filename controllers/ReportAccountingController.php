@@ -542,11 +542,15 @@ class ReportAccountingController extends Controller
 												rp.street as street,
 												p.kwitansi AS kwitansi, 
 												p.date_invoice AS date_invoice,
-												aml.debit AS total 
+												aml.debit AS total,
+												p.name as no_po_cus,
+												rps.name as sales_name
 											FROM account_invoice AS p 
 												LEFT JOIN account_move AS am ON am.id=p.move_id 
 												LEFT JOIN account_move_line AS aml ON aml.move_id=am.id 
 												LEFT JOIN res_partner as rp ON rp.id=p.partner_id
+												LEFT JOIN res_users as ru ON ru.id=p.user_id
+												LEFT JOIN res_partner as rps ON rps.id=ru.partner_id
 											WHERE 
 												aml.account_id=56 
 											AND
@@ -582,11 +586,15 @@ class ReportAccountingController extends Controller
 												rp.street as street,
 												p.kwitansi AS kwitansi, 
 												p.date_invoice AS date_invoice,
-												aml.debit AS total 
+												aml.debit AS total,
+												p.name as no_po_cus,
+												rps.name as sales_name
 											FROM account_invoice AS p 
 												LEFT JOIN account_move AS am ON am.id=p.move_id 
 												LEFT JOIN account_move_line AS aml ON aml.move_id=am.id 
 												LEFT JOIN res_partner as rp ON rp.id=p.partner_id
+												LEFT JOIN res_users as ru ON ru.id=p.user_id
+												LEFT JOIN res_partner as rps ON rps.id=ru.partner_id
 											WHERE 
 												aml.account_id=56 
 											AND
@@ -814,7 +822,8 @@ class ReportAccountingController extends Controller
 												rp.street as street,
 												p.kwitansi AS kwitansi, 
 												p.date_invoice AS date_invoice,
-												aml.credit AS total 
+												aml.credit AS total,
+												p.reference as no_po
 											FROM account_invoice AS p 
 												LEFT JOIN account_move AS am ON am.id=p.move_id 
 												LEFT JOIN account_move_line AS aml ON aml.move_id=am.id 
@@ -854,7 +863,8 @@ class ReportAccountingController extends Controller
 												rp.street as street,
 												p.kwitansi AS kwitansi, 
 												p.date_invoice AS date_invoice,
-												aml.credit AS total 
+												aml.credit AS total,
+												p.reference as no_po
 											FROM account_invoice AS p 
 												LEFT JOIN account_move AS am ON am.id=p.move_id 
 												LEFT JOIN account_move_line AS aml ON aml.move_id=am.id 
