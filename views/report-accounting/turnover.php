@@ -38,7 +38,7 @@
 				$no_surat=substr($value['dn'], 0,7);
 				$no_pb=substr($value['op'], 0,7);
 			}
-
+			$jenis=$value['jenis'];
 			if($value['jenis']==""){
 				if($value['location_id']==5){
 					$jenis='Adjutsment';
