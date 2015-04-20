@@ -124,7 +124,7 @@ class AccountInvoiceController extends Controller
             if($invLine->account_id<>192){
                 $nameLine = (isset($invLine->product->name_template) ? $invLine->product->name_template : null);
 
-                if(!empty(trim($invLine->name))):
+                if(!trim($invLine->name)):
                     $nameLine .= (isset($invLine->product->name_template) ? '<br/>':"").nl2br($invLine->name);
                 endif;
 
@@ -570,13 +570,15 @@ class AccountInvoiceController extends Controller
 	}
 
 
+	public function actionTes(){
 
+	}
 	/**
 	 * ESS EXECUTIVE SALES ACHIEVEMEN DASHBOARD REPORT BY SALES GROUP
 	 * @param  [type] $year [description]
 	 * @return [type]       [description]
 	 */
-	public function actionExecutiveSummaryByGroup($year=null){
+	public function actionExecutiveSummaryByGroup($year=null,$validated=false){
 		$dataToRender = [];
 		$model = new ExecutiveSummaryGroup;
 		if(!$year) $year = date('Y'); #GET CURRENT YEAR
