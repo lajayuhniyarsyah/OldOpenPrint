@@ -46,6 +46,16 @@ $config = [
         'db' => require(__DIR__ . '/db.php'),
         'numericLib'=>[
             'class'=>'app\components\NumericLib',
+        ],
+        'urlManager'=>[
+            'enablePrettyUrl'=>true,
+            'rules'=>[
+
+                'invoice/<type:(in|out)>/<uid:\d+>'         => 'account-invoice/index',
+                '<controller:\w+>/<action:\w+>/<uid:\d+>'   => '<controller>/<action>',
+                'invoice/dashboard'                         => 'account-invoice/dashboard',
+                'sale-order/<action:\w+>/<uid:\d+>'         => 'sale-order/<action>'
+            ]
         ]
     ],
     'modules'=>[
@@ -59,8 +69,13 @@ $config = [
 
 if (YII_ENV_DEV) {
     // configuration adjustments for 'dev' environment
-    // $config['bootstrap'][] = 'debug';
-    $config['modules']['debug'] = 'yii\debug\Module';
+    $config['bootstrap'][] = 'debug';
+
+    // $config['modules']['debug'] = 'yii\debug\Module';
+    $config['modules']['debug'] = [
+        'class'=>'yii\debug\Module',
+        'allowedIPs'=>['127.0.0.1','::1','10.36.15.18','192.168.9.25']
+    ];
 
     $config['bootstrap'][] = 'gii';
     $config['modules']['gii'] = 'yii\gii\Module';

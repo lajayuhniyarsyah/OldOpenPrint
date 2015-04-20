@@ -10,8 +10,8 @@
 
 return [
     'class' => 'yii\db\Connection',
-    'dsn' => 'pgsql:host=192.168.9.26;dbname=LIVE_2014;port=5432',
-    'username' => 'proj70_supra',
-    'password' => 'proj70_supra',
+    'dsn' => 'pgsql:host=10.36.15.11;dbname=LIVE_2015;port=5432',
+    'username' => 'openerp',
+    'password' => 'admin',
     'charset' => 'utf8',
 ];
