@@ -507,6 +507,69 @@ class AccountInvoiceController extends Controller
 		return $this->render('order_invoice_dashboard',['title'=>$title,'model'=>$model,'saleUsers'=>$saleUsers,'resGrid'=>$resGrid,'pie'=>$pie]);
 	}
 
+
+	/**
+	 * ESS EXECUTIVE SUMMARY SALES REPORT BY SALES MAN WICH HAS INVOICE HAS BEEN VALIDATED BY ACCOUNTING
+	 * @param  [type] $year [description]
+	 * @return [type]       [description]
+	 */
+	public function actionValidatedExecutiveSummaryBySalesMan($year=null,$gid=null){
+		$modelSearch = new \app\models\ExecutiveSummaryGroupValidatedSearch;
+		$dataToRender = [];
+		if(!$year) $year = date('Y'); #GET CURRENT YEAR
+		
+		$modelSearch->year_invoice = $year;
+		$modelSearch->gid = $gid;
+		// $modelSearch->user_id = 'aaaa';
+		$query = $modelSearch->getQuery();
+
+		$query->orderBy('name ASC');
+		
+
+		
+		$dataArr = $query->asArray()->all();
+		$ytdSales = array_map(function($v){
+			return ['name'=>$v['name'],'y'=>floatval($v['ytd_target'])];
+		},$dataArr);
+
+		$ytdAchievement = array_map(function($v){
+			return ['name'=>$v['name'],'y'=>floatval($v['ytd_sales_achievement'])];
+		},$dataArr);
+		
+		
+		$dataToRender['chart']['series'] = [
+			[
+				'name'=>'Ytd Target',
+				'data'=>$ytdSales,
+				'pointPadding'=>0.3,
+				'pointPlacement'=>-0.1,
+			],
+			[
+				'name'=>'Ytd Achievement',
+				'data'=>$ytdAchievement,
+				'pointPadding'=>0.4,
+				'pointPlacement'=>-0.1,
+			],
+		];
+		// \yii\helpers\VarDumper::dump($dataArr);
+		$dataToRender['provider'] = new \yii\data\ArrayDataProvider([
+		    'allModels' => $dataArr,
+		    'pagination' => false
+		]);
+
+
+		$dataToRender['year'] = $modelSearch->year_invoice;
+
+		$dataToRender['salesTitle'] = ($gid && isset($dataArr[0]) ? strtoupper($dataArr[0]['group_name']):'All Sales');
+		// var_dump($dataToRender['salesTitle']);
+		// var_dump($modelSearch->errors);
+		foreach($modelSearch->errors as $error){
+			Yii::$app->session->setFlash('danger',$error[0]);
+		}
+		Yii::$app->view->title = 'Validated Executive Summary By ';
+		return $this->render('executive_summary_by_sales_man',$dataToRender);
+	}
+
 	/**
 	 * ESS EXECUTIVE SUMMARY SALES REPORT BY SALES MAN
 	 * @param  [type] $year [description]
@@ -565,20 +628,17 @@ class AccountInvoiceController extends Controller
 		foreach($modelSearch->errors as $error){
 			Yii::$app->session->setFlash('danger',$error[0]);
 		}
-		
+		Yii::$app->view->title = 'Executive Summary By ';
 		return $this->render('executive_summary_by_sales_man',$dataToRender);
 	}
 
 
-	public function actionTes(){
-
-	}
 	/**
 	 * ESS EXECUTIVE SALES ACHIEVEMEN DASHBOARD REPORT BY SALES GROUP
 	 * @param  [type] $year [description]
 	 * @return [type]       [description]
 	 */
-	public function actionExecutiveSummaryByGroup($year=null,$validated=false){
+	public function actionExecutiveSummaryByGroup($year=null){
 		$dataToRender = [];
 		$model = new ExecutiveSummaryGroup;
 		if(!$year) $year = date('Y'); #GET CURRENT YEAR
@@ -627,7 +687,66 @@ class AccountInvoiceController extends Controller
 		]);
 
 		$dataToRender['year'] = (int)$year;
+		Yii::$app->view->title = 'Executive Summary By Group';
+		return $this->render('executive_summary_by_group',$dataToRender);
+	}
 
+
+	/**
+	 * ESS INVOICE SUMMARY REPORT WICH INVOICE HAS BEEN VALIDATED BY ACCOUNTING TEAM
+	 * @param  [type] $year [description]
+	 * @return [type]       [description]
+	 */
+	public function actionValidatedExecutiveSummaryByGroup($year=null){
+		$dataToRender = [];
+		$model = new \app\models\ExecutiveSummaryGroupValidated;
+		if(!$year) $year = date('Y'); #GET CURRENT YEAR
+		$query = ExecutiveSummaryGroup::find()
+			->where('year_invoice = :year')
+			->addParams([':year'=>(int)$year])
+			->groupBy('gid, group_name, year_invoice')
+			->orderBy('group_name ASC');
+
+		$dataArr = $query->select('year_invoice, gid, group_name, 
+				SUM(amount_target) AS amount_target, SUM(ytd_target) as ytd_target, SUM(ytd_sales_achievement) as ytd_sales_achievement, 
+				SUM(achievement) AS achievement')->asArray()->all();
+		$ytdSales = array_map(function($v){
+			return ['name'=>$v['group_name'],'y'=>floatval($v['ytd_target'])];
+		},$dataArr);
+
+		$ytdAchievement = array_map(function($v){
+			return ['id'=>$v['gid'],'name'=>$v['group_name'],'y'=>floatval($v['ytd_sales_achievement'])];
+		},$dataArr);
+		
+		
+		$dataToRender['chart']['series'] = [
+			[
+				'name'=>'Ytd Target',
+				'data'=>$ytdSales,
+				'pointPadding'=>0.3,
+				'pointPlacement'=>-0.1,
+			],
+			[
+				'name'=>'Ytd Achievement',
+				'data'=>$ytdAchievement,
+				'pointPadding'=>0.4,
+				'pointPlacement'=>-0.1,
+			],
+		];
+
+		// \yii\helpers\VarDumper::dump($dataToRender['chart']['series']);
+
+		$dataToRender['provider'] = new ActiveDataProvider([
+		    'query' => $query->select('year_invoice, gid, group_name, 
+				SUM(amount_target) AS amount_target, SUM(ytd_target) as ytd_target, SUM(ytd_sales_achievement) as ytd_sales_achievement, 
+				SUM(achievement) AS achievement'),
+		    'pagination' => [
+		        'pageSize' => -1,
+		    ],
+		]);
+
+		$dataToRender['year'] = (int)$year;
+		Yii::$app->view->title = 'Validated Executive Summary By Group';
 		return $this->render('executive_summary_by_group',$dataToRender);
 	}
 
