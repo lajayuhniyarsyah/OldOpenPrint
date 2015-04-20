@@ -15,6 +15,7 @@ AppAsset::register($this);
 <html lang="<?= Yii::$app->language ?>">
 <head>
     <?php $this->registerCssFile(yii\helpers\Url::base().'/css/openerp.css'); ?>
+    <?php $this->registerCssFile(yii\helpers\Url::base().'/css/report.css'); ?>
     <meta charset="<?= Yii::$app->charset ?>"/>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <?= Html::csrfMetaTags() ?>
@@ -45,6 +46,7 @@ AppAsset::register($this);
                                   ['label' => 'Executive Summary', 'url' => ['#']],
                                   ['label' => 'Rekap Invoice', 'url' => ['#']],
                                   ['label' => 'Sales Order', 'url' => ['#']],
+                                  ['label' => 'Product Sales', 'url' => ['#']],
                                 ]
                         ],
                         ['label' => 'Admin', 'url' => ['/site/contact']],
@@ -60,7 +62,11 @@ AppAsset::register($this);
                                   ['label' => 'Report Jurnal pengeluaran', 'url' => ['/report-accounting/jurnalpengeluaran']],
                                 ]
                         ],
-                        ['label' => 'Purchases', 'url' => ['/site/contact']],
+                        ['label' => 'Purchases', 'url' => ['#'],
+                          'items' => [
+                                  ['label' => 'Purchase Report', 'url' =>['/purchase-order/purchasereport']],
+                                ]
+                        ],
                         ['label' => 'Warehouse', 'url' => ['/site/contact']],
                         ['label' => 'Manufacturing', 'url' => ['/site/contact']],
                         ['label' => 'Human Resources', 'url' => ['/site/contact']],

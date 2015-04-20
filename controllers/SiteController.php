@@ -140,7 +140,7 @@ class SiteController extends Controller
                 
                 $dataplan = [];
                 $datactual = [];
-            $unsetIdxs = [];
+                $unsetIdxs = [];
             foreach($query->all() as $idx=>$value):
                 $apus = false;
                 $activities[$idx] = [

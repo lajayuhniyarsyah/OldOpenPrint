@@ -75,8 +75,8 @@ class PurchaseOrderLine extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['create_uid', 'write_uid', 'product_uom', 'order_id', 'move_dest_id', 'partner_id', 'company_id', 'product_id', 'account_analytic_id', 'product_pb_id', 'pb_id', 'wo_id', 'line_pb_subcont_id', 'line_pb_general_id', 'line_pb_rent_id', 'no', 'variants'], 'integer'],
-            [['create_date', 'write_date', 'date_planned'], 'safe'],
+            [['create_uid', 'write_uid', 'product_uom', 'order_id', 'move_dest_id', 'partner_id', 'company_id', 'account_analytic_id', 'product_pb_id', 'pb_id', 'wo_id', 'line_pb_subcont_id', 'line_pb_general_id', 'line_pb_rent_id', 'no', 'variants'], 'integer'],
+            [['create_date', 'write_date', 'product_id', 'date_planned'], 'safe'],
             [['product_uom', 'order_id', 'price_unit', 'product_qty', 'name', 'state'], 'required'],
             [['price_unit', 'product_qty', 'discount', 'discount_nominal'], 'number'],
             [['invoiced'], 'boolean'],
@@ -106,7 +106,7 @@ class PurchaseOrderLine extends \yii\db\ActiveRecord
             'date_planned' => 'Date Planned',
             'company_id' => 'Company ID',
             'state' => 'State',
-            'product_id' => 'Product ID',
+            'product_id' => 'Product',
             'account_analytic_id' => 'Account Analytic ID',
             'product_pb_id' => 'Product Pb ID',
             'pb_id' => 'Pb ID',

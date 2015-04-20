@@ -98,9 +98,9 @@ class PurchaseOrder extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['create_uid', 'write_uid', 'journal_id', 'partner_id', 'dest_address_id', 'fiscal_position', 'location_id', 'company_id', 'pricelist_id', 'warehouse_id', 'payment_term_id', 'validator', 'port_moved0', 'print_line', 'attention'], 'integer'],
-            [['create_date', 'write_date', 'date_order', 'date_approve', 'minimum_planned_date', 'duedate', 'scheduleddate'], 'safe'],
-            [['date_order', 'partner_id', 'location_id', 'company_id', 'pricelist_id', 'name', 'invoice_method', 'jenis', 'type_permintaan', 'duedate', 'term_of_payment'], 'required'],
+            [['create_uid', 'write_uid', 'journal_id', 'dest_address_id', 'fiscal_position', 'location_id', 'company_id', 'pricelist_id', 'warehouse_id', 'payment_term_id', 'validator', 'port_moved0', 'print_line', 'attention'], 'integer'],
+            [['create_date', 'write_date', 'date_order', 'partner_id', 'date_approve', 'minimum_planned_date', 'duedate', 'scheduleddate'], 'safe'],
+            [['location_id', 'company_id', 'pricelist_id', 'name', 'invoice_method', 'jenis', 'type_permintaan', 'term_of_payment'], 'required'],
             [['amount_untaxed', 'amount_tax', 'amount_total'], 'number'],
             [['state', 'notes', 'invoice_method', 'subcont_type', 'yourref', 'note', 'other', 'jenis', 'type_permintaan', 'no_fpb', 'term_of_payment', 'delivery', 'after_shipment', 'total_price', 'shipment_to'], 'string'],
             [['shipped', 'rm_sent'], 'boolean'],
@@ -124,7 +124,7 @@ class PurchaseOrder extends \yii\db\ActiveRecord
             'origin' => 'Origin',
             'journal_id' => 'Journal ID',
             'date_order' => 'Date Order',
-            'partner_id' => 'Partner ID',
+            'partner_id' => 'Supplier',
             'dest_address_id' => 'Dest Address ID',
             'fiscal_position' => 'Fiscal Position',
             'amount_untaxed' => 'Amount Untaxed',

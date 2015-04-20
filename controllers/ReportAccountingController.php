@@ -237,7 +237,7 @@ class ReportAccountingController extends Controller
 					->addOrderBy(['aml.account_id' => SORT_ASC])
 					->addOrderBy(['aml.date' => SORT_ASC]);
 
-			 return $this->render('report\transaksiaccount',['data'=>$queryline->all(),'array'=>$query->all(),'from' =>$model->date_from, 'to'=>$model->date_to]);		
+			 return $this->render('report/transaksiaccount',['data'=>$queryline->all(),'array'=>$query->all(),'from' =>$model->date_from, 'to'=>$model->date_to]);		
 			     	
         }
      	return $this->render('reportaccount',['model' => $model,'SelectAccount'=>$SelectAccount]);
@@ -326,7 +326,7 @@ class ReportAccountingController extends Controller
 						->addOrderBy(['aml.id' => SORT_ASC])
 						->addOrderBy(['am.date' => SORT_ASC]);
         		}
-				return $this->render('report\transaksiar',['data'=>$queryline->all(), 'array'=>$query->all(), 'from' =>$model->date_from, 'to'=>$model->date_to]);	
+				return $this->render('report/transaksiar',['data'=>$queryline->all(), 'array'=>$query->all(), 'from' =>$model->date_from, 'to'=>$model->date_to]);	
         	}
 
      	return $this->render('jurnalar',['model' => $model]);
@@ -502,7 +502,7 @@ class ReportAccountingController extends Controller
 						");
 			}
 
-			return $this->render('report\arsummary',['data'=>$command->queryAll(),'date'=>$model->date_from]);	
+			return $this->render('report/arsummary',['data'=>$command->queryAll(),'date'=>$model->date_from]);	
         }
      	return $this->render('arsummary',['model' => $model]);
      }
@@ -606,7 +606,7 @@ class ReportAccountingController extends Controller
 												p.date_invoice DESC");
 			}
     	  
-			return $this->render('report\ardetail',['data'=>$command->queryAll(),'array'=>$array->queryAll(),'date'=>$model->date_from,'partner'=>'all']);	
+			return $this->render('report/ardetail',['data'=>$command->queryAll(),'array'=>$array->queryAll(),'date'=>$model->date_from,'partner'=>'all']);	
         }
      	return $this->render('ardetail',['model' => $model]);
      }
@@ -781,7 +781,7 @@ class ReportAccountingController extends Controller
 						");
 			}
 
-			return $this->render('report\apsummary',['data'=>$command->queryAll(),'date'=>$model->date_from]);	
+			return $this->render('report/apsummary',['data'=>$command->queryAll(),'date'=>$model->date_from]);	
         }
      	return $this->render('apsummary',['model' => $model]);	
      }
@@ -880,7 +880,7 @@ class ReportAccountingController extends Controller
 												p.date_invoice DESC");
 			}
     	  
-			return $this->render('report\apdetail',['data'=>$command->queryAll(),'array'=>$array->queryAll(),'date'=>$model->date_from,'partner'=>'all']);	
+			return $this->render('report/apdetail',['data'=>$command->queryAll(),'array'=>$array->queryAll(),'date'=>$model->date_from,'partner'=>'all']);	
         }
         
    //      if ($model->load(Yii::$app->request->get())) { 
@@ -903,7 +903,7 @@ class ReportAccountingController extends Controller
 			// 									WHERE p.state='open' AND aml.account_id=119 AND p.partner_id IN ($model->partner)");
 			// }
     	  
-			// return $this->render('report\apdetail',['data'=>$command->queryAll(),'date'=>$model->date_from,'partner'=>'all']);	
+			// return $this->render('report/apdetail',['data'=>$command->queryAll(),'date'=>$model->date_from,'partner'=>'all']);	
    //      }
      	return $this->render('apdetail',['model' => $model]);
      }
@@ -993,7 +993,7 @@ class ReportAccountingController extends Controller
 						->addOrderBy(['aml.id' => SORT_ASC])
 						->addOrderBy(['am.date' => SORT_ASC]);
         		}
-				return $this->render('report\transaksiap',['data'=>$queryline->all(), 'array'=>$query->all(), 'from' =>$model->date_from, 'to'=>$model->date_to]);	
+				return $this->render('report/transaksiap',['data'=>$queryline->all(), 'array'=>$query->all(), 'from' =>$model->date_from, 'to'=>$model->date_to]);	
         	}
 
      	return $this->render('jurnalap',['model' => $model]);	
@@ -1040,7 +1040,7 @@ class ReportAccountingController extends Controller
 		 			->andWhere(['not',['am.journal_id' =>[1,2]]])
 					->addOrderBy(['aml.id' => SORT_ASC]);
 
-			return $this->render('report\jurnalpengeluaran',['data'=>$queryline->all(),'array'=>$query->all(), 'from' =>$model->date_from, 'to'=>$model->date_to, 'account'=>'all']);	
+			return $this->render('report/jurnalpengeluaran',['data'=>$queryline->all(),'array'=>$query->all(), 'from' =>$model->date_from, 'to'=>$model->date_to, 'account'=>'all']);	
         }
      	return $this->render('jurnalpengeluaran',['model' => $model]);	
      }
@@ -1111,6 +1111,13 @@ class ReportAccountingController extends Controller
 			$data = $query->all();
 	
      	return $this->render('turnover',['data'=>$data,'nameproduct'=>$data[0]['product_name']]);	
+     }
+
+
+     public function actionNotaRetur()
+     {
+     	$this->layout = 'report';
+     	return $this->render('report/noteretur');		
      }
 }
 
