@@ -28,6 +28,8 @@
 							<tr class="head">
 								<td class="head">Name</td>
 								<td class="head">ID#</td>
+								<td class="head">Sales</td>
+								<td class="head">No Po</td>
 								<td class="head">Date</td>
 								<td class="head">Total Due</td>
 								<td class="head">0-30</td>
@@ -44,7 +46,7 @@
 							$totalbulan4=0;
 							foreach ($array as $val) {
 								echo '<tr>';
-										echo '<td colspan="8">'.$val['partner_name'].'<br/>'.$val['street'].'</td>';
+										echo '<td colspan="10">'.$val['partner_name'].'<br/>'.$val['street'].'</td>';
 								echo '</tr>';
 
 								$total1=0;
@@ -58,6 +60,8 @@
 									echo '<tr class="'.$value['partner_id'].'">';
 										echo '<td></td>';
 										echo '<td>'.$value['kwitansi'].'</td>';
+										echo '<td>'.ucfirst($value['sales_name']).'</td>';
+										echo '<td>'.$value['no_po_cus'].'</td>';
 										echo '<td>'.Yii::$app->formatter->asDatetime($value['date_invoice'], "php:d-m-Y").'</td>';
 										echo '<td><div class="price">'.app\components\NumericLib::indoStyle($value['total'],2,',','.').'</div></td>';
 
@@ -71,6 +75,7 @@
 												<td></td>
 												<td></td>
 												<td></td>
+
 												';
 											$total2=$total2+$value['total'];
 										}else if($i >30 AND $i<=60){
@@ -106,7 +111,7 @@
 							}
 
 							 echo '<tr class="bgdark">
-									<td class="bgdark" colspan="3">Total</td>
+									<td class="bgdark" colspan="5">Total</td>
 									<td class="bgdark"><div class="price">'.app\components\NumericLib::indoStyle($total1,2,',','.').'</div></td>
 									<td class="bgdark"><div class="price">'.app\components\NumericLib::indoStyle($total2,2,',','.').'</div></td>
 									<td class="bgdark"><div class="price">'.app\components\NumericLib::indoStyle($total3,2,',','.').'</div></td>
@@ -123,7 +128,7 @@
 						?>
 
 					<tr class="grandtotal">
-					<th  class="grandtotal"  style="text-align:left;" colspan="3">Grand Total</th>
+					<th  class="grandtotal"  style="text-align:left;" colspan="5">Grand Total</th>
 					<th  class="grandtotal"  style="text-align:left;"><?php 
 					echo app\components\NumericLib::indoStyle($grandtotal,2,',','.') ?></th>
 					<th  class="grandtotal"  style="text-align:left;"><?php 
