@@ -152,7 +152,25 @@ $formated = function($value) use ($model){
 	</form>
 </div>
 <div id="kwitansiContainer">
-	<div id="invNo"><?=$model->kwitansi?></div>
+	<div id="invNo">
+		<?php
+			$kwitansiNo = '';
+			$expK = explode('/', $model->kwitansi);
+			// var_dump($expK);
+			foreach($expK as $key=>$sectionKwNo){
+				switch ($key) {
+					case 0:
+						$kwitansiNo .= $sectionKwNo.'A';
+						break;
+					
+					default:
+						$kwitansiNo .= '/'.$sectionKwNo;
+						break;
+				}
+			}
+		?>
+		<?=$kwitansiNo?>
+	</div>
 	<div id="custName" class="absPos">
 		<?=$model->partner_to_print?>
 	</div>
@@ -172,7 +190,7 @@ $formated = function($value) use ($model){
 		<?php 
 			$taxes = $model->accountInvoiceTaxes;
 			foreach($taxes as $tax){
-				echo '<div class="widPO">'.$tax->name.'</div><div class="widPOCurr">'.$model->currency->name.'</div><div class="widPOVal">'.$formated($tax->amount).'</div>';
+				echo '<div class="widPO" contenteditable="true">'.$tax->name.'</div><div class="widPOCurr">'.$model->currency->name.'</div><div class="widPOVal">'.$formated($tax->amount).'</div>';
 			}
 		?>
 		
