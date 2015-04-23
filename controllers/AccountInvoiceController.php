@@ -119,12 +119,13 @@ class AccountInvoiceController extends Controller
 
         $lines = [];
         $total = 0;
-
+        $ar = 0;
         foreach($model->accountInvoiceLines as $invLine):
+            $ar++;
             if($invLine->account_id<>192){
                 $nameLine = (isset($invLine->product->name_template) ? $invLine->product->name_template : null);
 
-                if(!trim($invLine->name)):
+                if(trim($invLine->name)):
                     $nameLine .= (isset($invLine->product->name_template) ? '<br/>':"").nl2br($invLine->name);
                 endif;
 
@@ -138,10 +139,12 @@ class AccountInvoiceController extends Controller
                     $priceSub = Yii::$app->numericLib->westStyle($invLine->price_subtotal);
                 }
                 $lines[] = [
-                    'no'=>$invLine->sequence,
+                    'no'=>($model->payment_for =='dp' || $model->payment_for =='completion' ? '':$invLine->sequence),
                     'name'=>$nameLine,
                     'price_subtotal'=>$priceSub,
+                    'rate_symbol'=>$model->currency->name
                 ];
+
 
                 $total+=floatval($invLine->price_unit)*floatval($invLine->quantity);
                 /*echo 'price unit '.$invLine->price_unit;
@@ -166,8 +169,24 @@ class AccountInvoiceController extends Controller
         		'no'=>'',
         		'name'=>($model->currency_id == 13 ? 'Sesuai Invoice ':'As Per Invoice No. ').$model->kwitansi.($model->currency_id	==13 ? '<br/>(Lampiran Invoice : 1, 2)':'<br/>(List Find Attach In Invoice Page : 1, 2)'),
         		// 'AS PER INVOICE NO. LIST FIND ATTACH IN INVOICE PAGE 1, 2'
-        		'price_subtotal'=>($model->currency_id == 13 ? Yii::$app->numericLib->indoStyle($total):Yii::$app->numericLib->westStyle($total))
+        		'price_subtotal'=>($model->currency_id == 13 ? Yii::$app->numericLib->indoStyle($total):Yii::$app->numericLib->westStyle($total)),
+                'rate_symbol'=>$model->currency->name,
+
         	];
+        }else{
+            // IF DP OR COMPLETION
+            if($model->payment_for == 'dp'|| $model->payment_for=='completion'){
+                foreach($model->orders as $so){
+                    foreach($so->saleOrderLines as $line){
+                        $ar++;
+                        $lines[$ar]['no'] = $line->sequence;
+                        // $lines[$ar]['qty'] = $line->product_uom_qty.(isset($line->productUom->name) ? ' '.$line->productUom->name:null);
+                        $lines[$ar]['name'] = (isset($line->product->name_template) ? $line->product->name_template.'<br/>'.$line->name.'<br/>P/N : '.$line->product->default_code:nl2br($line->name));
+                        $lines[$ar]['price_subtotal'] = '';
+                        $lines[$ar]['rate_symbol'] = '';
+                    }
+                }
+            }
         }
         // echo $total;
         // print_r($lines);
@@ -212,7 +231,8 @@ class AccountInvoiceController extends Controller
                 		$lines[$k]['desc'] = '<b>'.$expl[0].' FOR :'.'</b>';
                 	}
                 	$dpName = '';
-                	$lines[$k]['unit_price'] = '<div style="float:left;">'.$model->currency->name.'</div><div style="float:right;padding-right:8px;">'.$formated($line->price_unit).'</div>';
+                	// $lines[$k]['unit_price'] = '<div style="float:left;">'.$model->currency->name.'</div><div style="float:right;padding-right:8px;">'.$formated($line->price_unit).'</div>';
+                    $lines[$k]['unit_price'] ='';
                 	$lines[$k]['ext_price'] = '<div style="float:left;">'.$model->currency->name.'</div><div style="float:right;">'.$formated($line->price_subtotal).'</div>';
                 }else{
                 	$lines[$k]['desc'] = (isset($line->product->name_template) ? $line->product->name_template.'<br/>'.$line->name.'<br/>P/N : '.$line->product->default_code:nl2br($line->name));
@@ -256,11 +276,22 @@ class AccountInvoiceController extends Controller
         }
         $lines[$ar]['unit_price'] = '';
         $lines[$ar]['ext_price'] = '';
-        if($uid==100){
+        if($uid==100 || $uid == 191){
             $printer='sri';
         }
 
         return $this->render('print/inv',['model'=>$model,'lines'=>$lines,'printer'=>$printer,'discountLine'=>$discountLine,'total'=>$total]);
+    }
+
+
+    public function actionPrintKwitansi($id,$uid,$printer='refa'){
+        $this->layout = 'printout';
+        $model = $this->findModel($id);
+
+        if($uid==100 || $uid == 191){
+            $printer='sri';
+        }
+        return $this->render('print/kwitansi',['model'=>$model,'printer'=>$printer]);
     }
 
 	/**

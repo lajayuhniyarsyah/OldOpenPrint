@@ -369,6 +369,8 @@ $formated = function($value) use ($model){
 
 <?php
 $jsonLines = \yii\helpers\Json::encode($lines);
+$jsonModel = \yii\helpers\Json::encode($model);
+// var_dump($jsonModel);
 $scr = <<<EOD
 var currPage = 1;
 
@@ -383,6 +385,7 @@ jQuery('.containerLines:last').attr('id','tdLine'+currPage);
 
 // data to render
 var lines = $jsonLines;
+var model = $jsonModel;
 var maxLinesHeight = jQuery('.containerLines:last').height();
 
 

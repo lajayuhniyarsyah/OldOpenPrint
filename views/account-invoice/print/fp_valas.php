@@ -79,10 +79,17 @@ use yii\helpers\Url;
     .productDescTd{
         padding-right: 10px;
     }
+    table td{
+        vertical-align: top;
+    }
     <?php
     if($printer=='sri'):
         echo '.pages{padding-top: 12mm;}';
     endif;
+
+    if($printer=='refa'){
+        echo '.xxx table{margin-top:10px;}';
+    }
 
     ?>
     @media print{
@@ -128,7 +135,7 @@ use yii\helpers\Url;
                     <tr>
                         <td>
                             <div class="pkp" style="margin-top:7mm;margin-left:36mm;">
-                                <div class="ptSupra">PT. SUPRABAKTI MANDIRI</div>
+                                <div class="ptSupra" contenteditable="true">PT. SUPRABAKTI MANDIRI</div>
                                 <div class="fontAddr" style="height:10mm;"><span>Jl. Danau Sunter Utara Blok. A No. 9 Tanjung Priok - Jakarta Utara 14350</span></div>
                                 <div>01.327.742.1-038.000</div>
                             </div>
@@ -139,20 +146,41 @@ use yii\helpers\Url;
                             <div class="pbkp">
                                 <div class="partnerName" contenteditable="true">
                                     <?php
-                                        $prtName = (isset($model->partner->parent) ? $model->partner->parent->name:$model->partner->name);
-                                        $expPartnerName = explode(',',$prtName );
-                                        if(is_array($expPartnerName) && isset($expPartnerName[1])){
-                                            $partnerName = $expPartnerName[1].'.'.$expPartnerName[0];
-                                        }else{
-                                            $partnerName = $model->partner->name;
+                                        if($model->fakturAddress){
+                                            $prtName = (isset($model->fakturAddress->parent) ? $model->fakturAddress->parent->name:$model->fakturAddress->name);
+                                            $expPartnerName = explode(',',$prtName );
+                                            if(is_array($expPartnerName) && isset($expPartnerName[1])){
+                                                $partnerName = $expPartnerName[1].'.'.$expPartnerName[0];
+                                            }else{
+                                                $partnerName = $model->partner->name;
+                                            }
                                         }
+                                        else
+                                        {
+                                            $prtName = (isset($model->partner->parent) ? $model->partner->parent->name:$model->partner->name);
+                                            $expPartnerName = explode(',',$prtName );
+                                            if(is_array($expPartnerName) && isset($expPartnerName[1])){
+                                                $partnerName = $expPartnerName[1].'.'.$expPartnerName[0];
+                                            }else{
+                                                $partnerName = $model->partner->name;
+                                            }
+                                        }
+                                        
                                         echo $partnerName;
 
                                     ?>
                                 </div>
                                 <div class="fontAddr partnerStreet" contenteditable="true">
                                     <span>
-                                        <?= $model->partner->street; ?><?= '<br/>'.$model->partner->street2 ?> <?= $model->partner->city ?>, <?= (isset($model->partner->state->name) ? $model->partner->state->name:'').($model->partner->zip ? ' - '.$model->partner->zip:"") ?>
+                                        <?php
+                                            if($model->fakturAddress){
+                                                $iAddr = $model->fakturAddress->street.'<br/>'.$model->fakturAddress->street2.' '.$model->fakturAddress->city.', '.(isset($model->fakturAddress->state->name) ? $model->fakturAddress->state->name:'').($model->fakturAddress->zip ? ' - '.$model->fakturAddress->zip:"");
+                                            }else{
+                                                $iAddr = $model->partner->street.'<br/>'.$model->partner->street2.' '.$model->partner->city.', '.(isset($model->partner->state->name) ? $model->partner->state->name:'').($model->partner->zip ? ' - '.$model->partner->zip:"");
+                                            }
+                                        ?>
+                                        <?=$iAddr?>
+                                        
                                     </span>
                                 </div>
                                 <div>
@@ -163,7 +191,7 @@ use yii\helpers\Url;
                     </tr>
                     <tr>
                         <?php
-                            $maxHeight = '103mm'; 
+                            $maxHeight = '102mm'; 
                             if($printer=='sri'){
                                 $maxHeight = '105mm';
                             }
@@ -231,7 +259,7 @@ use yii\helpers\Url;
                                 <table style="width:100%;" cellpadding="0" cellspacing="0">
                                     <tr>
                                         <td style="width:61%;"><?='<div style="width:auto;float:left;">'.  $model->currency->name.'</div><div class="wid1">'.Yii::$app->numericLib->westStyle($model->amount_untaxed).'</div>'?></td>
-                                        <td style="text-align:right;"><?=Yii::$app->numericLib->westStyle((round($model->amount_untaxed*$model->pajak)))?></td>
+                                        <td style="text-align:right;"><?=Yii::$app->numericLib->indoStyle((round($model->amount_untaxed*$model->pajak)))?></td>
                                     </tr>
                                 </table>
                             </div>
@@ -241,7 +269,7 @@ use yii\helpers\Url;
                         <td>
                             <div class="amount" style="margin-top:-3px;">
                                 <div style="width:auto;float:left;"><?= (isset($model->amount_tax) ? '<div style="float:left;width:auto;">'.$model->currency->name.'</div><div class="wid1">'.Yii::$app->numericLib->westStyle($model->amount_tax).'</div><div style="clear:both;"></div>':''); ?></div>
-                                <div style="text-align:right;"><?=Yii::$app->numericLib->westStyle((round(($model->amount_untaxed*$model->pajak)*0.10)))?></div>
+                                <div style="text-align:right;"><?=Yii::$app->numericLib->indoStyle((round(($model->amount_untaxed*$model->pajak)*0.10)))?></div>
                                 <div class="clear:both;"></div>
                             </div>
                         </td>
@@ -299,7 +327,7 @@ $this->registerJs('
 
     function prepareRow(rowNo,data)
     {
-        return "<tr class=\'cRows rows"+rowNo+"\'><td style=\"width:6%;\">"+data.no+"</td><td contenteditable=\"true\" style=\"width:56%;padding-right:10px;\">"+data.name+"</td><td><div style=\"float:left;width:13mm;\">"+rateSymbol+"</div><div style=\"width:106px;text-align:right;\">"+data.price_subtotal+"</div><div style=\"clear:both;\"></div></td><td>&nbsp;</td></tr>";
+        return "<tr class=\'cRows rows"+rowNo+"\'><td style=\"width:6%;\">"+data.no+"</td><td contenteditable=\"true\" style=\"width:56%;padding-right:10px;\">"+data.name+"</td><td><div style=\"float:left;width:13mm;\">"+data.rate_symbol+"</div><div style=\"width:106px;text-align:right;\">"+data.price_subtotal+"</div><div style=\"clear:both;\"></div></td><td>&nbsp;</td></tr>";
     }
 
     function prepareNoteRow(rowNo,data)
@@ -345,5 +373,98 @@ $this->registerJs('
     var noteRow = prepareNoteRow(currRow,{name:\'PO No : \'+poNo});
     jQuery(\'table#lines\'+currPage+\' tr:last\').after(noteRow);
     // end loop
+
+
+    var currIndex = 0;
+    function refreshActButton(currIndex){
+        jQuery(\'.btnActLine\').remove();
+        jQuery(\'table.contentLines td:last-child\').each(function(ro,v){
+            jQuery(this).append(\'<div class="btnActLine hideOnPrint" style="margin-left: 150px;position: absolute;"><input type="checkbox" class="chkBoxRow" value="\'+ro+\'" /><a href="#" class="btnCutRow" data="\'+ro+\'">Cut</a><a href="#" data="\'+ro+\'" class="btnPaste btnPasteBefore hidden"> | Paste Before</a><a href="#" class="btnPaste btnPasteAfter hidden" data="\'+ro+\'"> | Paste After</a></div>\');
+            currIndex = currIndex+1;
+            return currIndex;
+        });
+    }
+
+    currIndex = refreshActButton();
+
+    var trCopy = "";
+    var trCopyIdx;
+    /*jQuery(\'.btnCutRow\').click(function(){
+        trCopy = jQuery(this).parents("tr").html();
+        trCopyIdx = jQuery(this).attr(\'data\');
+        console.log(trCopy);
+        jQuery(\'.btnPaste\').show();
+        return false;
+    });
+
+    jQuery(\'.btnPasteAfter\').click(function(){
+        var roNo = jQuery(this).attr(\'data\');
+        jQuery("<tr>"+trCopy+"</tr>").insertAfter(\'tr:eq(\'+roNo+\')\');
+        jQuery("tr:eq("+trCopyIdx+")").remove();
+        trCopy = "";
+        trCopyIdx = "";
+        jQuery(\'.btnPaste\').hide();
+        return false;
+    });*/
+
+    jQuery(\'#pageContainer\').on(\'click\',\'.btnCutRow\',function(e){
+        e.preventDefault();
+
+        var target = jQuery(this).parents("tr");
+        jQuery(this).parent().remove();
+        trCopy = target.html();
+        trCopyIdx = jQuery(this).attr(\'data\');
+        console.log("THtml = "+trCopy+". Index = "+trCopyIdx);
+        jQuery(\'.btnPaste\').show();
+        console.log("Removing TR "+trCopyIdx);
+        jQuery("tr.rows"+trCopyIdx).remove();
+        return false;
+    });
+
+    jQuery(\'#pageContainer\').on(\'click\',\'.btnPasteAfter\',function(e){
+        e.preventDefault();
+        var roNo = jQuery(this).attr(\'data\');
+        
+        
+        console.log("inserting after "+roNo);
+        currIndex = currIndex+1;
+        jQuery(\'<tr class="cRows rows\'+currIndex+\'"></tr>\'+trCopy+"</tr>").insertAfter(\'tr.rows\'+roNo);
+        console.log(jQuery(\'tr.rows\'+currIndex+\' .btnCutRow\').attr(\'class\'));
+        trCopy = "";
+        trCopyIdx = "";
+        jQuery(\'.btnPaste\').hide();
+        return false;
+    });
+
+    jQuery(\'#pageContainer\').on(\'click\',\'.btnPasteBefore\',function(e){
+        e.preventDefault();
+        var roNo = jQuery(this).attr(\'data\');
+        console.log("inserting before "+roNo);
+        currIndex = currIndex+1;
+        jQuery(\'<tr class="cRows rows\'+currIndex+\'"></tr>\'+trCopy+"</tr>").insertBefore(\'tr.rows\'+roNo);
+        console.log(jQuery(\'tr.rows\'+currIndex+\' .btnCutRow\').attr(\'class\'));
+        trCopy = "";
+        trCopyIdx = "";
+        jQuery(\'.btnPaste\').hide();
+        return false;
+    });
+    jQuery("#btnCutRows").click(function(){
+
+        trCopy = "";
+        jQuery.each(jQuery("input.chkBoxRow:checked"),function(idx,v){
+            var target = jQuery(v).parents("tr");
+            jQuery(v).parent().remove();
+            currIndex = currIndex+1;
+            trCopy += \'<tr class="cRows rows\'+currIndex+\'"></tr>\'+target.html()+"</tr>";
+            trCopyIdx = jQuery(v).val();
+            console.log("THtml = "+trCopy+". Index = "+trCopyIdx);
+            jQuery(\'.btnPaste\').show();
+            console.log("Removing TR "+trCopyIdx);
+            jQuery("tr.rows"+trCopyIdx).remove();
+        });
+        // console.log(trCopy);
+        return false;
+    });
 ');
 ?>
+<button class="hideOnPrint" id="btnCutRows">Cut Selected Row</button>
