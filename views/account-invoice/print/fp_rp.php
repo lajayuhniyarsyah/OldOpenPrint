@@ -67,9 +67,14 @@ use yii\helpers\Url;
 		text-align: right;
 		padding-right: 20px;
 	}
+	table td{
+		vertical-align: top;
+	}
 	<?php
     if($printer=='sri'):
         echo '.pages{padding-top: 11mm;}';
+    elseif($printer=='refa-semen'):
+    	echo '.pages{padding-top:21mm;}';
     endif;
     ?>
     .xxx{
@@ -96,6 +101,7 @@ use yii\helpers\Url;
 		Print To : <select name="printer" onchange="jQuery('#formSelectPrinter').submit();">
 			<option <?=($printer=='refa' ? 'selected ':null)?> value="refa">Refa</option>
 			<option <?=($printer=='sri' ? 'selected ':null)?> value="sri">Sri</option>
+			<option <?=($printer=='refa-semen' ? 'selected ':null)?> value="refa-semen">Refa-Semen</option>
 		</select>
 	</form>
 </div>
@@ -118,7 +124,7 @@ use yii\helpers\Url;
 					<tr>
 						<td>
 							<div class="pkp" style="margin-top:8mm;margin-left:36mm;">
-								<div style="margin-bottom:1mm;">PT. SUPRABAKTI MANDIRI</div>
+								<div style="margin-bottom:1mm;" contenteditable="true">PT. SUPRABAKTI MANDIRI</div>
 								<div style="height:10mm;"><span>Jl. Danau Sunter Utara Blok. A No. 9 Tanjung Priok - Jakarta Utara 14350</span></div>
 								<div>01.327.742.1-038.000</div>
 							</div>
