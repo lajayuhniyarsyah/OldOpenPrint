@@ -9,7 +9,7 @@ use miloschuman\highcharts\Highcharts;
 <div class="chart-executive-summary-by-sales-man">
 
 	<h1>
-		Executive Summary By 
+		<?=$this->title?>
 		<span id="salesListTitle" class="dropdown">
 			
 			<a href="#"  data-toggle="dropdown" class="dropdown-toggle"><?=Html::encode((isset($salesTitle) ? $salesTitle:'All Sales'))?></a>

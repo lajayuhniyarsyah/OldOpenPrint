@@ -43,7 +43,6 @@ use yii\helpers\Url;
 	.cRows{
 		vertical-align: top;
 	}
-
     .xxx{
         position: absolute;
         margin-left: -143mm;
@@ -64,17 +63,19 @@ use yii\helpers\Url;
 		margin-left: 36mm;
 		height: 88px;
 	}
-
 	.lineVal{
 		text-align: right;
 		padding-right: 20px;
 	}
-
+	table td{
+		vertical-align: top;
+	}
 	<?php
     if($printer=='sri'):
         echo '.pages{padding-top: 11mm;}';
+    elseif($printer=='refa-semen'):
+    	echo '.pages{padding-top:21mm;}';
     endif;
-
     ?>
     .xxx{
     	margin-left: -147mm !important;
@@ -85,11 +86,7 @@ use yii\helpers\Url;
     @media print{
         .xxx table, .xxx table tr, .xxx table tr td{
             border: 0px;
-
         }
-
-
-
 		.choosePrinter{
 			display: none;
 		}
@@ -104,6 +101,7 @@ use yii\helpers\Url;
 		Print To : <select name="printer" onchange="jQuery('#formSelectPrinter').submit();">
 			<option <?=($printer=='refa' ? 'selected ':null)?> value="refa">Refa</option>
 			<option <?=($printer=='sri' ? 'selected ':null)?> value="sri">Sri</option>
+			<option <?=($printer=='refa-semen' ? 'selected ':null)?> value="refa-semen">Refa-Semen</option>
 		</select>
 	</form>
 </div>
@@ -126,7 +124,7 @@ use yii\helpers\Url;
 					<tr>
 						<td>
 							<div class="pkp" style="margin-top:8mm;margin-left:36mm;">
-								<div style="margin-bottom:1mm;">PT. SUPRABAKTI MANDIRI</div>
+								<div style="margin-bottom:1mm;" contenteditable="true">PT. SUPRABAKTI MANDIRI</div>
 								<div style="height:10mm;"><span>Jl. Danau Sunter Utara Blok. A No. 9 Tanjung Priok - Jakarta Utara 14350</span></div>
 								<div>01.327.742.1-038.000</div>
 							</div>
@@ -147,7 +145,6 @@ use yii\helpers\Url;
 											$partnerName = $model->partner->name;
 										}
 										echo $partnerName;
-
 									?>
 								</div>
 								<div style="height:10mm;" contenteditable="true">
@@ -224,7 +221,6 @@ use yii\helpers\Url;
 <?php
 $this->registerJs('
 	var currPage = 1;
-
 	// save page template to var
 	var tmpl = \'<div style="height:2mm;">&nbsp;</div>\'+jQuery(\'div#pageContainer\').html();
 	var poNo = "'.$model->name.'";
@@ -233,21 +229,16 @@ $this->registerJs('
 	jQuery(\'table.contentLines:last\').attr(\'id\',\'lines\'+currPage);
 	jQuery(\'table tr td.tdLines:last\').attr(\'id\',\'tdLine\'+currPage);
 	
-
 	// data to render
 	var lines = '.\yii\helpers\Json::encode($lines).';
 	var maxLinesHeight = jQuery(\'.tdLines:last\').height();
 	
-
 	var currRow = 0;
-
 	console.log(maxLinesHeight);
-
 	function prepareRow(rowNo,data)
 	{
 		return "<tr class=\'cRows rows"+rowNo+"\'><td style=\"width:38px;\">"+eval(rowNo+1)+"</td><td contenteditable=\"true\" style=\"width:440px;\">"+data.name+"</td><td class=\"lineVal\">"+data.price_subtotal+"</td></tr>";
 	}
-
 	function prepareNoteRow(rowNo,data)
     {
         return "<tr class=\'cRows rows"+rowNo+"\'><td>&nbsp;</td><td colspan=\"2\" contenteditable=\"true\">"+data.name+"</td></tr>";
@@ -264,7 +255,6 @@ $this->registerJs('
 			jQuery(\'table#lines\'+currPage+\' tr:last\').after(getRow);
 		}
 		rowPage = rowPage+1;
-
 		var currLineHeight = jQuery(\'#tdLine\'+currPage).height();
 		if(currLineHeight>maxLinesHeight){
 			// remove last row
@@ -277,17 +267,14 @@ $this->registerJs('
 			jQuery(\'div.pages:last\').attr(\'id\',\'page\'+currPage);
 			jQuery(\'table.contentLines:last\').attr(\'id\',\'lines\'+currPage);
 			jQuery(\'table tr td.tdLines:last\').attr(\'id\',\'tdLine\'+currPage);
-
 			jQuery(\'table#lines\'+currPage).html(getRow);
 			currLineHeight = jQuery(\'#tdLine\'+currPage).height();
 			// console.log(tmpl);
 			
 		}
-
 		console.log(\'Rendering Page \'+currPage+\' Row \'+currRow+\' Height => \'+currLineHeight);
 		currRow=currRow+1;
 	});
-
 	var noteRow = prepareNoteRow(currRow,{name:\'PO No : \'+poNo});
     jQuery(\'table#lines\'+currPage+\' tr:last\').after(noteRow);
 	// end loop

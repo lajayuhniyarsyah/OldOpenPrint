@@ -7,7 +7,7 @@ use miloschuman\highcharts\Highcharts;
 <div class="account-invoice-index">
 	<form></form>
 	<h1>
-		Executive Summary By Group On
+		<?=$this->title?>
 		<span id="yearTitle" class="dropdown">
 			<a href="#"  data-toggle="dropdown" class="dropdown-toggle"><?=$year?></a>
 			<?php

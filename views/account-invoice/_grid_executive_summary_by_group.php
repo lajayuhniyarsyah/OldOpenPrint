@@ -9,7 +9,8 @@ use yii\web\JsExpression;
 <div class="account-invoice-index">
 
 	<h1>
-		Executive Summary By Group On
+		<?=$this->title?>
+		On
 		<span id="yearTitle" class="dropdown">
 			<a href="#"  data-toggle="dropdown" class="dropdown-toggle"><?=$year?></a>
 			<?php

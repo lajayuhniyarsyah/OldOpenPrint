@@ -73,7 +73,7 @@ use Yii;
  */
 class AccountInvoice extends \yii\db\ActiveRecord
 {
-    public $total_rated,$currency_rate;
+    public $partner_to_print;
     /**
      * @inheritdoc
      */
@@ -89,8 +89,8 @@ class AccountInvoice extends \yii\db\ActiveRecord
     {
         return [
             [['create_uid', 'write_uid', 'account_id', 'company_id', 'currency_id', 'partner_id', 'fiscal_position', 'user_id', 'partner_bank_id', 'payment_term', 'journal_id', 'period_id', 'move_id', 'commercial_partner_id', 'approver'], 'integer'],
-            [['create_date', 'write_date', 'date_due', 'date_invoice'], 'safe'],
-            [['check_total', 'amount_tax', 'residual', 'amount_untaxed', 'amount_total', 'pajak', 'kurs'], 'number'],
+            [['create_date', 'write_date', 'date_due', 'date_invoice','payment_for'], 'safe'],
+            [['check_total', 'amount_tax', 'residual', 'amount_untaxed', 'amount_total', 'pajak', 'kurs','faktur_address'], 'number'],
             [['account_id', 'company_id', 'currency_id', 'partner_id', 'reference_type', 'journal_id'], 'required'],
             [['reference_type', 'state', 'type', 'comment'], 'string'],
             [['reconciled', 'sent','print_all_taxes_line'], 'boolean'],
@@ -150,45 +150,17 @@ class AccountInvoice extends \yii\db\ActiveRecord
             'pajak' => 'Kurs Pajak',
             'kurs' => 'Kurs BI',
             'approver' => 'Approved by',
-            'currency_rate'=>'Currency Rate',
-            'total_rated'=>'Subtotal In IDR',
         ];
     }
 
-   public function afterFind(){
+   /* public function afterFind(){
         
-        /*$this->amount_tax = $this->numberFormat($this->amount_tax);
+        $this->amount_tax = $this->numberFormat($this->amount_tax);
         $this->amount_untaxed = $this->numberFormat($this->amount_untaxed);
-        $this->amount_total = $this->numberFormat($this->amount_total);*/
-        $this->setCurrencyRate();
-        $this->setTotalRated();
+        $this->amount_total = $this->numberFormat($this->amount_total);
         return true;
-    }
+    }*/
 
-    private function getCurrencyRate(){
-        $res = 1;
-        if($this->currency_id!=13){
-            // if not RP
-            $q = ResCurrencyRate::find()
-                ->where('currency_id=:currencyId AND name = :dateRate')
-                ->addParams(
-                    [
-                        ':currencyId'=>$this->currency_id,
-                        ':dateRate'=>($this->date_invoice ? $this->date_invoice:$this->create_date)
-                    ]
-                )
-                ->asArray()
-                ->one();
-            $res = $q['rating'];
-        }
-        return $res;
-    }
-    private function setCurrencyRate(){
-        $this->currency_rate=$this->getCurrencyRate();
-    }
-    private function setTotalRated(){
-        $this->total_rated=($this->currency_rate*$this->amount_total);
-    }
     private function numberFormat($val){
         return number_format($val,2,',','.');
     }
@@ -327,7 +299,7 @@ class AccountInvoice extends \yii\db\ActiveRecord
      */
     public function getAccountInvoiceLines()
     {
-        return $this->hasMany(AccountInvoiceLine::className(), ['invoice_id' => 'id'])->orderBy('sequence ASC, id ASC');
+        return $this->hasMany(AccountInvoiceLine::className(), ['invoice_id' => 'id'])->orderBy('sequence, id ASC');
     }
 
     /**
@@ -356,5 +328,15 @@ class AccountInvoice extends \yii\db\ActiveRecord
     public function getPurchaseInvoiceRels()
     {
         return $this->hasMany(PurchaseInvoiceRel::className(), ['invoice_id' => 'id']);
+    }
+
+    public function afterFind(){
+        $prtName = (isset($this->partner->parent) ? $this->partner->parent->name:$this->partner->name);
+        $expPartnerName = explode(',',$prtName );
+        if(is_array($expPartnerName) && isset($expPartnerName[1])){
+            $this->partner_to_print = $expPartnerName[1].'. '.$expPartnerName[0];
+        }else{
+            $this->partner_to_print = $this->partner->name;
+        }
     }
 }

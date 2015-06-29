@@ -119,12 +119,13 @@ class AccountInvoiceController extends Controller
 
         $lines = [];
         $total = 0;
-
+        $ar = 0;
         foreach($model->accountInvoiceLines as $invLine):
+            $ar++;
             if($invLine->account_id<>192){
                 $nameLine = (isset($invLine->product->name_template) ? $invLine->product->name_template : null);
 
-                if(!empty(trim($invLine->name))):
+                if(trim($invLine->name)):
                     $nameLine .= (isset($invLine->product->name_template) ? '<br/>':"").nl2br($invLine->name);
                 endif;
 
@@ -138,10 +139,12 @@ class AccountInvoiceController extends Controller
                     $priceSub = Yii::$app->numericLib->westStyle($invLine->price_subtotal);
                 }
                 $lines[] = [
-                    'no'=>$invLine->sequence,
+                    'no'=>($model->payment_for =='dp' || $model->payment_for =='completion' ? '':$invLine->sequence),
                     'name'=>$nameLine,
                     'price_subtotal'=>$priceSub,
+                    'rate_symbol'=>$model->currency->name
                 ];
+
 
                 $total+=floatval($invLine->price_unit)*floatval($invLine->quantity);
                 /*echo 'price unit '.$invLine->price_unit;
@@ -166,8 +169,24 @@ class AccountInvoiceController extends Controller
         		'no'=>'',
         		'name'=>($model->currency_id == 13 ? 'Sesuai Invoice ':'As Per Invoice No. ').$model->kwitansi.($model->currency_id	==13 ? '<br/>(Lampiran Invoice : 1, 2)':'<br/>(List Find Attach In Invoice Page : 1, 2)'),
         		// 'AS PER INVOICE NO. LIST FIND ATTACH IN INVOICE PAGE 1, 2'
-        		'price_subtotal'=>($model->currency_id == 13 ? Yii::$app->numericLib->indoStyle($total):Yii::$app->numericLib->westStyle($total))
+        		'price_subtotal'=>($model->currency_id == 13 ? Yii::$app->numericLib->indoStyle($total):Yii::$app->numericLib->westStyle($total)),
+                'rate_symbol'=>$model->currency->name,
+
         	];
+        }else{
+            // IF DP OR COMPLETION
+            if($model->payment_for == 'dp'|| $model->payment_for=='completion'){
+                foreach($model->orders as $so){
+                    foreach($so->saleOrderLines as $line){
+                        $ar++;
+                        $lines[$ar]['no'] = $line->sequence;
+                        // $lines[$ar]['qty'] = $line->product_uom_qty.(isset($line->productUom->name) ? ' '.$line->productUom->name:null);
+                        $lines[$ar]['name'] = (isset($line->product->name_template) ? $line->product->name_template.'<br/>'.$line->name.'<br/>P/N : '.$line->product->default_code:nl2br($line->name));
+                        $lines[$ar]['price_subtotal'] = '';
+                        $lines[$ar]['rate_symbol'] = '';
+                    }
+                }
+            }
         }
         // echo $total;
         // print_r($lines);
@@ -212,7 +231,8 @@ class AccountInvoiceController extends Controller
                 		$lines[$k]['desc'] = '<b>'.$expl[0].' FOR :'.'</b>';
                 	}
                 	$dpName = '';
-                	$lines[$k]['unit_price'] = '<div style="float:left;">'.$model->currency->name.'</div><div style="float:right;padding-right:8px;">'.$formated($line->price_unit).'</div>';
+                	// $lines[$k]['unit_price'] = '<div style="float:left;">'.$model->currency->name.'</div><div style="float:right;padding-right:8px;">'.$formated($line->price_unit).'</div>';
+                    $lines[$k]['unit_price'] ='';
                 	$lines[$k]['ext_price'] = '<div style="float:left;">'.$model->currency->name.'</div><div style="float:right;">'.$formated($line->price_subtotal).'</div>';
                 }else{
                 	$lines[$k]['desc'] = (isset($line->product->name_template) ? $line->product->name_template.'<br/>'.$line->name.'<br/>P/N : '.$line->product->default_code:nl2br($line->name));
@@ -256,11 +276,22 @@ class AccountInvoiceController extends Controller
         }
         $lines[$ar]['unit_price'] = '';
         $lines[$ar]['ext_price'] = '';
-        if($uid==100){
+        if($uid==100 || $uid == 191){
             $printer='sri';
         }
 
         return $this->render('print/inv',['model'=>$model,'lines'=>$lines,'printer'=>$printer,'discountLine'=>$discountLine,'total'=>$total]);
+    }
+
+
+    public function actionPrintKwitansi($id,$uid,$printer='refa'){
+        $this->layout = 'printout';
+        $model = $this->findModel($id);
+
+        if($uid==100 || $uid == 191){
+            $printer='sri';
+        }
+        return $this->render('print/kwitansi',['model'=>$model,'printer'=>$printer]);
     }
 
 	/**
@@ -507,6 +538,69 @@ class AccountInvoiceController extends Controller
 		return $this->render('order_invoice_dashboard',['title'=>$title,'model'=>$model,'saleUsers'=>$saleUsers,'resGrid'=>$resGrid,'pie'=>$pie]);
 	}
 
+
+	/**
+	 * ESS EXECUTIVE SUMMARY SALES REPORT BY SALES MAN WICH HAS INVOICE HAS BEEN VALIDATED BY ACCOUNTING
+	 * @param  [type] $year [description]
+	 * @return [type]       [description]
+	 */
+	public function actionValidatedExecutiveSummaryBySalesMan($year=null,$gid=null){
+		$modelSearch = new \app\models\ExecutiveSummaryGroupValidatedSearch;
+		$dataToRender = [];
+		if(!$year) $year = date('Y'); #GET CURRENT YEAR
+		
+		$modelSearch->year_invoice = $year;
+		$modelSearch->gid = $gid;
+		// $modelSearch->user_id = 'aaaa';
+		$query = $modelSearch->getQuery();
+
+		$query->orderBy('name ASC');
+		
+
+		
+		$dataArr = $query->asArray()->all();
+		$ytdSales = array_map(function($v){
+			return ['name'=>$v['name'],'y'=>floatval($v['ytd_target'])];
+		},$dataArr);
+
+		$ytdAchievement = array_map(function($v){
+			return ['name'=>$v['name'],'y'=>floatval($v['ytd_sales_achievement'])];
+		},$dataArr);
+		
+		
+		$dataToRender['chart']['series'] = [
+			[
+				'name'=>'Ytd Target',
+				'data'=>$ytdSales,
+				'pointPadding'=>0.3,
+				'pointPlacement'=>-0.1,
+			],
+			[
+				'name'=>'Ytd Achievement',
+				'data'=>$ytdAchievement,
+				'pointPadding'=>0.4,
+				'pointPlacement'=>-0.1,
+			],
+		];
+		// \yii\helpers\VarDumper::dump($dataArr);
+		$dataToRender['provider'] = new \yii\data\ArrayDataProvider([
+		    'allModels' => $dataArr,
+		    'pagination' => false
+		]);
+
+
+		$dataToRender['year'] = $modelSearch->year_invoice;
+
+		$dataToRender['salesTitle'] = ($gid && isset($dataArr[0]) ? strtoupper($dataArr[0]['group_name']):'All Sales');
+		// var_dump($dataToRender['salesTitle']);
+		// var_dump($modelSearch->errors);
+		foreach($modelSearch->errors as $error){
+			Yii::$app->session->setFlash('danger',$error[0]);
+		}
+		Yii::$app->view->title = 'Validated Executive Summary By ';
+		return $this->render('executive_summary_by_sales_man',$dataToRender);
+	}
+
 	/**
 	 * ESS EXECUTIVE SUMMARY SALES REPORT BY SALES MAN
 	 * @param  [type] $year [description]
@@ -565,10 +659,9 @@ class AccountInvoiceController extends Controller
 		foreach($modelSearch->errors as $error){
 			Yii::$app->session->setFlash('danger',$error[0]);
 		}
-		
+		Yii::$app->view->title = 'Executive Summary By ';
 		return $this->render('executive_summary_by_sales_man',$dataToRender);
 	}
-
 
 
 	/**
@@ -625,7 +718,66 @@ class AccountInvoiceController extends Controller
 		]);
 
 		$dataToRender['year'] = (int)$year;
+		Yii::$app->view->title = 'Executive Summary By Group';
+		return $this->render('executive_summary_by_group',$dataToRender);
+	}
 
+
+	/**
+	 * ESS INVOICE SUMMARY REPORT WICH INVOICE HAS BEEN VALIDATED BY ACCOUNTING TEAM
+	 * @param  [type] $year [description]
+	 * @return [type]       [description]
+	 */
+	public function actionValidatedExecutiveSummaryByGroup($year=null){
+		$dataToRender = [];
+		$model = new \app\models\ExecutiveSummaryGroupValidated;
+		if(!$year) $year = date('Y'); #GET CURRENT YEAR
+		$query = ExecutiveSummaryGroup::find()
+			->where('year_invoice = :year')
+			->addParams([':year'=>(int)$year])
+			->groupBy('gid, group_name, year_invoice')
+			->orderBy('group_name ASC');
+
+		$dataArr = $query->select('year_invoice, gid, group_name, 
+				SUM(amount_target) AS amount_target, SUM(ytd_target) as ytd_target, SUM(ytd_sales_achievement) as ytd_sales_achievement, 
+				SUM(achievement) AS achievement')->asArray()->all();
+		$ytdSales = array_map(function($v){
+			return ['name'=>$v['group_name'],'y'=>floatval($v['ytd_target'])];
+		},$dataArr);
+
+		$ytdAchievement = array_map(function($v){
+			return ['id'=>$v['gid'],'name'=>$v['group_name'],'y'=>floatval($v['ytd_sales_achievement'])];
+		},$dataArr);
+		
+		
+		$dataToRender['chart']['series'] = [
+			[
+				'name'=>'Ytd Target',
+				'data'=>$ytdSales,
+				'pointPadding'=>0.3,
+				'pointPlacement'=>-0.1,
+			],
+			[
+				'name'=>'Ytd Achievement',
+				'data'=>$ytdAchievement,
+				'pointPadding'=>0.4,
+				'pointPlacement'=>-0.1,
+			],
+		];
+
+		// \yii\helpers\VarDumper::dump($dataToRender['chart']['series']);
+
+		$dataToRender['provider'] = new ActiveDataProvider([
+		    'query' => $query->select('year_invoice, gid, group_name, 
+				SUM(amount_target) AS amount_target, SUM(ytd_target) as ytd_target, SUM(ytd_sales_achievement) as ytd_sales_achievement, 
+				SUM(achievement) AS achievement'),
+		    'pagination' => [
+		        'pageSize' => -1,
+		    ],
+		]);
+
+		$dataToRender['year'] = (int)$year;
+		Yii::$app->view->title = 'Validated Executive Summary By Group';
 		return $this->render('executive_summary_by_group',$dataToRender);
 	}
 
