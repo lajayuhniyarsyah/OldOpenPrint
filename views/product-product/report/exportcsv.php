@@ -15,4 +15,4 @@ $array_to_csv = Array(
 
 );
 
-app\components\NumericLib::convert_to_csv($array_to_csv, 'product.csv', ',');
+app\components\ExportCSV::convert_to_csv($array_to_csv, 'product.csv', ',');
