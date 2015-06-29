@@ -11,6 +11,7 @@ use app\models\MrpBomSearch;
 use app\models\AccountAccount;
 use app\models\ResPartner;
 use app\models\AccountingReportForm;
+use app\models\AccountInvoice;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -882,29 +883,7 @@ class ReportAccountingController extends Controller
     	  
 			return $this->render('report/apdetail',['data'=>$command->queryAll(),'array'=>$array->queryAll(),'date'=>$model->date_from,'partner'=>'all']);	
         }
-        
-   //      if ($model->load(Yii::$app->request->get())) { 
   
-   //      	$this->layout = 'report';
-   //      	$query = new Query;
-   //  	    if($model->partner==false){ // All Partner
-   //  	    	$command = 
-   //  	    		Yii::$app->db->createCommand("SELECT DISTINCT aml.partner_id as partner 
-			// 										FROM account_invoice as p
-			// 										LEFT JOIN account_move as am ON am.id=p.move_id
-			// 										LEFT JOIN account_move_line as aml ON aml.move_id=am.id
-			// 										WHERE p.state='open' AND aml.account_id=119");
-			// }else{
-			// 	$command = 
-			// 		Yii::$app->db->createCommand("SELECT DISTINCT p.partner_id as partner 
-			// 									FROM account_invoice as p
-			// 									LEFT JOIN account_move as am ON am.id=p.move_id
-			// 									LEFT JOIN account_move_line as aml ON aml.move_id=am.id
-			// 									WHERE p.state='open' AND aml.account_id=119 AND p.partner_id IN ($model->partner)");
-			// }
-    	  
-			// return $this->render('report/apdetail',['data'=>$command->queryAll(),'date'=>$model->date_from,'partner'=>'all']);	
-   //      }
      	return $this->render('apdetail',['model' => $model]);
      }
 
@@ -1113,12 +1092,19 @@ class ReportAccountingController extends Controller
      	return $this->render('turnover',['data'=>$data,'nameproduct'=>$data[0]['product_name']]);	
      }
 
+   
 
-     public function actionNotaRetur()
+     public function actionNotaRetur($id)
      {
      	$this->layout = 'report';
-     	return $this->render('report/noteretur');		
+
+     	$model = new AccountInvoice();
+     	$AccountInvoice = AccountInvoice::find()->where(['id' =>$id])->one();
+     	return $this->render('report/noteretur',['model'=>$AccountInvoice]);		
      }
+
+
+
 }
 
 ?>

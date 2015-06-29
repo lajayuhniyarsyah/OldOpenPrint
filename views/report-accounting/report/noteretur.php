@@ -264,9 +264,19 @@ use yii\helpers\Url;
 <div id="pageContainer">
 
 <?php
-	for($i=1; $i<30; $i++){
-		$data2[]=array('1','EKA','1231');
+
+	foreach ($model->accountInvoiceLines as $value) {
+		// echo $value['product_id'];
+		$data2[]=array(
+						''.$value['sequence'].'',
+						''.$value['name'].'',
+						''.app\components\NumericLib::indoStyle($value['quantity'],2,',','.').' '.$value->uos->name.'',
+						''.app\components\NumericLib::indoStyle($value['price_unit'],2,',','.').'',
+						''.app\components\NumericLib::indoStyle($value['quantity']*$value['price_unit'],2,',','.').'');
 	}
+	// for($i=1; $i<30; $i++){
+	// 	$data2[]=array('1','EKA','1231');
+	// }
 	
 ?>
 <div class="pages" >
@@ -286,7 +296,7 @@ use yii\helpers\Url;
 											<tr>
 												<td width="100px">Faktur Pajak No</td>
 												<td width="5px">:</td>
-												<td></td>
+												<td><?php echo $model->faktur_pajak_no; ?></td>
 												<td width="50px">Nomor</td>
 												<td width="5px">:</td>						
 												<td></td>
@@ -294,10 +304,10 @@ use yii\helpers\Url;
 											<tr>
 												<td width="100px">Invoice No.</td>
 												<td width="5px">:</td>
-												<td></td>
+												<td><?php echo $model->kwitansi; ?></td>
 												<td width="50px">Tanggal</td>
 												<td width="5px">:</td>						
-												<td></td>
+												<td><?php echo Yii::$app->formatter->asDatetime($model->date_invoice, "php:d-M-Y")?></td>
 											</tr>
 										</table>
 									</div>
@@ -313,17 +323,21 @@ use yii\helpers\Url;
 											<tr>
 												<td width="100px">Nama </td>
 												<td width="5px">:</td>
-												<td></td>
+												<td><?php echo $model->partner->name; ?></td>
 											</tr>
 											<tr style="height:40px;">
 												<td width="100px" valign="top">Alamat</td>
 												<td width="5px" valign="top">:</td>
-												<td></td>
+												<td>
+													<?php echo $model->partner->street; ?><br/>
+													<?php echo $model->partner->street2; ?><br/>
+													<?php echo $model->partner->city; ?> <?php echo $model->partner->zip; ?> <br/>
+												</td>
 											</tr>
 											<tr>
 												<td width="100px">N.P.W.P</td>
 												<td width="5px">:</td>
-												<td></td>
+												<td><?php echo $model->partner->npwp ?></td>
 											</tr>
 											<tr>
 												<td width="100px">N.P.P.K.P</td>
@@ -344,17 +358,17 @@ use yii\helpers\Url;
 											<tr>
 												<td width="100px">Nama </td>
 												<td width="5px">:</td>
-												<td></td>
+												<td>PT. SUPRABAKTI MANDIRI</td>
 											</tr>
 											<tr>
 												<td width="100px" valign="top">Alamat</td>
 												<td width="5px" valign="top">:</td>
-												<td></td>
+												<td>Jl. Danau Sunter Utara Blok. A No. 9 Tanjung Priok - Jakarta Utara 14350</td>
 											</tr>
 											<tr>
 												<td width="100px">N.P.W.P</td>
 												<td width="5px">:</td>
-												<td></td>
+												<td>01.327.742.1-038.000</td>
 											</tr>
 											<tr>
 												<td width="100px">N.P.P.K.P</td>
@@ -373,14 +387,14 @@ use yii\helpers\Url;
 										<th width="30px">No.</th>
 										<th width="300px">Nama Barang Kena Pajak/ <br/> Jasa Kena pajak</th>
 										<th width="74px">Quantity</th>
-										<th width="121px">Harga Satuan <br/>USD</th>
+										<th width="121px">Harga Satuan <br/><?php echo $model->currency->name ?></th>
 										<th width="162px">Harga BKP yang <br/>Dikembalikan (Rp)</th>
 									</tr>
 							</table>
 							</td>
 					</tr>
 						<tr>
-							<?php $maxHeight = '115mm'; ?>
+							<?php $maxHeight = '85mm'; ?>
 							<td class="tdLines" style="height:<?=$maxHeight?>;vertical-align:top;">
 								<div class="contentArea">
 									<table class="contentLines">
@@ -394,15 +408,15 @@ use yii\helpers\Url;
 							<table class="foodtablepages" style="width:186mm; border:1px solid black; border-collapse: collapse; margin-top:-11px;">
 									<tr>
 										<th width="505px" >Jumlah Harga BKP yang dikembalikan</th>
-										<th>-</th>
+										<th style="text-align:right;"><?php echo app\components\NumericLib::indoStyle($model->amount_untaxed,2,',','.') ?></th>
 									</tr>
 									<tr>
 										<th>Pajak Pertambahan Nilai yang dikembalikan</th>
-										<th>-</th>
+										<th style="text-align:right;"><?php echo app\components\NumericLib::indoStyle($model->amount_tax,2,',','.') ?></th>
 									</tr>
 									<tr>
 										<th></th>
-										<th>-</th>
+										<th style="text-align:right;">-</th>
 									</tr>
 							</table>
 							</td>
@@ -452,7 +466,7 @@ $this->registerJs('
 	function prepareRow(rowNo,data)
 	{
 		console.log(data[0]);
-		return "<tr class=\'cRows rows"+rowNo+"\'><td style=\"width:30px; text-align:center;\">"+data[0]+"</td><td style=\"width:300px; text-align:center;\">"+data[1]+"</td><td style=\"width:74px; text-align:center;\">"+data[1]+"</td><td style=\"width:121px; text-align:center;\">"+data[1]+"</td><td style=\"width:162px; text-align:center;\">"+data[1]+"</td></tr>";
+		return "<tr class=\'cRows rows"+rowNo+"\'><td style=\"width:30px; text-align:center;\">"+data[0]+"</td><td style=\"width:300px; text-align:left;\">"+data[1]+"</td><td style=\"width:74px; text-align:center;\">"+data[2]+"</td><td style=\"width:121px; text-align:right;\">"+data[3]+"</td><td style=\"width:162px; text-align:right;\">"+data[4]+"</td></tr>";
 	}
 
 	var rowPage = 0;

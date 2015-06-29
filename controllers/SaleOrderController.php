@@ -7,13 +7,21 @@ use app\models\SaleOrder;
 use app\models\SaleOrderSearch;
 use app\models\ResUsers;
 use app\models\ResPartner;
+use app\models\SaleOrderLine;
+use app\models\ProductSaleReportForm;
 
 use app\models\SaleAnnualReportForm;
 use app\models\ResGroups;
 use app\models\ResGroupsUsersRel;
 use app\models\GroupSales;
 use app\models\GroupSalesLine;
-
+use app\models\ProductCategory;
+use app\models\ProductPricelist;
+use yii\grid\GridView;
+use yii\data\ActiveDataProvider;
+use yii\data\ArrayDataProvider;
+use yii\db\Query;
+use yii\helpers\Json;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -619,7 +627,314 @@ EOQ;
 				'status'=>$model->update(),
 			];
 		}
-
 		return $res;
 	}
+
+
+	   public function actionCustomerlist($search = null, $id = null) 
+	{
+		$out = ['more' => false];
+		if (!is_null($search)) {
+			$query = new Query;
+			$lowerchr=strtolower($search);
+			$command = Yii::$app->db->createCommand("SELECT DISTINCT id, name as text FROM res_partner WHERE lower(name) LIKE '%".$lowerchr."%' AND customer=true AND is_company=true LIMIT 20");
+			$data = $command->queryAll();
+			$out['results'] = array_values($data);
+		}
+		elseif ($id > 0) {
+			$out['results'] = ['id' => $id, 'text' => ResPartner::find($id)->name];
+		}
+		else {
+			$out['results'] = ['id' => 0, 'text' => 'No matching records found'];
+		}
+		echo Json::encode($out);
+	}
+
+
+	public function actionProductlist($search = null, $id = null) 
+	{
+		$out = ['more' => false];
+		if (!is_null($search)) {
+			$query = new Query;
+			$lowerchr=strtolower($search);
+			$command = Yii::$app->db->createCommand("SELECT DISTINCT id, name as text FROM product_template WHERE lower(name) LIKE '%".$lowerchr."%' AND purchase_ok=true LIMIT 20");
+			$data = $command->queryAll();
+			$out['results'] = array_values($data);
+		}
+		elseif ($id > 0) {
+			$out['results'] = ['id' => $id, 'text' => ProductTemplate::find($id)->name];
+		}
+		else {
+			$out['results'] = ['id' => 0, 'text' => 'No matching records found'];
+		}
+		echo Json::encode($out);
+	}
+
+
+	public function actionProductcategory($search = null, $id = null) 
+	{
+		$out = ['more' => false];
+		if (!is_null($search)) {
+			$query = new Query;
+			$lowerchr=strtolower($search);
+			$command = Yii::$app->db->createCommand("SELECT DISTINCT id, name as text FROM product_category WHERE lower(name) LIKE '%".$lowerchr."%' LIMIT 20");
+			$data = $command->queryAll();
+			$out['results'] = array_values($data);
+		}
+		elseif ($id > 0) {
+			$out['results'] = ['id' => $id, 'text' => ProductCategory::find($id)->name];
+		}
+		else {
+			$out['results'] = ['id' => 0, 'text' => 'No matching records found'];
+		}
+		echo Json::encode($out);
+	}
+
+	public function actionProductpricelist($search = null, $id = null) 
+	{
+		$out = ['more' => false];
+		if (!is_null($search)) {
+			$query = new Query;
+			$lowerchr=strtolower($search);
+			$command = Yii::$app->db->createCommand("SELECT DISTINCT id, name as text FROM product_pricelist WHERE lower(name) LIKE '%".$lowerchr."%' AND type='sale' LIMIT 20");
+			$data = $command->queryAll();
+			$out['results'] = array_values($data);
+		}
+		elseif ($id > 0) {
+			$out['results'] = ['id' => $id, 'text' => ProductPricelist::find($id)->name];
+		}
+		else {
+			$out['results'] = ['id' => 0, 'text' => 'No matching records found'];
+		}
+		echo Json::encode($out);
+	}
+
+	public function actionProductsales($groupBy=null)
+	{
+		$this->layout = 'dashboard';
+		$model = new ProductSaleReportForm();
+		$modelsales = new SaleOrder();
+		$modelsaleine = new SaleOrderLine();
+
+		// Data Category Product
+		$category = ProductCategory::find()->all();
+		$datacetegory = ArrayHelper::map($category,'id','name');
+
+		// Data Pricelist
+		$pricelist = ProductPricelist::find()->where(['type' => 'sale'])->all();
+		$datapricelist = ArrayHelper::map($pricelist,'id','name');
+
+		if ($model->load(Yii::$app->request->get())) {
+			$query = $this->getSOLineRelatedQuery($model,$groupBy);
+
+		}else{
+			$query = $this->getSOLineRelatedQuery($model,$groupBy);
+			$productcategory=null;
+			$pricelist=null;
+		}
+
+		$dataProvider = new ActiveDataProvider([
+			'query' => $query,
+			'key'=>'id',
+			'pagination' => [
+				'pageSize' => 100,
+			],
+		]);
+
+		if($groupBy){
+			return $this->render('productsales_form',['model'=>$model,'type'=>'search','dataProvider'=>$dataProvider,'groupBy'=>$groupBy,'datacetegory'=>$datacetegory,'datapricelist'=>$datapricelist]);
+		}else{
+			return $this->render('productsales_form',['model'=>$model,'type'=>'search','dataProvider'=>$dataProvider,'groupBy'=>'nogroup','datacetegory'=>$datacetegory,'datapricelist'=>$datapricelist]);
+		}
+
+	}
+
+	public function getSOLineRelatedQuery($params = [], $groupBy = null){
+		$query = new Query;
+
+
+		if($params['productcategory']){
+			if(is_array($params['productcategory'])){
+				$category=implode(",", $params['productcategory']);		
+			}else{
+				$category=$params['productcategory'];		
+			}
+		}else{
+			$category='0';
+		}
+
+
+		if($params['partner']){
+			$partner=$params['partner'];	
+		}else{
+			$partner='0';	
+		}
+		if($params['product']){
+			$product=$params['product'];
+		}else{
+			$product='0';
+		}
+		if($params['state']){
+			$state=$params['state'];
+		}else{
+			$state='0';
+		}
+
+		if($params['date_from']){
+			$dattefrom=$params['date_from'];
+			$dateto=$params['date_to'];
+		}else{
+			$dattefrom='0';
+			$dateto='0';
+		}
+
+		if($params['pricelist']){
+			if(is_array($params['pricelist'])){
+				$pricelist=implode(",", $params['pricelist']);	
+			}else{
+				$pricelist=$params['pricelist'];
+			}
+			
+		}else{
+			$pricelist='0';
+		}
+
+		// jika group
+		if($groupBy){
+			$query->select(['CONCAT("pc"."id", \'/\', "pid"."id", \'/\', "pc"."name", \'/\', "pid"."name",\'/\',\''.$category.'\',\'/\',\''.$partner.'\',\'/\',\''.$product.'\',\'/\',\''.$pricelist.'\',\'/\',\''.$state.'\',\'/\',\''.$dattefrom.'\',\'/\',\''.$dateto.'\') as id,
+					pc.name as category,
+					SUM(sol.price_unit*sol.product_uom_qty) as total,
+					pid.name as pricelist']);
+		}else{
+			$query
+				->select ('
+					sol.id as id,
+					so.partner_id as partner_id,
+					so.date_order as date_order,
+					so.name as no_po,
+					rp.name as partner,
+					sol.product_id as product_id,
+					pp.name as product,
+					sol.price_unit as price_unit,
+					sol.state as state,
+					pc.name as category,
+					pid.name as pricelist,
+					sol.product_uom_qty as qty,
+					sol.name as product_desc,
+					(sol.product_uom_qty*sol.price_unit) as total,
+					so.name as so_no
+				');
+		}
+		$query->from('sale_order_line as sol')
+			->join('LEFT JOIN','sale_order as so','so.id=sol.order_id')
+			->join('LEFT JOIN','product_template as pp','pp.id=sol.product_id')
+			->join('LEFT JOIN','res_partner as rp','rp.id=so.partner_id')
+			->join('LEFT JOIN','product_category as pc','pc.id=pp.categ_id')
+			->join('LEFT JOIN','product_pricelist as pid','pid.id=so.pricelist_id');
+		if($groupBy){
+			$query->groupBy(['pc.id', 'pid.id']);
+		}
+		if(isset($params['partner']) && $params['partner']){
+			if($params['partner']!='0')
+			{
+				$query->andWhere(['so.partner_id'=>explode(',',$params['partner'])]); 
+			}
+		}
+		if(isset($params['productcategory']) && $params['productcategory']){
+			if($params['productcategory']!='0')
+			{
+				if(is_array($params['productcategory'])){
+					$query->andWhere(['pp.categ_id'=>explode(',',implode(",", $params['productcategory']))]); 	
+				}else{
+					$query->andWhere(['pp.categ_id'=>explode(',',$params['productcategory'])]); 
+				}
+				
+			}
+		}
+		if(isset($params['product']) && $params['product']){
+			 if($params['product']!='0')
+		 	{
+				$query->andWhere(['sol.product_id'=>explode(',',$params['product'])]); 
+			}
+		}
+		if(isset($params['pricelist']) && $params['pricelist']){
+			if($params['pricelist']!='0')
+			{
+				if(is_array($params['pricelist'])){
+					$query->andWhere(['so.pricelist_id'=>explode(',',implode(",", $params['pricelist']))]); 	
+				}else{
+					$query->andWhere(['so.pricelist_id'=>explode(',',$params['pricelist'])]); 
+				}
+				
+			}
+		}
+		if(isset($params['state']) && $params['state']){
+			if($params['state']!='0')
+				{
+					$query->andWhere(['sol.state'=>explode(',',$params['state'])]); 
+				}
+		}
+		if(isset($params['date_from']) && $params['date_from']){
+			 if($params['date_from'] !='0')
+			 	{
+			 		$query->andWhere(['>=','so.date_order',$params['date_from']]);
+			 		$query->andWhere(['<=','so.date_order',$params['date_to']]);
+			 	}
+		}
+
+		$query->andWhere(['not', ['sol.product_id' => null]]); 
+		if(!$groupBy){
+			$query->addOrderBy(['so.date_order' => SORT_DESC]);
+		}
+		return $query;
+	}
+
+
+	public function actionDetailGrid($expandRowKey=null) {
+		$this->layout = 'dashboard';
+		if(isset($_POST['expandRowKey'])) $expandRowKey = $_POST['expandRowKey'];
+			$model = new ProductSaleReportForm();
+		if ($expandRowKey) {
+			$exp = explode('/', $expandRowKey);
+			$categoryid = (int)$exp[0];
+			$pricelistid = $exp[1];
+			$category_name = $exp[2];
+			$pricelist_name = $exp[3];
+			
+			$category = $exp[4];
+			$partner=$exp[5];
+			$product=$exp[6];
+			$pricelist=$exp[1];
+			$state=$exp[8];
+			$datefrom=$exp[9];
+			$dateto=$exp[10];
+
+			$query = $this->getSOLineRelatedQuery([
+										'productcategory'=>$categoryid,
+										'pricelist'=>$pricelist,
+										'partner'=>$partner,
+										'product'=>$product,
+										'state'=>$state,
+										'date_from'=>$datefrom,
+										'date_to'=>$dateto,
+										]);
+			
+			$dataProvider = new ArrayDataProvider([
+				'allModels'=>$query->all(),
+				'key'=>'id',
+				'pagination'=>[
+					'params'=>array_merge($_GET,['expandRowKey'=>$expandRowKey,]),
+					'pageSize' => 100,
+				]
+				
+			]);
+			// return $this->renderAjax('_ajax_grid_detail',['dataProvider'=>$dataProvider]);
+			return $this->renderPartial('_ajax_grid_detail',['dataProvider'=>$dataProvider,'category'=>$category,'pricelist'=>$pricelist,'category_name'=>$category_name,'pricelist_name'=>$pricelist_name]);
+		}
+		else
+		{
+			return '<div class="alert alert-danger">No data found</div>';
+		}
+	}
 }
+

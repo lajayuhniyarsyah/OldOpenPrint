@@ -46,7 +46,7 @@ AppAsset::register($this);
                                   ['label' => 'Executive Summary', 'url' => ['#']],
                                   ['label' => 'Rekap Invoice', 'url' => ['#']],
                                   ['label' => 'Sales Order', 'url' => ['#']],
-                                  ['label' => 'Product Sales', 'url' => ['#']],
+                                  ['label' => 'Product Sales', 'url' => ['/sale-order/productsales']],
                                 ]
                         ],
                         ['label' => 'Admin', 'url' => ['/site/contact']],

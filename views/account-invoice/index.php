@@ -14,6 +14,8 @@ use miloschuman\highcharts\Highcharts;
 /* @var $searchModel app\models\AccountInvoiceSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
+
+
 $this->title = 'Account Invoices';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
