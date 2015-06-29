@@ -178,6 +178,8 @@ class NumericLib extends Component{
 		}*/
 		
 		return $formatted;
-	}	
+	}
+
+
 }
 ?>

@@ -1,19 +1,18 @@
 <?php
-    
-    $customer[]=Array("\"LT\"",
-			        "\"NPWP\"",
-			        "\"NAMA\"",
-			        "\"JALAN\"",
-			        "\"BLOK\"",
-			        "\"NOMOR\"",
-			        "\"RT\"",
-			        "\"RW\"",
-			        "\"KECAMATAN\"",
-			        "\"KELURAHAN\"",
-			        "\"KABUPATEN\"",
-			        "\"PROPINSI\"",
-			        "\"KODE_POS\"",
-			        "\"NOMOR_TELEPON\"",
+    $customer[]=Array("LT",
+			        "NPWP",
+			        "NAMA",
+			        "JALAN",
+			        "BLOK",
+			        "NOMOR",
+			        "RT",
+			        "RW",
+			        "KECAMATAN",
+			        "KELURAHAN",
+			        "KABUPATEN",
+			        "PROPINSI",
+			        "KODE_POS",
+			        "NOMOR_TELEPON",
 			    );
 
     foreach ($model as $value) {
@@ -23,22 +22,22 @@
         $phone=str_replace('"', '', $value['phone']);
         $zip=str_replace('"', '', $value['zip']);
 
-        $customer[]=Array("\"LT\"",
-			        "\"$npwp\"",
-			        "\"$name\"",
-			        "\"$street\"",
-			        "\"BLOK\"",
-			        "\"NOMOR\"",
-			        "\"RT\"",
-			        "\"RW\"",
-			        "\"KECAMATAN\"",
-			        "\"KELURAHAN\"",
-			        "\"KABUPATEN\"",
-			        "\"PROPINSI\"",
-			        "\"$zip\"",
-			        "\"$phone\"",
+        $customer[]=Array("LT",
+			        "$npwp",
+			        "$name",
+			        "$street",
+			        "BLOK",
+			        "NOMOR",
+			        "RT",
+			        "RW",
+			        "KECAMATAN",
+			        "KELURAHAN",
+			        "KABUPATEN",
+			        "PROPINSI",
+			        "$zip",
+			        "$phone",
 			);
     }
 
 $array_to_csv =$customer;
-app\components\ExportCSV::convert_to_csv($array_to_csv, 'producttree.csv', ',');
+app\components\ExportCSV::convert_to_csv($array_to_csv, 'customertree.csv', ',');

@@ -14,7 +14,7 @@ class ExportCSV extends Component{
 	    /** loop through array  */
 	    foreach ($input_array as $line) {
 	        /** default php csv handler **/
-	        fputcsv($f, $line, $delimiter,chr(0));
+	        fputcsv($f, $line, $delimiter);
 	    }
 	    
 	    fseek($f, 0);
